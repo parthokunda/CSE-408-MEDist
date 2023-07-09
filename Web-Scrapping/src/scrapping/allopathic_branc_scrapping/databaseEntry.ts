@@ -8,6 +8,7 @@ import Generic from "../../database/models/Generic.model";
 import Brand from "../../database/models/Brand.model";
 import DosageForm from "../../database/models/DosageForm.model";
 import Manufacturer from "../../database/models/Manufacturer.model";
+import { BrandDetails } from "./extracDetails_ofCurrentBrand";
 
 const _dbService = new dbService();
 
@@ -76,4 +77,28 @@ export const entryToDB_BrandOverviews = async (
   log.info(
     "All Brand Overviews of current page are inserted into the database"
   );
+};
+
+export const entryToDB_BrandDetails = async (
+  brandName: string,
+  brandDetails: BrandDetails
+) => {
+  const brand = await _dbService.brandService.getBrandByName(brandName);
+  log.info(`Creating Description for Brand: ${brand.toJSON()}`);
+
+  if (brand.descriptionID) { 
+    log.info(`Description already exists for Brand: ${brand.toJSON()}`);
+    return;
+  }
+
+  const Description = await _dbService.descriptionService.createDescription({
+    ...brandDetails,
+  });
+  log.info(
+    `Created Description: ${Description.toJSON()} ---- for Brand: ${brand.toJSON()}`
+  );
+
+  brand.descriptionID = Description.id;
+  await brand.save();
+  log.info(`Description_ID Updated in Brand: ${brand.toJSON()}`);
 };

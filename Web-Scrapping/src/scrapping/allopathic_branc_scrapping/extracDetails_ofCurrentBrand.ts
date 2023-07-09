@@ -5,12 +5,6 @@ import puppeteer, { Page } from "puppeteer";
 import log from "../../utils/logger";
 import { BrandOverview } from "./extractOverviews_ofAllBrands_FromAllBrandsPage";
 
-interface AvailableForms {
-  dosageForm: string;
-  strength: string;
-  unitPrice: string;
-}
-
 export interface BrandDetails {
   unitPrice: string;
   indications: string;
@@ -25,7 +19,6 @@ export interface BrandDetails {
   overdose_effects: string;
   therapeuticClass: string;
   storage_conditions: string;
-  availableForms: AvailableForms[];
 }
 
 const createEmptyBrandDescriptionInfo = (): BrandDetails => {
@@ -43,7 +36,6 @@ const createEmptyBrandDescriptionInfo = (): BrandDetails => {
     overdose_effects: "",
     therapeuticClass: "",
     storage_conditions: "",
-    availableForms: [],
   };
 };
 
@@ -54,90 +46,118 @@ const extractDetails_ofCurrentBrand = async (page: Page) => {
   let brandDetails: BrandDetails = createEmptyBrandDescriptionInfo();
 
   // Extract unit price
-  brandDetails.unitPrice = await page.$$eval(
-    ".package-container span:not(:first-child)",
-    (spans) => {
-      let unitPrice = "";
+  if (await page.$(".package-container span:not(:first-child)")) {
+    brandDetails.unitPrice = await page.$$eval(
+      ".package-container span:not(:first-child)",
+      (spans) => {
+        let unitPrice = "";
 
-      spans.forEach((span) => {
-        unitPrice += span.textContent?.trim() || "";
-      });
+        spans.forEach((span) => {
+          unitPrice += span.textContent?.trim();
+        });
 
-      return unitPrice;
-    }
-  ) || "";
+        return unitPrice;
+      }
+    );
+  }
 
   // Extract indications
-  brandDetails.indications = await page.$eval(
-    "#indications + .ac-body",
-    (element) => element.textContent.trim()
-  ) || "";
+  if (await page.$("#indications + .ac-body")) {
+    brandDetails.indications = await page.$eval(
+      "#indications + .ac-body",
+      (element) => element.textContent.trim()
+    );
+  }
 
   // Extract compositions
-  brandDetails.compositions = await page.$eval(
-    "#composition + .ac-body",
-    (element) => element.textContent.trim()
-  ) || "";
+  if (await page.$("#composition + .ac-body")) {
+    brandDetails.compositions = await page.$eval(
+      "#composition + .ac-body",
+      (element) => element.textContent.trim()
+    );
+  }
 
   // Extract pharmacology
-  brandDetails.pharmacology = await page.$eval(
-    "#mode_of_action + .ac-body",
-    (element) => element.textContent.trim()
-  ) || "";
+  if (await page.$("#mode_of_action + .ac-body")) {
+    brandDetails.pharmacology = await page.$eval(
+      "#mode_of_action + .ac-body",
+      (element) => element.textContent.trim()
+    );
+  }
 
   // Extract dosage and administration
-  brandDetails.dosage_and_administration = await page.$eval(
-    "#dosage + .ac-body",
-    (element) => element.textContent.trim()
-  ) || "";
+  if (await page.$("#dosage + .ac-body")) {
+    brandDetails.dosage_and_administration = await page.$eval(
+      "#dosage + .ac-body",
+      (element) => element.textContent.trim()
+    );
+  }
 
   // Extract interaction
-  brandDetails.interaction = await page.$eval(
-    "#interaction + .ac-body",
-    (element) => element.textContent.trim()
-  ) || "";
+  if (await page.$("#interaction + .ac-body")) {
+    brandDetails.interaction = await page.$eval(
+      "#interaction + .ac-body",
+      (element) => element.textContent.trim()
+    );
+  }
 
   // Extract contraindications
-  brandDetails.contraindications = await page.$eval(
-    "#contraindications + .ac-body",
-    (element) => element.textContent.trim()
-  ) || "";
+  if (await page.$("#contraindications + .ac-body")) {
+    brandDetails.contraindications = await page.$eval(
+      "#contraindications + .ac-body",
+      (element) => element.textContent.trim()
+    );
+  }
 
   // Extract side effects
-  brandDetails.sideEffects = await page.$eval(
-    "#side_effects + .ac-body",
-    (element) => element.textContent.trim()
-  ) || "";
+  if (await page.$("#side_effects + .ac-body")) {
+    brandDetails.sideEffects = await page.$eval(
+      "#side_effects + .ac-body",
+      (element) => element.textContent.trim()
+    );
+  }
 
   // Extract pregnancy and lactation
-  brandDetails.pregnancy_and_lactation = await page.$eval(
-    "#pregnancy_cat + .ac-body",
-    (element) => element.textContent.trim()
-  ) || "";
+  if (await page.$("#pregnancy_cat + .ac-body")) {
+    brandDetails.pregnancy_and_lactation = await page.$eval(
+      "#pregnancy_cat + .ac-body",
+      (element) => element.textContent.trim()
+    );
+  }
 
   // Extract precautions and warning
-  brandDetails.precautions_and_warning = await page.$eval(
-    "#precautions + .ac-body",
-    (element) => element.textContent.trim()
-  ) || "";
+  if (await page.$("#precautions + .ac-body")) {
+    brandDetails.precautions_and_warning = await page.$eval(
+      "#precautions + .ac-body",
+      (element) => element.textContent.trim()
+    );
+  }
 
   // Extract overdose effects
-  brandDetails.overdose_effects = await page.$eval(
-    "#overdose_effects + .ac-body",
-    (element) => element.textContent.trim()
-  ) || "";
+  if (await page.$("#overdose_effects + .ac-body")) {
+    brandDetails.overdose_effects = await page.$eval(
+      "#overdose_effects + .ac-body",
+      (element) => element.textContent.trim()
+    );
+  }
 
   // Extract therapeutic class
-  brandDetails.therapeuticClass = await page.$eval(
-    "#drug_classes + .ac-body",
-    (element) => element.textContent.trim()
-  ) || "";
+  if (await page.$("#drug_classes + .ac-body")) {
+    brandDetails.therapeuticClass = await page.$eval(
+      "#drug_classes + .ac-body",
+      (element) => element.textContent.trim()
+    );
+  }
 
   // Extract storage conditions
-  brandDetails.storage_conditions = await page.$eval(
-    "#storage_conditions + .ac-body",
-    (element) => element.textContent.trim()
-  ) || "";
+  if (await page.$("#storage_conditions + .ac-body")) {
+    brandDetails.storage_conditions = await page.$eval(
+      "#storage_conditions + .ac-body",
+      (element) => element.textContent.trim()
+    );
+  }
+
+  return brandDetails;
 };
 
 export default extractDetails_ofCurrentBrand;

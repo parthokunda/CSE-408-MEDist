@@ -23,16 +23,11 @@ interface BrandAttributes {
   manufacturer: string;
   description_url: string;
   unit_price: string;
-  availableDosageForms: AvailableDosageFormAttributes[];
 
   genericID: number;
   dosageFormID: number;
   manufacturerID: number;
-}
-
-interface AvailableDosageFormAttributes {
-  dosageFormID: number;
-  unit_price: string;
+  descriptionID: number;
 }
 
 class Brand extends Model implements BrandAttributes {
@@ -42,10 +37,10 @@ class Brand extends Model implements BrandAttributes {
   public manufacturer!: string;
   public description_url!: string;
   public unit_price!: string;
-  public availableDosageForms!: AvailableDosageFormAttributes[];
   public genericID!: number;
   public dosageFormID!: number;
   public manufacturerID!: number;
+  public descriptionID!: number;
 
   // Define associations
   public getGeneric!: BelongsToGetAssociationMixin<Generic>;
@@ -91,11 +86,6 @@ Brand.init(
       type: DataTypes.STRING(80),
       allowNull: true,
       defaultValue: "",
-    },
-    availableDosageForms: {
-      type: DataTypes.JSON,
-      allowNull: true,
-      defaultValue: [],
     },
   },
   {
