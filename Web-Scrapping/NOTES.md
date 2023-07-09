@@ -6,6 +6,18 @@ npm install --save sequelize pg pg-hstore
 npm install --save dotenv
 ```
 
+## Regarding Associations in Sequelize
+`example : models/generic.js`
+
+> it is not mandatory to define the associations using the getBrands and associations properties. These properties are optional and mainly used for TypeScript type checking and IDE autocompletion purposes.
+
+>The getBrands property is a type definition that allows you to use the getBrands method on an instance of the Generic model to retrieve associated Brand instances. It provides type safety and autocompletion support.
+
+>The associations property is also a type definition that helps with type checking and autocompletion. It specifies the association name (brands) and the association type (Association<Generic, Brand>).
+
+>If you don't require TypeScript type checking or IDE autocompletion for these associations, you can omit these properties. Your code will still work correctly without them.
+
+
 ## for me
 
 ```json

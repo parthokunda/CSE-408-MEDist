@@ -1,9 +1,17 @@
 // external import
-import { DataTypes, Model } from "sequelize";
+import {
+  Association,
+  DataTypes,
+  HasManyGetAssociationsMixin,
+  Model,
+} from "sequelize";
 
 // internal import
 import sequelizeConnection from "../config";
 import log from "../../utils/logger";
+
+// import models
+import Brand from "./Brand.model";
 
 export interface DosageFormAttributes {
   id: number;
@@ -18,6 +26,12 @@ class DosageForm
   public id!: number;
   public name!: string;
   public img_url!: string;
+
+  // Define associations
+  public getBrands?: HasManyGetAssociationsMixin<Brand>;
+  public static associations: {
+    brands: Association<DosageForm, Brand>;
+  };
 }
 
 DosageForm.init(
@@ -34,7 +48,7 @@ DosageForm.init(
     img_url: {
       type: DataTypes.STRING(100),
       allowNull: true,
-    }
+    },
   },
   {
     sequelize: sequelizeConnection,
