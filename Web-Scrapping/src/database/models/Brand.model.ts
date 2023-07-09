@@ -19,10 +19,15 @@ import Description from "./Description.model";
 interface BrandAttributes {
   id: number;
   name: string;
-  strenth: string;
+  strength: string;
   manufacturer: string;
   description_url: string;
   unit_price: string;
+  availableDosageForms: AvailableDosageFormAttributes[];
+
+  genericID: number;
+  dosageFormID: number;
+  manufacturerID: number;
 }
 
 interface AvailableDosageFormAttributes {
@@ -33,11 +38,14 @@ interface AvailableDosageFormAttributes {
 class Brand extends Model implements BrandAttributes {
   public id!: number;
   public name!: string;
-  public strenth!: string;
+  public strength!: string;
   public manufacturer!: string;
   public description_url!: string;
   public unit_price!: string;
   public availableDosageForms!: AvailableDosageFormAttributes[];
+  public genericID!: number;
+  public dosageFormID!: number;
+  public manufacturerID!: number;
 
   // Define associations
   public getGeneric!: BelongsToGetAssociationMixin<Generic>;
@@ -67,13 +75,13 @@ Brand.init(
       type: DataTypes.STRING(80),
       allowNull: false,
     },
-    strenth: {
+    strength: {
       type: DataTypes.STRING(80),
       allowNull: false,
     },
     manufacturer: {
       type: DataTypes.STRING(80),
-      allowNull: false,
+      allowNull: true,
     },
     description_url: {
       type: DataTypes.STRING(100),
@@ -82,10 +90,12 @@ Brand.init(
     unit_price: {
       type: DataTypes.STRING(80),
       allowNull: true,
+      defaultValue: "",
     },
     availableDosageForms: {
       type: DataTypes.JSON,
       allowNull: true,
+      defaultValue: [],
     },
   },
   {
@@ -129,17 +139,23 @@ Manufacturer.hasMany(Brand, {
 
 // between Brand and Description
 Brand.belongsTo(Description, {
-  foreignKey: "descriptionID",
+  foreignKey: {
+    name: "descriptionID",
+    allowNull: true,
+  },
   as: "_description",
 });
 Description.hasOne(Brand, {
-  foreignKey: "descriptionID",
+  foreignKey: {
+    name: "descriptionID",
+    allowNull: true,
+  },
   as: "_brand",
 });
 
 // pre processing before saving
-Brand.beforeCreate(async (brand) => {
-  const manufacturer = await brand.getManufacturer();
+Brand.afterSave(async (brand) => {
+  const manufacturer = await brand.getManufacturer;
   if (manufacturer) {
     brand.manufacturer = manufacturer.name;
   }

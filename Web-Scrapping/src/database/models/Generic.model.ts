@@ -1,5 +1,10 @@
 // external import
-import { Association, DataTypes, HasManyGetAssociationsMixin, Model } from "sequelize";
+import {
+  Association,
+  DataTypes,
+  HasManyGetAssociationsMixin,
+  Model,
+} from "sequelize";
 
 // internal import
 import sequelizeConnection from "../config";
@@ -9,11 +14,13 @@ import Brand from "./Brand.model";
 export interface GenericAttributes {
   id: number;
   name: string;
+  type: string;
 }
 
 class Generic extends Model implements GenericAttributes {
   public id!: number;
   public name!: string;
+  public type!: string;
 
   // Define associations
   public getBrands?: HasManyGetAssociationsMixin<Brand>;
@@ -32,8 +39,13 @@ Generic.init(
       primaryKey: true,
     },
     name: {
-      type: DataTypes.STRING(80),
+      type: DataTypes.STRING(100),
       allowNull: false,
+    },
+    type: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      defaultValue: "Allopathic",
     },
   },
   {

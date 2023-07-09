@@ -12,7 +12,9 @@ import Description from "./models/Description.model";
 
 const isDev = process.env.NODE_ENV === "development";
 
-const dbInit = () =>
+
+
+const dbInit = async () =>
   Promise.all([
     Generic.sync({ alter: isDev }),
     DosageForm.sync({ alter: isDev }),
