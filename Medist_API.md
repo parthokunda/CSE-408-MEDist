@@ -244,7 +244,7 @@
 #### Request Body
 ```json
 {
-  "Visit_fee" : "2000"
+  "Visit_fee" : "1300"
 }
 ```
 
@@ -290,7 +290,7 @@
 #### Response Body
 ```json
 {
-  "Message": "temporary clinic created.",
+  "Message": "new time slot added.",
   "online_visit": {
     "Visit_fee": "1300",
     "Contact": "017xxxxxxxx",
@@ -417,8 +417,7 @@
 ||||
 
 #### Request Body
-```json
-Body: 
+```json 
 {
   "assistantID" : 31243
 }
@@ -437,7 +436,7 @@ Body:
 ### ```PUT``` Edit Schedule of a Specific Clinic
 |API Endpoint | HTTP Method| Response Code | 
 | --- | :---: | :---: |
-| [api/doctor/clinic/:clinicID]() | ```PUT``` | 201 Created |
+| [api/doctor/clinic/:clinicID]() | ```PUT``` | 200 OK |
 ||||
 
 #### Request Body
@@ -463,7 +462,7 @@ Body:
 #### Response Body
 ```json
 {
-  "Message": "schedule edited to the clinic",
+  "Message": "schedule edited for the clinic",
   "Clinic": {
     "Clinic_id": 10002,
     "Clinic_name": "Multiverse Hospital",
@@ -517,7 +516,7 @@ Body:
 ---
 
 ## Appointment Services
-### ```GET``` View Appointments of a Clinic
+### ```GET``` View Appointments
 |API Endpoint | HTTP Method| Response Code | 
 | --- | :---: | :---: |
 | [api/appointment?filterByName="strange"&filterBySpecialization=""&filterByStatus="completed"&filterByDate="17/03/2023"]() | ```GET``` | 200 OK |
@@ -540,6 +539,30 @@ Body:
   "Online_Appointments" : []
 }
 ```
+
+### ```GET``` View Appointments of a Clinic
+|API Endpoint | HTTP Method| Response Code | 
+| --- | :---: | :---: |
+| [api/appointment/:clinic?filterByName="evan"&filterByStatus="completed"&filterByDate="17/03/2023"]() | ```GET``` | 200 OK |
+||||
+
+#### Request Query
+```json
+{
+  "filterByName": "evan",
+  "filterByStatus": "completed/pending",
+  "filterByDate" : "17/03/2023"
+}
+```
+
+#### Response Body
+```json
+{        
+  "Appointments" : [],
+  "Online_Appointments" : []
+}
+```
+
 
 ### ```DELETE``` Delete an Appointment
 |API Endpoint | HTTP Method| Response Code | 
@@ -668,12 +691,12 @@ Body:
 #### Response Body
 ```json
 {
-  "Message": "Previous Records are stored successfully",
+  "Message": "Previous Records are shared successfully",
   "Appointment": {
     "AppointmentId": 23212,
     "doctorID": 2002,
-    "clinicID": 500 or Null,
-    "Time_slot_id": 234 or Null,
+    "clinicID": 500,
+    "Time_slot_id": null,
     "Date": "17/07/23",
     "Status": "pending",
     "Past_appointments": [],
@@ -938,7 +961,7 @@ Body:
 #### Response Body
 ```json
 {
-  "Message" : "successfull"
+  "Message" : "successful"
 }
 ```
 
