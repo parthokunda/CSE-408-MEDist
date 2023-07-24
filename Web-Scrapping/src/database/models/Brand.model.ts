@@ -2,6 +2,7 @@
 import {
   Association,
   BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
   DataTypes,
   Model,
 } from "sequelize";
@@ -44,15 +45,21 @@ class Brand extends Model implements BrandAttributes {
 
   // Define associations
   public getGeneric!: BelongsToGetAssociationMixin<Generic>;
+  public setGeneric!: BelongsToSetAssociationMixin<Generic, number>;
+
   public getDosageForm!: BelongsToGetAssociationMixin<DosageForm>;
+  public setDosageForm!: BelongsToSetAssociationMixin<DosageForm, number>;
+
   public getManufacturer!: BelongsToGetAssociationMixin<Manufacturer>;
+  public setManufacturer!: BelongsToSetAssociationMixin<Manufacturer, number>;
+
   public getDescription!: BelongsToGetAssociationMixin<Description>;
+  public setDescription!: BelongsToSetAssociationMixin<Description, number>;
+
+
 
   public static associations: {
     generic: Association<Brand, Generic>;
-    // It specifies that the Brand model belongs to the Generic model,
-    // indicating a many-to-one relationship.
-
     dosageForm: Association<Brand, DosageForm>;
     manufacturer: Association<Brand, Manufacturer>;
     description: Association<Brand, Description>;
@@ -95,60 +102,8 @@ Brand.init(
   }
 );
 
-/* ................ Define associations ................. */
 
-// between Brand and Generic
-Brand.belongsTo(Generic, {
-  foreignKey: "genericID",
-  as: "_generic",
-});
-Generic.hasMany(Brand, {
-  foreignKey: "genericID",
-  as: "_brands",
-});
 
-// between Brand and DosageForm
-Brand.belongsTo(DosageForm, {
-  foreignKey: "dosageFormID",
-  as: "_dosage_form",
-});
-DosageForm.hasMany(Brand, {
-  foreignKey: "dosageFormID",
-  as: "_brands",
-});
 
-// between Brand and Manufacturer
-Brand.belongsTo(Manufacturer, {
-  foreignKey: "manufacturerID",
-  as: "_manufacturer",
-});
-Manufacturer.hasMany(Brand, {
-  foreignKey: "manufacturerID",
-  as: "_brands",
-});
-
-// between Brand and Description
-Brand.belongsTo(Description, {
-  foreignKey: {
-    name: "descriptionID",
-    allowNull: true,
-  },
-  as: "_description",
-});
-Description.hasOne(Brand, {
-  foreignKey: {
-    name: "descriptionID",
-    allowNull: true,
-  },
-  as: "_brand",
-});
-
-// pre processing before saving
-Brand.afterSave(async (brand) => {
-  const manufacturer = await brand.getManufacturer;
-  if (manufacturer) {
-    brand.manufacturer = manufacturer.name;
-  }
-});
 
 export default Brand;
