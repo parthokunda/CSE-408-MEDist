@@ -37,7 +37,7 @@ class Brand extends Model implements BrandAttributes {
   public id!: number;
   public name!: string;
   public strength!: string;
-  public manufacturer!: string;
+  public manufacturer: string;
   public description_url!: string;
   public unit_price!: string;
   public genericID!: number;

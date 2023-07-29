@@ -1,14 +1,17 @@
 import { Request, Response, NextFunction } from "express";
 import createError, { HttpError } from "http-errors";
 
+//internal imports
+import log from "./logger";
+
 // 404 handler
 export const notFoundHandler = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  console.log("404 handler called.");
-  next(createError(404, "Resource not found."));
+  log.error("404 handler called.");
+  next(createError(404, "Page Not Found."));
 };
 
 // default error handler
@@ -19,14 +22,14 @@ export const defaultErrorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log("Default error handler called.");
-  console.log("Path:", req.path);
-  console.error("Error occured:", err);
+  log.error("Default error handler called.");
+  log.trace(`request path: ${req.path}`);
+  log.trace(err, "Error occured:");
 
   res.status(err.status || 500);
   res.json({
-    errors: {
-      message: err.message,
-    },
+    error: {
+      ...err,
+    }
   });
 };

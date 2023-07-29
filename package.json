@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "http-errors": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/http-errors": "^2.0.1"
+  }
+}

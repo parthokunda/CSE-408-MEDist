@@ -1,6 +1,12 @@
 import DosageForm from "../models/DosageForm.model";
 
-export default class dbService_DosageForm {
+interface DosageFormInterface {
+  getDosageFormByName(_name: string): Promise<DosageForm | null>;
+  getDosageFormById(id: number): Promise<DosageForm | null>;
+  createDosageForm(_newDosageForm: Partial<DosageForm>): Promise<DosageForm>;
+}
+
+export default class dbService_DosageForm implements DosageFormInterface{
   constructor() {}
 
     

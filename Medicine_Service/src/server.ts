@@ -3,7 +3,7 @@ import express from "express";
 
 // internal imports
 import log from "./utils/logger";
-import router from './routes'
+import router from './routes/index'
 import { notFoundHandler, defaultErrorHandler } from "./utils/error-handler";
 
 // database

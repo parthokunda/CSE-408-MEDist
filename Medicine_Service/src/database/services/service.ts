@@ -7,7 +7,7 @@ import dbService_DosageForm from "./dosage.service";
 import dbService_Manufacturer from "./manufacturer.service";
 import dbService_Description from "./description.service";
 
-export default class dbService {
+class DB_Service {
   genericService: dbService_Generic;
   brandService: dbService_Brand;
   dosageService: dbService_DosageForm;
@@ -31,3 +31,5 @@ export default class dbService {
     this.descriptionService = new dbService_Description();
   }
 }
+
+export default new DB_Service();
