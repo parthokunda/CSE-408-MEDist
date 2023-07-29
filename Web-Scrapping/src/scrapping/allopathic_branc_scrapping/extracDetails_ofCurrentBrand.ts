@@ -46,7 +46,7 @@ const extractDetails_ofCurrentBrand = async (page: Page) => {
   let brandDetails: BrandDetails = createEmptyBrandDescriptionInfo();
 
   // Extract unit price
-  if (await page.$(".package-container span:not(:first-child)")) {
+  if (await page.$(".package-container")) {
     brandDetails.unitPrice = await page.$$eval(
       ".package-container span:not(:first-child)",
       (spans) => {

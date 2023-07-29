@@ -7,6 +7,8 @@ import {
   Model,
 } from "sequelize";
 
+////import "./associations";
+
 // internal import
 import sequelizeConnection from "../config";
 import log from "../../utils/logger";
@@ -56,8 +58,6 @@ class Brand extends Model implements BrandAttributes {
   public getDescription!: BelongsToGetAssociationMixin<Description>;
   public setDescription!: BelongsToSetAssociationMixin<Description, number>;
 
-
-
   public static associations: {
     generic: Association<Brand, Generic>;
     dosageForm: Association<Brand, DosageForm>;
@@ -102,8 +102,44 @@ Brand.init(
   }
 );
 
+/* ................ Define associations ................. */
 
+// between Brand and Generic
+Brand.belongsTo(Generic, {
+  foreignKey: "genericID",
+});
+Generic.hasMany(Brand, {
+  foreignKey: "genericID",
+});
 
+// between Brand and DosageForm
+Brand.belongsTo(DosageForm, {
+  foreignKey: "dosageFormID",
+});
+DosageForm.hasMany(Brand, {
+  foreignKey: "dosageFormID",
+});
 
+// between Brand and Manufacturer
+Brand.belongsTo(Manufacturer, {
+  foreignKey: "manufacturerID",
+});
+Manufacturer.hasMany(Brand, {
+  foreignKey: "manufacturerID",
+});
+
+// between Brand and Description
+Brand.belongsTo(Description, {
+  foreignKey: {
+    name: "descriptionID",
+    allowNull: true,
+  },
+});
+Description.hasOne(Brand, {
+  foreignKey: {
+    name: "descriptionID",
+    allowNull: true,
+  },
+});
 
 export default Brand;

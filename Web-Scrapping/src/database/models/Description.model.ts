@@ -3,8 +3,11 @@ import {
   Association,
   DataTypes,
   HasOneGetAssociationMixin,
+  HasOneSetAssociationMixin,
   Model,
 } from "sequelize";
+
+//import "./associations";
 
 // internal import
 import sequelizeConnection from "../config";
@@ -51,6 +54,7 @@ class Description
 
   // Define associations
   public getBrand!: HasOneGetAssociationMixin<Brand>;
+  public addBrand!: HasOneSetAssociationMixin<Brand, number>;
 
   public static associations: {
     brand: Association<Description, Brand>;
@@ -65,7 +69,7 @@ Description.init(
       primaryKey: true,
     },
     unit_price: {
-      type: DataTypes.STRING(80),
+      type: DataTypes.STRING,
       allowNull: true,
     },
     indications: {
@@ -124,6 +128,5 @@ Description.init(
     timestamps: true,
   }
 );
-
 
 export default Description;

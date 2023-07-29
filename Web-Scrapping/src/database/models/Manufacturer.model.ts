@@ -2,9 +2,12 @@
 import {
   Association,
   DataTypes,
+  HasManyAddAssociationMixin,
   HasManyGetAssociationsMixin,
   Model,
 } from "sequelize";
+
+//import "./associations";
 
 // internal import
 import sequelizeConnection from "../config";
@@ -13,39 +16,44 @@ import log from "../../utils/logger";
 // import models
 import Brand from "./Brand.model";
 
-
-export interface ManufacturerAttributes { 
-    id: number;
-    name: string;
+export interface ManufacturerAttributes {
+  id: number;
+  name: string;
 }
 
-class Manufacturer extends Model<ManufacturerAttributes> implements ManufacturerAttributes { 
-    public id!: number;
-    public name!: string;
+class Manufacturer
+  extends Model<ManufacturerAttributes>
+  implements ManufacturerAttributes
+{
+  public id!: number;
+  public name!: string;
 
-    // Define associations
-    public getBrands?: HasManyGetAssociationsMixin<Brand>;
-    public static associations: {
-        brands: Association<Manufacturer, Brand>;
-    };
+  // Define associations
+  public getBrands?: HasManyGetAssociationsMixin<Brand>;
+  public addBrand!: HasManyAddAssociationMixin<Brand, number>;
+
+  public static associations: {
+    brands: Association<Manufacturer, Brand>;
+  };
 }
 
-Manufacturer.init({
+Manufacturer.init(
+  {
     id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
     name: {
-        type: DataTypes.STRING(80),
-        allowNull: false,
+      type: DataTypes.STRING(80),
+      allowNull: false,
     },
-}, {
+  },
+  {
     sequelize: sequelizeConnection,
     tableName: "manufacturers",
     timestamps: false,
-});
-
-
+  }
+);
 
 export default Manufacturer;

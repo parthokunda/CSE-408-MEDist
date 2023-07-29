@@ -70,6 +70,15 @@ export const entryToDB_BrandOverviews = async (
         dosageFormID: DosageForm.id,
         manufacturerID: Manufacturer.id,
       });
+
+      Brand.setGeneric(Generic);
+      Brand.setDosageForm(DosageForm);
+      Brand.setManufacturer(Manufacturer);
+
+      Generic.addBrand(Brand);
+      DosageForm.addBrand(Brand);
+      Manufacturer.addBrand(Brand);
+    
       log.info(`Created Brand: ${Brand.toJSON()}`);
     } else log.info(`Brand already exists: ${Brand}`);
   });
@@ -99,6 +108,8 @@ export const entryToDB_BrandDetails = async (
   );
 
   brand.descriptionID = Description.id;
+  brand.setDescription(Description);
+
   await brand.save();
   log.info(`Description_ID Updated in Brand: ${brand.toJSON()}`);
 };

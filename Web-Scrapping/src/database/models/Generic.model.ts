@@ -2,9 +2,12 @@
 import {
   Association,
   DataTypes,
+  HasManyAddAssociationMixin,
   HasManyGetAssociationsMixin,
   Model,
 } from "sequelize";
+
+//import "./associations";
 
 // internal import
 import sequelizeConnection from "../config";
@@ -24,10 +27,10 @@ class Generic extends Model implements GenericAttributes {
 
   // Define associations
   public getBrands?: HasManyGetAssociationsMixin<Brand>;
+  public addBrand!: HasManyAddAssociationMixin<Brand, number>;
+
   public static associations: {
     brands: Association<Generic, Brand>;
-    // It specifies that the Generic model has a one-to-many association
-    // with the Brand model, where each Generic can have multiple Brand instances.
   };
 }
 

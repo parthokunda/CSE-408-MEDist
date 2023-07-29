@@ -2,9 +2,12 @@
 import {
   Association,
   DataTypes,
+  HasManyAddAssociationMixin,
   HasManyGetAssociationsMixin,
   Model,
 } from "sequelize";
+
+//import "./associations";
 
 // internal import
 import sequelizeConnection from "../config";
@@ -29,6 +32,8 @@ class DosageForm
 
   // Define associations
   public getBrands?: HasManyGetAssociationsMixin<Brand>;
+  public addBrand!: HasManyAddAssociationMixin<Brand, number>;
+
   public static associations: {
     brands: Association<DosageForm, Brand>;
   };
