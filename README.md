@@ -9,10 +9,10 @@ npm i
 > in Production
 
 ```bash
-npm run dev
+npm start
 ```
 > in Development
 
 ```bash
-npm run dev
+nodemon
 ```
