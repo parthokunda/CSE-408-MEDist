@@ -20,4 +20,11 @@ medicineRouter.get(
   medicineController.search_all_medicines
 );
 
+// get selected medicine details
+medicineRouter.get(
+  "/get_medicine_info/:medicineId",
+  validateRequest(medicineSchema.get_medicine_info_Schema),
+  medicineController.get_medicine_info
+);
+
 export default medicineRouter;

@@ -3,11 +3,13 @@ import { object, string, union, TypeOf, number } from "zod";
 
 interface Medicine_Schema_Interface {
   search_All_Medicine_Schema: object;
+  get_medicine_info_Schema: object;
 }
 
 const filterQueries_options = ["brands", "generics", "manufacturer"];
 
 class Medicine_Schema implements Medicine_Schema_Interface {
+  // search_All_Medicine_Schema
   search_All_Medicine_Schema = object({
     query: object({
       filterBy: string()
@@ -38,6 +40,13 @@ class Medicine_Schema implements Medicine_Schema_Interface {
         .transform((val) => Number(val)),
     }).optional(),
   });
+
+  // get_medicine_info
+  get_medicine_info_Schema = object({
+    params: object({
+      medicineId: union([number(), string()]).transform((val) => Number(val)),
+    }),
+  });
 }
 
 export default new Medicine_Schema();
@@ -48,4 +57,8 @@ export type Search_All_Medicine_Queries_Input = TypeOf<
 
 export type Search_All_Medicine_Params_Input = TypeOf<
   Medicine_Schema["search_All_Medicine_Schema"]
+>["params"];
+
+export type Get_Medicine_Info_Params_Input = TypeOf<
+  Medicine_Schema["get_medicine_info_Schema"]
 >["params"];

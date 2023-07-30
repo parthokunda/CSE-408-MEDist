@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import {
+  Get_Medicine_Info_Params_Input,
   Search_All_Medicine_Params_Input,
   Search_All_Medicine_Queries_Input,
 } from "schema/medicine.schema";
@@ -13,10 +14,15 @@ interface Medicine_Controller_Interface {
     req: Request<{}, {}, {}, Search_All_Medicine_Queries_Input>,
     res: Response
   ): Promise<void>;
+
+  get_medicine_info(
+    req: Request<Get_Medicine_Info_Params_Input>,
+    res: Response
+  ): Promise<void>;
 }
 
-
 class Medicine_Controller implements Medicine_Controller_Interface {
+  // ------------------------------ search_all_medicines ------------------------------
   async search_all_medicines(
     req: Request<
       Search_All_Medicine_Params_Input,
@@ -25,7 +31,7 @@ class Medicine_Controller implements Medicine_Controller_Interface {
       Search_All_Medicine_Queries_Input
     >,
     res: Response
-  ): Promise<void> {
+  ) {
     const filterBy = req.query.filterBy as string;
     const searchBy = req.query.searchBy as string;
     const pagination = req.query.pagination
@@ -57,13 +63,31 @@ class Medicine_Controller implements Medicine_Controller_Interface {
       results = await dbService.manufacturerService.getAllManufacturers(
         searchBy,
         pagination,
-        1
+        currentPage
       );
 
     log.info(results, "results: ");
 
     res.status(200).json({
       results,
+    });
+  }
+
+  // ------------------------------ get_medicine_info ------------------------------
+  async get_medicine_info(
+    req: Request<Get_Medicine_Info_Params_Input>,
+    res: Response
+  ) {
+    const medicineId = req.params.medicineId as number;
+
+    log.info(`get_medicine_info called with medicineID: ${medicineId}`);
+
+    const result = await dbService.brandService.getBrandById(medicineId);
+
+    log.info(result, "result: ");
+
+    res.status(200).json({
+      ...result,
     });
   }
 }
