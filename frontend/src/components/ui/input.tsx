@@ -9,8 +9,6 @@ export interface InputProps
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => {
     return (
-      <div className="relative w-1/2 left-4">
-        <AiOutlineSearch className="h-8 w-8  absolute p-1 box-border right-3 top-1/2 transform -translate-y-1/2"/>
         <input
           type={type}
           className={cn(
@@ -20,7 +18,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           {...props}
         />
-      </div>
     );
   }
 );
