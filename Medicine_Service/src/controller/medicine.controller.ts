@@ -32,7 +32,9 @@ class Medicine_Controller implements Medicine_Controller_Interface {
     >,
     res: Response
   ) {
-    const filterBy = req.query.filterBy as string;
+    const filterBy = req.query.filterBy
+      ? (req.query.filterBy as string)
+      : "brands";
     const searchBy = req.query.searchBy as string;
     const pagination = req.query.pagination
       ? (req.query.pagination as number)

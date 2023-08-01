@@ -13,12 +13,12 @@ class Medicine_Schema implements Medicine_Schema_Interface {
   search_All_Medicine_Schema = object({
     query: object({
       filterBy: string()
-        .default("brands")
-        .transform((val) => val.toLowerCase()) // Transform the value to lowercase
+        .optional()
+        .transform((val) => (val ? val.toLowerCase() : "brands")) // if filterBy is empty, default to "brands"
         .refine(
-          (val) => filterQueries_options.includes(val), // Check if the transformed value is one of the options
+          (val) => !val || filterQueries_options.includes(val), // Check if the transformed value is one of the options
           {
-            message: `filterBy may be empty, if not it must be one of ${filterQueries_options.join(
+            message: `filterBy may be empty or must be one of ${filterQueries_options.join(
               ", "
             )}`,
           }
@@ -30,8 +30,8 @@ class Medicine_Schema implements Medicine_Schema_Interface {
         .optional(),
 
       pagination: union([number(), string()])
-        .default(5)
-        .transform((val) => Number(val)),
+        .optional()
+        .transform((val) => (val ? Number(val) : 5)),
     }),
 
     params: object({
