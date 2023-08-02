@@ -15,7 +15,7 @@ function App() {
   return (
     <>
       <NavBar navList={navList} />
-      <MedicineDescriptionPage />
+      <MedicineSearchPage />
     </>
   );
 }
