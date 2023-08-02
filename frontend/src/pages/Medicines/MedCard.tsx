@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -11,7 +10,7 @@ import {
 import { TbMedicineSyrup } from "react-icons/tb";
 import { Brand } from "@/models/Brand";
 
-const MedCard: FC<{medicine:Brand}> = (props) => {
+const MedCard: FC<{ medicine: Brand }> = (props) => {
   return (
     <Card className="flex flex-col w-fit drop-shadow m-4">
       <CardHeader className="text-c1">
@@ -30,5 +29,14 @@ const MedCard: FC<{medicine:Brand}> = (props) => {
 };
 
 // TODO: FlexBox overflow hoile atkano
+
+export const MedCardLoading: FC = () => {
+  return (
+    <div
+      className="inline-block my-10 h-12 w-12 animate-spin rounded-full border-4 border-solid border-c1 border-r-transparent align-[-0.125em] text-success motion-reduce:animate-[spin_1.5s_linear_infinite]"
+      role="status"
+    />
+  );
+};
 
 export default MedCard;

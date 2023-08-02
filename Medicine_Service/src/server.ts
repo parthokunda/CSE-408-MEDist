@@ -1,5 +1,6 @@
 //external imports
 import express from "express";
+const cors = require('cors');
 
 // internal imports
 import log from "./utils/logger";
@@ -11,6 +12,7 @@ import dbInit from "./database/init";
 dbInit();
 
 const app = express();
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
