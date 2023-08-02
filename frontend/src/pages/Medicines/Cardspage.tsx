@@ -27,7 +27,7 @@ const MedCards: FC<{ medicineList: Brand[] }> = (props) => {
                     <a className="page-link" href="#" onClick={prevPage}>Previous</a>
                 </li>{
                     pages.map((page) => 
-                        <li className="mr-4 hover:text-c2 ">
+                        <li className={page===currentPage?"text-c1 font-bold mr-4 hover:text-c2 ": "mr-4 hover:text-c2 "}>
                             <a className="page-link" href="#" onClick={() => setPage(page)}>{page}</a>
                         </li>
                     )
