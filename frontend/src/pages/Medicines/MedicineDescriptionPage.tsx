@@ -34,36 +34,12 @@ const MedCard: FC<{ medicine: BrandDescription }> = (props) => {
 
       <MedCardSingleBox boxHeader="Indications" boxText={props.medicine.indications} />
       <MedCardSingleBox boxHeader="Pharmacology" boxText={props.medicine.pharmacology} />
-
-
-      <div className="bg-c3 text-xl text-c1 py-1">
-        <b className="ml-3">Pharmacology</b>
-      </div>
-      <div>{props.medicine.pharmacology}</div>
-      <div className="bg-c3 text-xl text-c1 py-1">
-        <b className="ml-3">Dosage and Administration</b>
-      </div>
-      <div>{props.medicine.dosageAdministration}</div>
-      <div className="bg-c3 text-xl text-c1 py-1">
-        <b>Interaction</b>
-      </div>
-      <div>{props.medicine.interaction}</div>
-      <div className="bg-c3 text-xl text-c1 py-1">
-        <b>Contraindiction</b>
-      </div>
-      <div>{props.medicine.contraindiction}</div>
-      <div className="bg-c3 text-xl text-c1 py-1">
-        <b>Side Effects</b>
-      </div>
-      <div>{props.medicine.sideEffects}</div>
-      <div className="bg-c3 text-xl text-c1 py-1">
-        <b>Overdose Effects</b>
-      </div>
-      <div>{props.medicine.overDoseEffect}</div>
-      <div className="bg-c3 text-xl text-c1 py-1">
-        <b>Storage Condition</b>
-      </div>
-      <div>{props.medicine.storageCondition}</div>
+      <MedCardSingleBox boxHeader="Dosage and Administration" boxText={props.medicine.dosageAdministration} />
+      <MedCardSingleBox boxHeader="Interaction" boxText={props.medicine.interaction} />
+      <MedCardSingleBox boxHeader="Contraindiction" boxText={props.medicine.contraindiction} />
+      <MedCardSingleBox boxHeader="Side Effects" boxText={props.medicine.sideEffects} />
+      <MedCardSingleBox boxHeader="Overdose Effects" boxText={props.medicine.overDoseEffect} />
+      <MedCardSingleBox boxHeader="Storage Condition" boxText={props.medicine.storageCondition} />
     </div>
   );
 };

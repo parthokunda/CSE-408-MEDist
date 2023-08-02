@@ -12,10 +12,10 @@ export interface BrandDescription {
     indications: string;
     pharmacology: string;
     dosageAdministration: string;
-    interaction?: string;
-    contraindiction?: string;
+    interaction: string;
+    contraindiction: string;
     sideEffects: string;
-    overDoseEffect?: string;
-    storageCondition?: string;
+    overDoseEffect: string;
+    storageCondition: string;
   }
   
