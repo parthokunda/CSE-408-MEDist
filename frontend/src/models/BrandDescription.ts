@@ -1,4 +1,4 @@
-export interface Description {
+export interface BrandDescription {
     id: number;
     name: string;
     strength: string;
