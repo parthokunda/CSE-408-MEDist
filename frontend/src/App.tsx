@@ -1,5 +1,6 @@
 import NavBar from "./components/customUI/NavBar";
 import { navIcon } from "./models/navIcon";
+import MedicineDescriptionPage from "./pages/MedicineDescriptionPage";
 import MedicineSearchPage from "./pages/Medicines/MedicineSearchPage";
 
 const navList: navIcon[] = [
@@ -14,7 +15,7 @@ function App() {
   return (
     <>
       <NavBar navList={navList} />
-      <MedicineSearchPage />
+      <MedicineDescriptionPage />
     </>
   );
 }
