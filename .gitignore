@@ -26,5 +26,5 @@ frontend/*.njsproj
 frontend/*.sln
 frontend/*.sw?
 
-#main folder
-node_modules
+
+Medicine_Service/node_modules
