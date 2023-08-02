@@ -12,7 +12,7 @@ const MedCardSingleBox: FC<{ boxHeader: string; boxText: string }> = (
       <div className="bg-c3 text-xl text-c1 py-1 mx rounded-md">
         <b className="ml-3">{props.boxHeader}</b>
       </div>
-      <p className="ml-3 mt-1">{props.boxText}</p>
+      <p className="ml-3 mt-1 break-normal whitespace-pre-wrap">{props.boxText}</p>
     </div>
   );
 };
@@ -61,12 +61,12 @@ const MedicineDescription: BrandDescription = {
   interaction:
     "hekkidasdasdasfjasjfnasfjnasfnkasnnasfknasjnfasnjnknfsanfksanfasfnasjf",
   contraindiction:
-    "dsfdsfdshfsdfsdfjsdhfsdhfshdfdshjsfdfdsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssshfsdjfjsdfhhhfdjjjjjjjjjjjjjjjjjjjjjjj",
+    "dsfdsfdshfsdfsdfjsdhfsdhfshdfdshjsfdfdsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss ssssssssssssssssssssssssssssssssssssssssshfsdjfjsdfhhhfdjjjjjjjjjjjjjjjjjjjjjjj",
   sideEffects:
     "hekkidasdasdasfjasjfnasfjnasfnkasnnasfknasjnfasnjnknfsanfksanfasfnasjf",
   overDoseEffect: "dasdasfafafafafa",
   storageCondition:
-    "keep in a safe and dry place \n always keep medicines out of reach of children",
+    "keep in a safe and dry place. \nalways keep medicines out of reach of children",
 };
 
 const MedicineDescriptionPage: FC = () => {
