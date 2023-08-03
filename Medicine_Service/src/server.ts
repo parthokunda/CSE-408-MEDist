@@ -12,6 +12,7 @@ import dbInit from "./database/init";
 dbInit();
 
 const app = express();
+app.use(cors());
 
 // pre-route middlewares
 app.use(express.json());
