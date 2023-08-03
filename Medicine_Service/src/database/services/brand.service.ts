@@ -17,24 +17,30 @@ interface BrandInfo {
   DosageForm: DosageFormAttributes;
   Generic: GenericAttributes;
   Manufacturer: ManufacturerAttributes;
+}
+
+interface BrandDescription extends BrandInfo {
   Description: DescriptionAttributes;
 }
 
 interface Brand_Service_Interface {
-  getBrandById(id: number): Promise<BrandInfo>;
-  getBrandByName(_name: string): Promise<Brand>;
-  createBrand(_newBrand: Partial<Brand>): Promise<Brand>;
+  getBrandById(id: number): Promise<BrandDescription>;
+
+  getBrandByName(_name: string): Promise<Brand>; // this is used in webScrapping
+
+  createBrand(_newBrand: Partial<Brand>): Promise<Brand>; // this is used in webScrapping
+
   getAllBrands(
     searchBy: string,
     pagination: number,
     currentPage: number
-  ): Promise<Brand[]>;
+  ): Promise<BrandInfo[]>;
 }
 
 export default class dbService_Brand implements Brand_Service_Interface {
   constructor() {}
 
-  async getBrandById(id: number) {
+  async getBrandById(id: number): Promise<BrandDescription> {
     const brand = await Brand.findByPk(id);
     if (brand === null) {
       log.error(`Brand with id ${id} not found`);
@@ -46,7 +52,7 @@ export default class dbService_Brand implements Brand_Service_Interface {
     const manufacturer = await brand.getManufacturer();
     const details = await brand.getDescription();
 
-    const brandInfo: BrandInfo = {
+    const brandDescription: BrandDescription = {
       Brand: {
         id: brand.id,
         name: brand.name,
@@ -58,7 +64,7 @@ export default class dbService_Brand implements Brand_Service_Interface {
       Description: details.dataValues,
     };
 
-    return brandInfo;
+    return brandDescription;
   }
 
   async getBrandByName(_name: string) {
@@ -81,13 +87,15 @@ export default class dbService_Brand implements Brand_Service_Interface {
     const itemsPerPage = pagination;
     const offset = (currentPage - 1) * itemsPerPage;
 
+    let brands: Brand[];
+
     if (searchBy === "" || searchBy === undefined || searchBy === null) {
-      return await Brand.findAll({
+      brands = await Brand.findAll({
         offset,
         limit: itemsPerPage,
       });
     } else {
-      return await Brand.findAll({
+      brands = await Brand.findAll({
         where: {
           name: {
             [Op.iLike]: `%${searchBy}%`,
@@ -97,5 +105,25 @@ export default class dbService_Brand implements Brand_Service_Interface {
         limit: itemsPerPage,
       });
     }
+
+    // populating the brands
+    const brandInfos = brands.map(async (brand) => {
+      const dosageForm = await brand.getDosageForm();
+      const generic = await brand.getGeneric();
+      const manufacturer = await brand.getManufacturer();
+
+      return {
+        Brand: {
+          id: brand.id,
+          name: brand.name,
+          strength: brand.strength,
+        },
+        DosageForm: dosageForm.dataValues,
+        Generic: generic.dataValues,
+        Manufacturer: manufacturer.dataValues,
+      };
+    });
+
+    return await Promise.all(brandInfos);
   }
 }
