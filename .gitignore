@@ -1,6 +1,9 @@
 Web-Scrapping/node_modules
 Web-Scrapping/dist
 
+# Medicine_Service
+Medicine_Service/node_modules
+Medicine_Service/dist
 
 # frontend
 frontend/logs
@@ -27,4 +30,3 @@ frontend/*.sln
 frontend/*.sw?
 
 
-Medicine_Service/node_modules
