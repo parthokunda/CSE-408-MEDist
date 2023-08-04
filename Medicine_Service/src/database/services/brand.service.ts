@@ -8,7 +8,7 @@ import { DosageFormAttributes } from "database/models/DosageForm.model";
 import { GenericAttributes } from "database/models/Generic.model";
 import { ManufacturerAttributes } from "database/models/Manufacturer.model";
 
-interface BrandInfo {
+export interface BrandInfo {
   Brand: {
     id: number;
     name: string;
@@ -19,7 +19,7 @@ interface BrandInfo {
   Manufacturer: ManufacturerAttributes;
 }
 
-interface BrandDescription extends BrandInfo {
+export interface BrandDescription extends BrandInfo {
   Description: DescriptionAttributes;
 }
 

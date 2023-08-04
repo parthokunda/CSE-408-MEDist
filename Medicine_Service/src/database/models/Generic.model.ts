@@ -3,6 +3,7 @@ import {
   Association,
   DataTypes,
   HasManyAddAssociationMixin,
+  HasManyCountAssociationsMixin,
   HasManyGetAssociationsMixin,
   Model,
 } from "sequelize";
@@ -28,6 +29,7 @@ class Generic extends Model implements GenericAttributes {
   // Define associations
   public getBrands?: HasManyGetAssociationsMixin<Brand>;
   public addBrand!: HasManyAddAssociationMixin<Brand, number>;
+  public countBrands!: HasManyCountAssociationsMixin;
 
   public static associations: {
     brands: Association<Generic, Brand>;

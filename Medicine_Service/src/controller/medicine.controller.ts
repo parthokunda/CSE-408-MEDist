@@ -9,16 +9,17 @@ import {
 import dbService from "../database/services/service";
 import log from "../utils/logger";
 
+
 interface Medicine_Controller_Interface {
   search_all_medicines(
     req: Request<{}, {}, {}, Search_All_Medicine_Queries_Input>,
     res: Response
-  ): Promise<void>;
+  );
 
   get_medicine_info(
     req: Request<Get_Medicine_Info_Params_Input>,
     res: Response
-  ): Promise<void>;
+  );
 }
 
 class Medicine_Controller implements Medicine_Controller_Interface {
