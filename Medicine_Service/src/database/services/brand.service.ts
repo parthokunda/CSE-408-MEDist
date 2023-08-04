@@ -83,7 +83,7 @@ export default class dbService_Brand implements Brand_Service_Interface {
     searchBy: string,
     pagination: number,
     currentPage: number
-  ) {
+  ): Promise<BrandInfo[]> {
     const itemsPerPage = pagination;
     const offset = (currentPage - 1) * itemsPerPage;
 

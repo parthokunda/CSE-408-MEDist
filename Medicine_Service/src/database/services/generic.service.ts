@@ -1,9 +1,16 @@
 import { Op } from "sequelize";
 import Generic, { GenericAttributes } from "../models/Generic.model";
+import { BrandInfo } from "./brand.service";
+import createHttpError from "http-errors";
 
-interface GenericInfo {
+export interface AllGenericInfo {
   Generic: GenericAttributes;
   availableBrands: number;
+}
+
+export interface SingleGenericInfo {
+  Generic: GenericAttributes;
+  availableBrands: BrandInfo[];
 }
 
 interface GenericInterface {
@@ -11,11 +18,13 @@ interface GenericInterface {
   getGenericById(id: number): Promise<Generic | null>; // this is used in webScrapping
   createGeneric(_newGeneric: Partial<Generic>): Promise<Generic>; // this is used in webScrapping
 
-  getAllGenerics(
+  getAllGenericInfos(
     searchBy: string,
     pagination: number,
     currentPage: number
-  ): Promise<GenericInfo[]>;
+  ): Promise<AllGenericInfo[]>;
+
+  getSingleGenericInfo(id: number): Promise<SingleGenericInfo>;
 }
 
 export default class dbService_Generic implements GenericInterface {
@@ -37,11 +46,11 @@ export default class dbService_Generic implements GenericInterface {
     return await Generic.create(_newGeneric);
   }
 
-  async getAllGenerics(
+  async getAllGenericInfos(
     searchBy: string,
     pagination: number,
     currentPage: number
-  ): Promise<GenericInfo[]> {
+  ): Promise<AllGenericInfo[]> {
     const itemsPerPage = pagination;
     const offset = (currentPage - 1) * itemsPerPage;
 
@@ -76,5 +85,35 @@ export default class dbService_Generic implements GenericInterface {
     });
 
     return await Promise.all(genericInfos);
+  }
+
+  // when we click on a generic, we want to see all the brands that are available for that generic
+  async getSingleGenericInfo(id: number): Promise<SingleGenericInfo> {
+    const generic = await Generic.findByPk(id);
+
+    if (!generic) throw new createHttpError.NotFound("Generic not found");
+
+    const brands = await generic.getBrands();
+
+    const brandInfos = brands.map(async (brand) => {
+      const dosageForm = await brand.getDosageForm();
+      const manufacturer = await brand.getManufacturer();
+
+      return {
+        Brand: {
+          id: brand.id,
+          name: brand.name,
+          strength: brand.strength,
+        },
+        DosageForm: dosageForm.dataValues,
+        Generic: generic.dataValues,
+        Manufacturer: manufacturer.dataValues,
+      };
+    });
+
+    return {
+      Generic: generic.dataValues,
+      availableBrands: await Promise.all(brandInfos),
+    };
   }
 }

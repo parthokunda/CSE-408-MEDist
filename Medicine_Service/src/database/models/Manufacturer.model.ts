@@ -3,6 +3,7 @@ import {
   Association,
   DataTypes,
   HasManyAddAssociationMixin,
+  HasManyCountAssociationsMixin,
   HasManyGetAssociationsMixin,
   Model,
 } from "sequelize";
@@ -31,6 +32,7 @@ class Manufacturer
   // Define associations
   public getBrands?: HasManyGetAssociationsMixin<Brand>;
   public addBrand!: HasManyAddAssociationMixin<Brand, number>;
+  public countBrands!: HasManyCountAssociationsMixin;
 
   public static associations: {
     brands: Association<Manufacturer, Brand>;

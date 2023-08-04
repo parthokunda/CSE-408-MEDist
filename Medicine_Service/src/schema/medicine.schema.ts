@@ -47,6 +47,22 @@ class Medicine_Schema implements Medicine_Schema_Interface {
       medicineId: union([number(), string()]).transform((val) => Number(val)),
     }),
   });
+
+  // get_generic_info
+  get_generic_info_Schema = object({
+    params: object({
+      genericId: union([number(), string()]).transform((val) => Number(val)),
+    }),
+  });
+
+  // get_manufacturer_info
+  get_manufacturer_info_Schema = object({
+    params: object({
+      manufacturerId: union([number(), string()]).transform((val) =>
+        Number(val)
+      ),
+    }),
+  });
 }
 
 export default new Medicine_Schema();
@@ -61,4 +77,12 @@ export type Search_All_Medicine_Params_Input = TypeOf<
 
 export type Get_Medicine_Info_Params_Input = TypeOf<
   Medicine_Schema["get_medicine_info_Schema"]
+>["params"];
+
+export type Get_Generic_Info_Params_Input = TypeOf<
+  Medicine_Schema["get_generic_info_Schema"]
+>["params"];
+
+export type Get_Manufacturer_Info_Params_Input = TypeOf<
+  Medicine_Schema["get_manufacturer_info_Schema"]
 >["params"];

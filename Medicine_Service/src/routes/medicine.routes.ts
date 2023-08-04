@@ -27,4 +27,18 @@ medicineRouter.get(
   medicineController.get_medicine_info
 );
 
+// get selected generic details
+medicineRouter.get(
+  "/get_generic_info/:genericId",
+  validateRequest(medicineSchema.get_generic_info_Schema),
+  medicineController.get_generic_info
+);
+
+// get selected manufacturer details
+medicineRouter.get(
+  "/get_manufacturer_info/:manufacturerId",
+  validateRequest(medicineSchema.get_manufacturer_info_Schema),
+  medicineController.get_manufacturer_info
+);
+
 export default medicineRouter;

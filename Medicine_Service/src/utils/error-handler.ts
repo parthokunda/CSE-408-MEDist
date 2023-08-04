@@ -3,6 +3,7 @@ import createError, { HttpError } from "http-errors";
 
 //internal imports
 import log from "./logger";
+import createHttpError from "http-errors";
 
 // 404 handler
 export const notFoundHandler = (
@@ -11,7 +12,7 @@ export const notFoundHandler = (
   next: NextFunction
 ) => {
   log.error("404 handler called.");
-  next(createError(404, "Page Not Found."));
+  next(createHttpError.NotFound("Page not found"));
 };
 
 // default error handler
@@ -26,10 +27,10 @@ export const defaultErrorHandler = (
   log.trace(`request path: ${req.path}`);
   log.trace(err, "Error occured:");
 
-  res.status(err.status || 500);
-  res.json({
+  res.status(err.status || 500).json({
     error: {
-      ...err,
-    }
+      status: err.status || 500,
+      message: err.message,
+    },
   });
 };
