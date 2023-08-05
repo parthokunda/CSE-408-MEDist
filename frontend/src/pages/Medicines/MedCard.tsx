@@ -16,8 +16,8 @@ const MedCard: FC<{ medicine: BrandInfo }> = (props) => {
       <CardHeader className="text-c1">
         <CardTitle className="flex flex-row items-center">
           {props.medicine.Brand.name}
+          <img src={props.medicine.DosageForm.img_url} className="ml-3 h-6 w-6"/>
           {/* <TbMedicineSyrup className="mx-3" /> */}
-          <img src={props.medicine.DosageForm.img_url} className="mx-3 h-6 w-6"/>
         </CardTitle>
         <CardDescription>{props.medicine.Brand.strength}</CardDescription>
       </CardHeader>

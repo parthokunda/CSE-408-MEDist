@@ -2,6 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 import { Checkbox } from "../../components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "../../components/ui/input";
 import { AiOutlineSearch } from "react-icons/ai";
 import { useEffect } from "react";
@@ -10,16 +12,14 @@ const FormSchema = z.object({
   searchText: z
     .string()
     .max(20, { message: "Search string length cannot exceed 20" }),
-  filterByBrand: z.boolean().default(false),
-  filterByGeneric: z.boolean().default(false),
+  filterBy: z.union([z.literal("brands"), z.literal("generics")]),
 });
 
 export function SearchMed() {
   const forms = useForm<z.infer<typeof FormSchema>>({
     defaultValues: {
       searchText: "",
-      filterByBrand: false,
-      filterByGeneric: false,
+      filterBy: "brands",
     },
     resolver: zodResolver(FormSchema),
   });
@@ -54,34 +54,26 @@ export function SearchMed() {
             </div>
           )}
         />
-        <div className="flex w-1/2 m-3 gap-3">
+        <div className="flex  w-1/2 m-3 gap-3">
           Filter By:
           <Controller
-            name="filterByBrand"
+            name="filterBy"
             control={forms.control}
             render={({ field }) => (
-              <div className="flex gap-2  items-center">
-                <Checkbox
-                  className=""
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-                <label>Brand</label>
-              </div>
-            )}
-          />
-          <Controller
-            name="filterByGeneric"
-            control={forms.control}
-            render={({ field }) => (
-              <div className="flex gap-2 items-center">
-                <Checkbox
-                  className=""
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-                <label htmlFor="">Generic</label>
-              </div>
+              <RadioGroup
+                defaultValue={field.value}
+                onValueChange={field.onChange}
+                className="flex flex-row gap-2  items-center"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="brands" id="brands" />
+                  <Label htmlFor="option-one">Brands</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="generics" id="generics" />
+                  <Label htmlFor="generics">Generics</Label>
+                </div>
+              </RadioGroup>
             )}
           />
         </div>
