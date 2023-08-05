@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { Link } from "react-router-dom";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -13,7 +14,7 @@ const NavBar: FC<{ navList: navIcon[] }> = (props) => {
     <NavigationMenu>
       <div className="flex items-center w-screen h-14 bg-c1 font-inter ">
         <div className="font-bold text-3xl text-c4 ml-4 flex-grow">
-          MEDist
+          <Link to="/">MEDist</Link>
         </div>
         <NavigationMenuList className="flex px-4 gap-4">
           {props.navList.map((icon) => (
