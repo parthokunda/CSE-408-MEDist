@@ -8,21 +8,22 @@ import {
 } from "@/components/ui/card";
 
 import { TbMedicineSyrup } from "react-icons/tb";
-import { Brand } from "@/models/Brand";
+import { BrandInfo } from "@/models/Brand";
 
-const MedCard: FC<{ medicine: Brand }> = (props) => {
+const MedCard: FC<{ medicine: BrandInfo }> = (props) => {
   return (
     <Card className="flex flex-col w-fit drop-shadow m-4">
       <CardHeader className="text-c1">
         <CardTitle className="flex flex-row items-center">
-          {props.medicine.name}
-          <TbMedicineSyrup className="mx-3" />
+          {props.medicine.Brand.name}
+          {/* <TbMedicineSyrup className="mx-3" /> */}
+          <img src={props.medicine.DosageForm.img_url} className="mx-3 h-6 w-6"/>
         </CardTitle>
-        <CardDescription>{props.medicine.strength}</CardDescription>
+        <CardDescription>{props.medicine.Brand.strength}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p>{props.medicine.generic}</p>
-        <p className="text-c1">{props.medicine.manufacturer}</p>
+        <p>{props.medicine.Generic.name}</p>
+        <p className="text-c1">{props.medicine.Manufacturer.name}</p>
       </CardContent>
     </Card>
   );

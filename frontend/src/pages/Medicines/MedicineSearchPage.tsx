@@ -1,6 +1,7 @@
 import { FC } from "react";
 import SearchMed from "./SearchMed";
-import { Brand } from "@/models/Brand";
+// import { Brand } from "@/models/Brand";
+import { BrandInfo } from "@/models/Brand";
 import MedCards from "./MedCards";
 import { useQuery } from "@tanstack/react-query";
 
@@ -55,7 +56,7 @@ import { useQuery } from "@tanstack/react-query";
 //   },
 // ];
 
-const fetchMedList = async () => {
+const fetchMedList = async () : Promise<BrandInfo[]> => {
   const response = await fetch(
     "http://localhost:3000/api/medicine/get_all_medicines?searchBy=&filterBy=brands"
   );
