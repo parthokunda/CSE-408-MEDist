@@ -5,6 +5,7 @@ import MedicineSearchPage from "./pages/Medicines/SearchMedicines/MedicineSearch
 import SearchMed from "./pages/Medicines/SearchMedicines/SearchMed";
 import GenericList from "./pages/Medicines/SearchMedicines/GenericList";
 import { Routes, Route, Navigate } from "react-router-dom";
+import GenericDescriptionPage from "./pages/Medicines/Generic/GenericDescriptionPage";
 
 const genericList = [
   {
@@ -46,7 +47,7 @@ function App() {
         <Route path="*" element={<Navigate to="/searchMedicines/" replace />} />
         <Route path="searchMedicines/" element={<MedicineSearchPage />}/>
         <Route path="medicine/:medicineId" element={<MedicineDescriptionPage/>}/>
-        <Route path="generic/:genericId" element={<>No page found</>} />
+        <Route path="generic/:genericId" element={<GenericDescriptionPage/>} />
         <Route path="manufacturer/:manufacturerId" element={<>Manu page not found</>} />
       </Routes>
       {/* <NavBar navList={navList} />

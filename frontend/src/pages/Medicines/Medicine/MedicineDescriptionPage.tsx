@@ -1,8 +1,7 @@
 import { FC } from "react";
 import { BrandDescription, DescriptionAttributes } from "@/models/Brand";
-import { TbMedicineSyrup } from "react-icons/tb";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 
 const fetchMedicineDescription = async ({
@@ -67,11 +66,11 @@ const MedicineDescriptionPage: FC = () => {
           />
         </div>
         <p className="opacity-50">{medicine.DosageForm.name}</p>
-        <p>{medicine.Generic.name}</p>
+        <Link to={`/generic/${medicine.Generic.id}`}><p className="hover:text-cyan-700">{medicine.Generic.name}</p></Link>
         <p>{medicine.Brand.strength}</p>
         <p className=" opacity-50">{medicine.Manufacturer.name}</p>
         <p>
-          Unit price :{" "}
+          Unit price :
           {medicine.Description.unit_price
             ? medicine.Description.unit_price
             : "19.99 place"}
