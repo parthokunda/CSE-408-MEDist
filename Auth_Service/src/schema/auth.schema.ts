@@ -31,6 +31,6 @@ class AuthSchema implements Auth_Schema_Interface {
 
 export default new AuthSchema();
 
-export type Signup_or_Login_Input = TypeOf<
+export type Signup_or_Login_Body_Input = TypeOf<
   AuthSchema["Signup_or_Login"]
 >["body"];

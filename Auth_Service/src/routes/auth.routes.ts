@@ -6,6 +6,7 @@ import validateRequest from "./middleware/validateRequest";
 import messageBroker from "../utils/broker";
 import { config } from "../config";
 import userService from "../services/user.service";
+import authSchema from "schema/auth.schema";
 
 const authRouter = express.Router();
 
@@ -13,6 +14,6 @@ const authRouter = express.Router();
 messageBroker.RPC_Observer(config.AUTH_RPC_QUEUE, userService);
 
 // sign up
-authRouter.post("/signup");
+authRouter.post("/signup", validateRequest(authSchema.Signup_or_Login), );
 
 export default authRouter;

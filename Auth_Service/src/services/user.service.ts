@@ -1,5 +1,5 @@
 //internal imports
-import { Signup_or_Login_Input } from "schema/auth.schema";
+import { Signup_or_Login_Body_Input } from "schema/auth.schema";
 import userRepository, {
   UserRepositoryInterface,
 } from "../database/repository/user.repository";
@@ -7,7 +7,7 @@ import createHttpError from "http-errors";
 import { RPC_Request_Payload } from "utils/broker";
 
 export interface UserServiceInterface {
-  SignUp(userInput: Signup_or_Login_Input): Promise<void>;
+  SignUp(userInput: Signup_or_Login_Body_Input): Promise<void>;
   serveRPCRequest(payload: RPC_Request_Payload): Promise<void>;
 }
 
@@ -18,7 +18,7 @@ class UserService implements UserServiceInterface {
     this.repository = userRepository;
   }
 
-  async SignUp(userInput: Signup_or_Login_Input) {
+  async SignUp(userInput: Signup_or_Login_Body_Input) {
     const { email, password, role } = userInput;
 
     const existingUser = await this.repository.findUserByEmail(email);
