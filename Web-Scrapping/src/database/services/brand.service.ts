@@ -7,10 +7,11 @@ export default class dbService_Brand {
     return await Brand.findByPk(id);
   }
 
-  async getBrandByName(_name: string) {
+  async getBrandByName_and_Strength(_name: string, _strength: string) {
     return await Brand.findOne({
       where: {
         name: _name,
+        strength: _strength,
       },
     });
   }

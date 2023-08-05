@@ -56,8 +56,9 @@ export const entryToDB_BrandOverviews = async (
       log.info(`Created Generic: ${Generic.toJSON()}`);
     } else log.info(`Generic already exists: ${Generic.toJSON()}`);
 
-    let Brand = await _dbService.brandService.getBrandByName(
-      brandOverview.brandName
+    let Brand = await _dbService.brandService.getBrandByName_and_Strength(
+      brandOverview.brandName,
+      brandOverview.strength
     );
 
     if (!Brand) {
@@ -90,9 +91,13 @@ export const entryToDB_BrandOverviews = async (
 
 export const entryToDB_BrandDetails = async (
   brandName: string,
+  brandStrength: string,
   brandDetails: BrandDetails
 ) => {
-  const brand = await _dbService.brandService.getBrandByName(brandName);
+  const brand = await _dbService.brandService.getBrandByName_and_Strength(
+    brandName,
+    brandStrength
+  );
   log.info(`Creating Description for Brand: ${brand.toJSON()}`);
 
   if (brand.descriptionID) {

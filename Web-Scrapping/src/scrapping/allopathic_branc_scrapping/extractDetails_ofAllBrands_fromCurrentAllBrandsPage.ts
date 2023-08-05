@@ -32,7 +32,7 @@ const extractDetails_ofAllBrands_fromCurrentAllBrandsPage = async (
     log.info(`Back to the previous page`);
 
     // data entry to the database
-    await entryToDB_BrandDetails(curr_brandOveriew.brandName, brandDetails);
+    await entryToDB_BrandDetails(curr_brandOveriew.brandName, curr_brandOveriew.strength, brandDetails);
   }
 };
 
