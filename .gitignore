@@ -1,6 +1,9 @@
 Web-Scrapping/node_modules
 Web-Scrapping/dist
 
+# Auth_Service
+Auth_Service/node_modules
+Auth_Service/dist
 
 # frontend
 frontend/logs
