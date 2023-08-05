@@ -48,7 +48,7 @@ export function SearchMed() {
           name="searchText"
           control={forms.control}
           render={({ field }) => (
-            <div className=" relative w-1/2 m-3">
+            <div className=" relative w-1/2 ">
               <AiOutlineSearch className="h-8 w-8  absolute p-1 box-border right-3 top-1/2 transform -translate-y-1/2" />
               <Input {...field} placeholder="Search" />
             </div>

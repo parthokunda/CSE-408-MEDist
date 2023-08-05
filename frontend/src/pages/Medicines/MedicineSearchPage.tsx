@@ -1,8 +1,11 @@
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import { FC } from "react";
 import SearchMed from "./SearchMed";
 // import { Brand } from "@/models/Brand";
 import { BrandInfo } from "@/models/Brand";
 import MedCards from "./MedCards";
+import Cardpage from "./Cardspage";
+
 import { useQuery } from "@tanstack/react-query";
 
 // const medicineList: Brand[] = [
