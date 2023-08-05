@@ -78,7 +78,7 @@ export const entryToDB_BrandOverviews = async (
       Generic.addBrand(Brand);
       DosageForm.addBrand(Brand);
       Manufacturer.addBrand(Brand);
-    
+
       log.info(`Created Brand: ${Brand.toJSON()}`);
     } else log.info(`Brand already exists: ${Brand}`);
   });
@@ -95,7 +95,7 @@ export const entryToDB_BrandDetails = async (
   const brand = await _dbService.brandService.getBrandByName(brandName);
   log.info(`Creating Description for Brand: ${brand.toJSON()}`);
 
-  if (brand.descriptionID) { 
+  if (brand.descriptionID) {
     log.info(`Description already exists for Brand: ${brand.toJSON()}`);
     return;
   }
@@ -108,6 +108,7 @@ export const entryToDB_BrandDetails = async (
   );
 
   brand.descriptionID = Description.id;
+  brand.unit_price = brandDetails.unit_price;
   brand.setDescription(Description);
 
   await brand.save();
