@@ -17,16 +17,18 @@ const selectBrandNameOption_FromDropdown = async (page: Page) => {
   });
 
   // wait for dropdown menu to load
-  await page.waitForSelector("#nav-menu-brands a");
+  await page.waitForSelector("#nav-menu-brands");
 
   // select "Brand Names (Allopathic)"
-  const brandNamesAllopathicLink = await page.$("#nav-menu-brands a");
-  await brandNamesAllopathicLink.click();
+  /* const brandNamesAllopathicLink = await page.$("#nav-menu-brands a");
+  await brandNamesAllopathicLink.click(); */
+
+  await page.click("#nav-menu-brands a");
 
   // wait for page navigation
-  await page.waitForNavigation();
+  //await page.waitForNavigation();
 
-  return page;
+  await page.screenshot({ path: "example.png" });
 
   return page;
 };

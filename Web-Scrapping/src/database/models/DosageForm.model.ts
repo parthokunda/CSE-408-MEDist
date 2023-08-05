@@ -49,6 +49,7 @@ DosageForm.init(
     name: {
       type: DataTypes.STRING(50),
       allowNull: false,
+      unique: true,
     },
     img_url: {
       type: DataTypes.STRING(100),

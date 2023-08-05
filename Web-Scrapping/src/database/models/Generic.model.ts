@@ -49,7 +49,6 @@ class Generic extends Model implements GenericAttributes {
   public therapeutic_class!: string;
   public storage_conditions!: string; */
 
-
   // Define associations
   public getBrands?: HasManyGetAssociationsMixin<Brand>;
   public addBrand!: HasManyAddAssociationMixin<Brand, number>;
@@ -69,6 +68,7 @@ Generic.init(
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,
+      unique: true,
     },
     type: {
       type: DataTypes.STRING(20),

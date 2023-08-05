@@ -79,10 +79,6 @@ Brand.init(
       type: DataTypes.STRING(80),
       allowNull: false,
     },
-    manufacturer: {
-      type: DataTypes.STRING(80),
-      allowNull: true,
-    },
     description_url: {
       type: DataTypes.STRING(100),
       allowNull: true,

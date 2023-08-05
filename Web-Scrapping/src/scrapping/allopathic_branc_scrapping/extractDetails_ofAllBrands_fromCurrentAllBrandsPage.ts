@@ -16,15 +16,20 @@ const extractDetails_ofAllBrands_fromCurrentAllBrandsPage = async (
 
     // go to the link of the brand
     await page.goto(curr_brandOveriew.brandLink);
-    log.info(`Page loaded successfully for ${curr_brandOveriew.brandName}`);
+    log.info(
+      `Page loaded successfully for ${curr_brandOveriew.brandName} ${curr_brandOveriew.strength}}`
+    );
 
     //extract details of the brand
     const brandDetails = await extractDetails_ofCurrentBrand(page);
 
-    log.info(brandDetails.unit_price, "in extractDetails_ofAllBrands_fromCurrentAllBrandsPage.ts")
+    log.info(
+      brandDetails.unit_price,
+      "in extractDetails_ofAllBrands_fromCurrentAllBrandsPage.ts"
+    );
 
     log.info(
-      `Details extracted successfully for ${curr_brandOveriew.brandName}`
+      `Details extracted successfully for ${curr_brandOveriew.brandName} ${curr_brandOveriew.strength}`
     );
 
     // back to the previous page
@@ -32,7 +37,12 @@ const extractDetails_ofAllBrands_fromCurrentAllBrandsPage = async (
     log.info(`Back to the previous page`);
 
     // data entry to the database
-    await entryToDB_BrandDetails(curr_brandOveriew.brandName, curr_brandOveriew.strength, brandDetails);
+    await entryToDB_BrandDetails(
+      curr_brandOveriew.brandName,
+      curr_brandOveriew.strength,
+      curr_brandOveriew.dosageForm.name,
+      brandDetails
+    );
   }
 };
 

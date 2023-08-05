@@ -47,6 +47,7 @@ Manufacturer.init(
     name: {
       type: DataTypes.STRING(80),
       allowNull: false,
+      unique: true,
     },
   },
   {

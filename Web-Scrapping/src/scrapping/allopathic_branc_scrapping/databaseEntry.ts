@@ -15,15 +15,17 @@ const _dbService = new dbService();
 export const entryToDB_BrandOverviews = async (
   brandOverviews: BrandOverview[]
 ) => {
-  brandOverviews.forEach(async (brandOverview) => {
+  for (let i = 0; i < brandOverviews.length; i++) {
+    const brandOverview = brandOverviews[i];
+
     let DosageForm = await _dbService.dosageService.getDosageFormByName(
-      brandOverview.dosageForm.name
+      brandOverview.dosageForm.name.trim()
     );
 
     if (!DosageForm) {
       log.info(`Creating DosageForm: ${brandOverview.dosageForm}`);
       DosageForm = await _dbService.dosageService.createDosageForm({
-        name: brandOverview.dosageForm.name,
+        name: brandOverview.dosageForm.name.trim(),
         img_url: brandOverview.dosageForm.img_url || "",
       });
 
@@ -32,37 +34,40 @@ export const entryToDB_BrandOverviews = async (
 
     let Manufacturer =
       await _dbService.manufacturerService.getManufacturerByName(
-        brandOverview.manufacturer
+        brandOverview.manufacturer.trim()
       );
 
     if (!Manufacturer) {
       log.info(`Creating Manufacturer: ${brandOverview.manufacturer}`);
       Manufacturer = await _dbService.manufacturerService.createManufacturer({
-        name: brandOverview.manufacturer,
+        name: brandOverview.manufacturer.trim(),
       });
       log.info(`Created Manufacturer: ${Manufacturer.toJSON()}`);
     } else log.info(`Manufacturer already exists: ${Manufacturer.toJSON()}`);
 
     let Generic = await _dbService.genericService.getGenericByName(
-      brandOverview.genericName
+      brandOverview.genericName.trim()
     );
 
     if (!Generic) {
       log.info(`Creating Generic: ${brandOverview.genericName}`);
       Generic = await _dbService.genericService.createGeneric({
-        name: brandOverview.genericName,
+        name: brandOverview.genericName.trim(),
         type: "Allopathic",
       });
       log.info(`Created Generic: ${Generic.toJSON()}`);
     } else log.info(`Generic already exists: ${Generic.toJSON()}`);
 
-    let Brand = await _dbService.brandService.getBrandByName_and_Strength(
-      brandOverview.brandName,
-      brandOverview.strength
-    );
+    let Brand =
+      await _dbService.brandService.getBrandByName_and_Strength_and_DosageName(
+        brandOverview.brandName,
+        brandOverview.strength,
+        brandOverview.dosageForm.name
+      );
 
     if (!Brand) {
       log.info(`Creating Brand: ${brandOverview.brandName}`);
+
       Brand = await _dbService.brandService.createBrand({
         name: brandOverview.brandName,
         strength: brandOverview.strength,
@@ -81,8 +86,8 @@ export const entryToDB_BrandOverviews = async (
       Manufacturer.addBrand(Brand);
 
       log.info(`Created Brand: ${Brand.toJSON()}`);
-    } else log.info(`Brand already exists: ${Brand}`);
-  });
+    } else log.info(`Brand already exists: ${Brand.toJSON()}`);
+  }
 
   log.info(
     "All Brand Overviews of current page are inserted into the database"
@@ -92,12 +97,15 @@ export const entryToDB_BrandOverviews = async (
 export const entryToDB_BrandDetails = async (
   brandName: string,
   brandStrength: string,
+  dosageFormName: string,
   brandDetails: BrandDetails
 ) => {
-  const brand = await _dbService.brandService.getBrandByName_and_Strength(
-    brandName,
-    brandStrength
-  );
+  const brand =
+    await _dbService.brandService.getBrandByName_and_Strength_and_DosageName(
+      brandName,
+      brandStrength,
+      dosageFormName
+    );
   log.info(`Creating Description for Brand: ${brand.toJSON()}`);
 
   if (brand.descriptionID) {
