@@ -3,7 +3,8 @@ import { navIcon } from "./models/navIcon";
 import MedicineDescriptionPage from "./pages/Medicines/MedicineDescriptionPage";
 import MedicineSearchPage from "./pages/Medicines/MedicineSearchPage";
 import SearchMed from "./pages/Medicines/SearchMed";
-import GenericList from "./pages/Medicines/generics";
+import GenericList from "./pages/Medicines/GenericList";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 const genericList = [
   {
@@ -26,7 +27,8 @@ const genericList = [
     description: "Generic 3 description",
     type: "Generic",
     availableBrands: 32,
-  }];
+  },
+];
 
 const navList: navIcon[] = [
   { name: "Medicines", link: "/medicines" },
@@ -39,9 +41,17 @@ const navList: navIcon[] = [
 function App() {
   return (
     <>
-      <NavBar navList={navList} />
+      <NavBar navList={navList}/>
+      <Routes>
+        <Route path="*" element={<Navigate to="/searchMedicines/" replace />} />
+        <Route path="searchMedicines/" element={<MedicineSearchPage />}/>
+        <Route path="medicine/:medicineId" element={<MedicineDescriptionPage/>}/>
+        <Route path="generic/:genericId" element={<>No page found</>} />
+        <Route path="manufacturer/:manufacturerId" element={<>Manu page not found</>} />
+      </Routes>
+      {/* <NavBar navList={navList} />
       <SearchMed />
-      <GenericList genericList={genericList} />
+      <GenericList genericList={genericList} /> */}
     </>
   );
 }

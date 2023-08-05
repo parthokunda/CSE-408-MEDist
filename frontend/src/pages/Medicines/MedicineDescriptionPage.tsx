@@ -2,7 +2,6 @@ import { FC } from "react";
 import { BrandDescription } from "@/models/BrandDescription";
 import { TbMedicineSyrup } from "react-icons/tb";
 import SearchMed from "./SearchMed";
-// import "./styles.css";
 
 const MedCardSingleBox: FC<{ boxHeader: string; boxText: string }> = (
   props

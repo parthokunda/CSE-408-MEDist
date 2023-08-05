@@ -1,31 +1,25 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import * as z from "zod";
-import { Checkbox } from "../../components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "../../components/ui/input";
 import { AiOutlineSearch } from "react-icons/ai";
-import { useEffect } from "react";
+import { FC, useEffect } from "react";
+import { MedSearchForm } from "@/models/FormSchema";
 
-const FormSchema = z.object({
-  searchText: z
-    .string()
-    .max(20, { message: "Search string length cannot exceed 20" }),
-  filterBy: z.union([z.literal("brands"), z.literal("generics")]),
-});
 
-export function SearchMed() {
-  const forms = useForm<z.infer<typeof FormSchema>>({
+export const SearchMed : FC<{ formValues : z.infer<typeof MedSearchForm>, formSubmitHandler: (formData: z.infer<typeof MedSearchForm>) => void }> = (props) => {
+  const forms = useForm<z.infer<typeof MedSearchForm>>({
     defaultValues: {
-      searchText: "",
-      filterBy: "brands",
+      searchText: props.formValues.searchText,
+      filterBy: props.formValues.filterBy,
     },
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(MedSearchForm),
   });
-  // console.log("🚀 ~ file: test.tsx:18 ~ TestForm ~ register:", register)
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
-    console.log(data);
+
+  const onSubmit: SubmitHandler<z.infer<typeof MedSearchForm>> = (data) => {
+    props.formSubmitHandler(data);
   };
 
   // console.log(forms.watch("filterByBrand"))

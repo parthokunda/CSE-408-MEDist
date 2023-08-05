@@ -18,8 +18,40 @@ export interface BrandInfo {
   DosageForm: DosageFormAttributes;
   Generic: GenericAttributes;
   Manufacturer: ManufacturerAttributes;
+  type? : "BrandInfo"
 }
 
+export interface AllGenericInfo {
+  Generic: GenericAttributes;
+  availableBrands: number;
+  type?: "AllGenericInfo"
+}
+
+//TODO: ask dhrubo for a discriminator or type flag to be added to proper check 
+
+export function isBrandInfoList(object: any): object is BrandInfo[] {
+  console.log(object);
+  return (
+    Array.isArray(object) &&
+    object.every((item) => {
+      return item.Brand && item.DosageForm && item.Generic && item.Manufacturer;
+    })
+  );
+}
+
+export function isAllGenericInfoList(object:any) : object is AllGenericInfo[] {
+  return (
+    Array.isArray(object) && object.every(item => {
+      return item.Generic && item.availableBrands;
+    })
+  )
+}
+
+
+export interface SingleGenericInfo {
+  Generic: GenericAttributes;
+  availableBrands: BrandInfo[];
+}
 
 export interface DosageFormAttributes {
   id: number;
@@ -31,7 +63,6 @@ export interface GenericAttributes {
   id: number;
   name: string;
   type: string;
-  
 }
 
 export interface ManufacturerAttributes {
