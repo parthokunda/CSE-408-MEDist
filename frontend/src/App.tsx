@@ -8,7 +8,7 @@ import GenericList from "./pages/Medicines/generics";
 const genericList = [
   {
     id: 2,
-    name: "Generic 2",
+    name: "Genericfsdf sdfsdfsdfdsjjjjjjfffffffffffffffffgggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggfffffkjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk2",
     description: "Generic 12 description",
     type: "Generic",
     availableBrands: 12,

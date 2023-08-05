@@ -10,7 +10,7 @@ const GenericList: FC<{ genericList: Generic[] }> = (props) => {
     <div >
       {props.genericList.map((generic) => (
         <div >
-          <div className="m-2 p-2 border border-c2 rounded-md">
+          <div className="m-2 p-2 border border-c2 rounded-md whitespace-nowrap overflow-hidden">
             <div className="font-bold text-c1">{generic.name}</div>
             <div className="opacity-50">{generic.description}</div>
           </div>
