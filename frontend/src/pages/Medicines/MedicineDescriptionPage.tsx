@@ -9,10 +9,12 @@ const MedCardSingleBox: FC<{ boxHeader: string; boxText: string }> = (
 ) => {
   return (
     <div className="my-2">
-      <div className="bg-c3 text-xl text-c1 py-1 mx rounded-md">
+      1<div className="bg-c3 text-xl text-c1 py-1 mx rounded-md">
         <b className="ml-3">{props.boxHeader}</b>
       </div>
-      <p className="ml-3 mt-1 break-normal whitespace-pre-wrap">{props.boxText}</p>
+      <p className="ml-3 mt-1 break-normal whitespace-pre-wrap">
+        {props.boxText}
+      </p>
     </div>
   );
 };
@@ -32,14 +34,38 @@ const MedCard: FC<{ medicine: BrandDescription }> = (props) => {
         <p>Unit price : {props.medicine.price}</p>
       </div>
 
-      <MedCardSingleBox boxHeader="Indications" boxText={props.medicine.indications} />
-      <MedCardSingleBox boxHeader="Pharmacology" boxText={props.medicine.pharmacology} />
-      <MedCardSingleBox boxHeader="Dosage and Administration" boxText={props.medicine.dosageAdministration} />
-      <MedCardSingleBox boxHeader="Interaction" boxText={props.medicine.interaction} />
-      <MedCardSingleBox boxHeader="Contraindiction" boxText={props.medicine.contraindiction} />
-      <MedCardSingleBox boxHeader="Side Effects" boxText={props.medicine.sideEffects} />
-      <MedCardSingleBox boxHeader="Overdose Effects" boxText={props.medicine.overDoseEffect} />
-      <MedCardSingleBox boxHeader="Storage Condition" boxText={props.medicine.storageCondition} />
+      <MedCardSingleBox
+        boxHeader="Indications"
+        boxText={props.medicine.indications}
+      />
+      <MedCardSingleBox
+        boxHeader="Pharmacology"
+        boxText={props.medicine.pharmacology}
+      />
+      <MedCardSingleBox
+        boxHeader="Dosage and Administration"
+        boxText={props.medicine.dosageAdministration}
+      />
+      <MedCardSingleBox
+        boxHeader="Interaction"
+        boxText={props.medicine.interaction}
+      />
+      <MedCardSingleBox
+        boxHeader="Contraindiction"
+        boxText={props.medicine.contraindiction}
+      />
+      <MedCardSingleBox
+        boxHeader="Side Effects"
+        boxText={props.medicine.sideEffects}
+      />
+      <MedCardSingleBox
+        boxHeader="Overdose Effects"
+        boxText={props.medicine.overDoseEffect}
+      />
+      <MedCardSingleBox
+        boxHeader="Storage Condition"
+        boxText={props.medicine.storageCondition}
+      />
     </div>
   );
 };
