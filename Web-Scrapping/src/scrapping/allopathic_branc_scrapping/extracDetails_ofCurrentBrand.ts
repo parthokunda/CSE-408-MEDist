@@ -6,7 +6,7 @@ import log from "../../utils/logger";
 import { BrandOverview } from "./extractOverviews_ofAllBrands_FromAllBrandsPage";
 
 export interface BrandDetails {
-  unitPrice: string;
+  unit_price: string;
   indications: string;
   compositions: string;
   pharmacology: string;
@@ -23,7 +23,7 @@ export interface BrandDetails {
 
 const createEmptyBrandDescriptionInfo = (): BrandDetails => {
   return {
-    unitPrice: "",
+    unit_price: "",
     indications: "",
     compositions: "",
     pharmacology: "",
@@ -47,19 +47,23 @@ const extractDetails_ofCurrentBrand = async (page: Page) => {
 
   // Extract unit price
   if (await page.$(".package-container")) {
-    brandDetails.unitPrice = await page.$$eval(
+    brandDetails.unit_price = await page.$$eval(
       ".package-container span:not(:first-child)",
       (spans) => {
-        let unitPrice = "";
+        let unit_price = "";
 
         spans.forEach((span) => {
-          unitPrice += span.textContent?.trim();
+          unit_price += span.textContent?.trim();
         });
+           
+    
 
-        return unitPrice;
+        return unit_price;
       }
     );
   }
+
+  log.info(brandDetails.unit_price)
 
   // Extract indications
   if (await page.$("#indications + .ac-body")) {

@@ -21,6 +21,8 @@ const extractDetails_ofAllBrands_fromCurrentAllBrandsPage = async (
     //extract details of the brand
     const brandDetails = await extractDetails_ofCurrentBrand(page);
 
+    log.info(brandDetails.unit_price, "in extractDetails_ofAllBrands_fromCurrentAllBrandsPage.ts")
+
     log.info(
       `Details extracted successfully for ${curr_brandOveriew.brandName}`
     );
