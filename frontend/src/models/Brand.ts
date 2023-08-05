@@ -20,7 +20,17 @@ export interface BrandInfo {
   Manufacturer: ManufacturerAttributes;
   type? : "BrandInfo"
 }
-
+export interface BrandDescription {
+  Brand: {
+    id: number;
+    name: string;
+    strength: string;
+  };
+  DosageForm: DosageFormAttributes,
+  Generic: GenericAttributes,
+  Manufacturer: ManufacturerAttributes,
+  Description: DescriptionAttributes,
+};
 export interface AllGenericInfo {
   Generic: GenericAttributes;
   availableBrands: number;
@@ -76,17 +86,19 @@ export interface BrandDescription extends BrandInfo {
 
 export interface DescriptionAttributes {
   id: number;
-  unit_price: string;
-  indications: string;
-  compositions: string;
-  pharmacology: string;
-  dosage_and_administration: string;
-  interaction: string;
-  contraindications: string;
-  side_effects: string;
-  pregnancy_and_lactation: string;
-  precautions_and_warnings: string;
-  overdose_effects: string;
-  therapeutic_class: string;
-  storage_conditions: string;
+  unit_price: string | null;
+  indications: string | null
+  compositions: string | null;
+  pharmacology: string | null;
+  dosage_and_administration: string | null;
+  interaction: string | null;
+  contraindications: string | null;
+  side_effects: string | null;
+  pregnancy_and_lactation: string | null;
+  precautions_and_warnings: string | null;
+  overdose_effects: string | null;
+  therapeutic_class: string | null;
+  storage_conditions: string | null;
+  createdAt ?: Date | null;
+  updatedAt ?: Date | null;
 }

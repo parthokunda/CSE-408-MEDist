@@ -1,9 +1,9 @@
 import NavBar from "./components/customUI/NavBar";
 import { navIcon } from "./models/navIcon";
-import MedicineDescriptionPage from "./pages/Medicines/MedicineDescriptionPage";
-import MedicineSearchPage from "./pages/Medicines/MedicineSearchPage";
-import SearchMed from "./pages/Medicines/SearchMed";
-import GenericList from "./pages/Medicines/GenericList";
+import MedicineDescriptionPage from "./pages/Medicines/Description/MedicineDescriptionPage";
+import MedicineSearchPage from "./pages/Medicines/Search/MedicineSearchPage";
+import SearchMed from "./pages/Medicines/Search/SearchMed";
+import GenericList from "./pages/Medicines/Search/GenericList";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 const genericList = [

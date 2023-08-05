@@ -35,10 +35,6 @@ const fetchMedList = async (
   return data.results;
 };
 
-// const isBrandInfo = (data : BrandInfo[] | AllGenericInfo[] | undefined) : boolean => {
-//   if (Array.isArray(data) && data.every(item => item.type === 'BrandInfo')) return true;
-//   return false;
-// }
 const MedicineSearchPage: FC = () => {
   const [searchFormData, setSearchFormData] = useState<
     z.infer<typeof MedSearchForm>

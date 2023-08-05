@@ -3,7 +3,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import * as z from "zod";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Input } from "../../components/ui/input";
+import { Input } from "../../../components/ui/input";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FC, useEffect } from "react";
 import { MedSearchForm } from "@/models/FormSchema";

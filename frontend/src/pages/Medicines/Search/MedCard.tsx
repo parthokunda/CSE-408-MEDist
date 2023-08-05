@@ -7,17 +7,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { TbMedicineSyrup } from "react-icons/tb";
 import { BrandInfo } from "@/models/Brand";
+import { Link } from "react-router-dom";
 
 const MedCard: FC<{ medicine: BrandInfo }> = (props) => {
+  // const navigate = useNavigate();
   return (
     <Card className="flex flex-col w-fit drop-shadow">
       <CardHeader className="text-c1">
         <CardTitle className="flex flex-row items-center">
-          {props.medicine.Brand.name}
-          <img src={props.medicine.DosageForm.img_url} className="ml-3 h-6 w-6" placeholder="img_404"/>
-          {/* <TbMedicineSyrup className="mx-3" /> */}
+          <Link to={`/medicine/${props.medicine.Brand.id}`}>{props.medicine.Brand.name}</Link>
+          <img
+            src={props.medicine.DosageForm.img_url}
+            className="ml-3 h-6 w-6"
+            placeholder="img_404"
+          />
         </CardTitle>
         <CardDescription>{props.medicine.Brand.strength}</CardDescription>
       </CardHeader>
@@ -30,7 +34,5 @@ const MedCard: FC<{ medicine: BrandInfo }> = (props) => {
 };
 
 // TODO: FlexBox overflow hoile atkano
-
-
 
 export default MedCard;
