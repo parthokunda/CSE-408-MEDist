@@ -5,6 +5,9 @@ import MedicineSearchPage from "./pages/Medicines/MedicineSearchPage";
 import SearchMed from "./pages/Medicines/SearchMed";
 import GenericList from "./pages/Medicines/generics";
 
+const availableBrands=[
+  
+]
 const genericList = [
   {
     id: 2,
