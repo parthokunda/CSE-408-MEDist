@@ -60,7 +60,7 @@ export function isAllGenericInfoList(object:any) : object is AllGenericInfo[] {
 
 export interface GenericDescription {
   Generic: GenericAttributes;
-  Description: DescriptionAttributes;
+  Description: GenericDescriptionAttributes;
   availableBrands: BrandInfo[];
 }
 
@@ -88,6 +88,24 @@ export interface BrandDescription extends BrandInfo {
 export interface DescriptionAttributes {
   id: number;
   unit_price: string | null;
+  indications: string | null
+  compositions: string | null;
+  pharmacology: string | null;
+  dosage_and_administration: string | null;
+  interaction: string | null;
+  contraindications: string | null;
+  side_effects: string | null;
+  pregnancy_and_lactation: string | null;
+  precautions_and_warnings: string | null;
+  overdose_effects: string | null;
+  therapeutic_class: string | null;
+  storage_conditions: string | null;
+  createdAt ?: Date | null;
+  updatedAt ?: Date | null;
+}
+
+export interface GenericDescriptionAttributes {
+  id: number;
   indications: string | null
   compositions: string | null;
   pharmacology: string | null;
