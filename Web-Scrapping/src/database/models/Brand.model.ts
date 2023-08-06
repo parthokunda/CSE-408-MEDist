@@ -18,6 +18,7 @@ import Generic from "./Generic.model";
 import DosageForm from "./DosageForm.model";
 import Manufacturer from "./Manufacturer.model";
 import Description from "./Description.model";
+import Generic_Description from "./Generic.Description.model";
 
 interface BrandAttributes {
   id: number;
@@ -130,6 +131,21 @@ Brand.belongsTo(Description, {
   },
 });
 Description.hasOne(Brand, {
+  foreignKey: {
+    name: "descriptionID",
+    allowNull: true,
+  },
+});
+
+// between Generic and Generic_Description
+// between Generic and Generic.Description
+Generic.belongsTo(Generic_Description, {
+  foreignKey: {
+    name: "descriptionID",
+    allowNull: true,
+  },
+});
+Generic_Description.hasOne(Generic, {
   foreignKey: {
     name: "descriptionID",
     allowNull: true,

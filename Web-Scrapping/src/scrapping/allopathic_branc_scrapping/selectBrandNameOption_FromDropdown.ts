@@ -28,7 +28,7 @@ const selectBrandNameOption_FromDropdown = async (page: Page) => {
   // wait for page navigation
   //await page.waitForNavigation();
 
-  await page.screenshot({ path: "example.png" });
+  //await page.screenshot({ path: "example.png" });
 
   return page;
 };

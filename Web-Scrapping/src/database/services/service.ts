@@ -6,6 +6,7 @@ import dbService_Brand from "./brand.service";
 import dbService_DosageForm from "./dosage.service";
 import dbService_Manufacturer from "./manufacturer.service";
 import dbService_Description from "./description.service";
+import dbService_Generic_Description from "./generic.description.service";
 
 export default class dbService {
   genericService: dbService_Generic;
@@ -13,6 +14,7 @@ export default class dbService {
   dosageService: dbService_DosageForm;
   manufacturerService: dbService_Manufacturer;
   descriptionService: dbService_Description;
+  genericDescriptionService: dbService_Generic_Description;
 
   constructor() {
     /* Generic Model Service  */
@@ -29,5 +31,8 @@ export default class dbService {
 
     /* Description Model Service */
     this.descriptionService = new dbService_Description();
+
+    /* Generic Description Model Service */
+    this.genericDescriptionService = new dbService_Generic_Description();
   }
 }

@@ -1,6 +1,8 @@
 // external import
 import {
   Association,
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
   DataTypes,
   HasManyAddAssociationMixin,
   HasManyGetAssociationsMixin,
@@ -13,23 +15,15 @@ import {
 import sequelizeConnection from "../config";
 import log from "../../utils/logger";
 import Brand from "./Brand.model";
+import Generic_Description from "./Generic.Description.model";
 
 export interface GenericAttributes {
   id: number;
   name: string;
   type: string;
 
-  // Generic description
-  /* indications: string;
-  composition: string;
-  pharmacology: string;
-  dosage_and_administration: string;
-  contraindications: string;
-  side_effects: string;
-  pregnancy_and_lactation: string;
-  precautions_and_warnings: string;
-  therapeutic_class: string;
-  storage_conditions: string; */
+  // generic description
+  descriptionID: number;
 }
 
 class Generic extends Model implements GenericAttributes {
@@ -38,23 +32,21 @@ class Generic extends Model implements GenericAttributes {
   public type!: string;
 
   // Generic description
-  /* public indications!: string;
-  public composition!: string;
-  public pharmacology!: string;
-  public dosage_and_administration!: string;
-  public contraindications!: string;
-  public side_effects!: string;
-  public pregnancy_and_lactation!: string;
-  public precautions_and_warnings!: string;
-  public therapeutic_class!: string;
-  public storage_conditions!: string; */
+  public descriptionID!: number;
 
   // Define associations
   public getBrands?: HasManyGetAssociationsMixin<Brand>;
   public addBrand!: HasManyAddAssociationMixin<Brand, number>;
 
+  public getDescription!: BelongsToGetAssociationMixin<Generic_Description>;
+  public setDescription!: BelongsToSetAssociationMixin<
+    Generic_Description,
+    number
+  >;
+
   public static associations: {
     brands: Association<Generic, Brand>;
+    description: Association<Generic, Generic_Description>;
   };
 }
 
@@ -82,5 +74,7 @@ Generic.init(
     timestamps: false,
   }
 );
+
+
 
 export default Generic;
