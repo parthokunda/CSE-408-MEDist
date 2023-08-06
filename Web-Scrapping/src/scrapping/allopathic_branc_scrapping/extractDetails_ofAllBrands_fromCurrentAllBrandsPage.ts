@@ -4,7 +4,9 @@ import puppeteer, { Page } from "puppeteer";
 // internal imports
 import log from "../../utils/logger";
 import { BrandOverview } from "./extractOverviews_ofAllBrands_FromAllBrandsPage";
-import extractDetails_ofCurrentBrand from "./extractDetails_ofCurrentBrand";
+import extractDetails_ofCurrentBrand, {
+  BrandDetails,
+} from "./extractDetails_ofCurrentBrand";
 import { entryToDB_BrandDetails } from "./databaseEntry";
 import extractGenericDetails_ofCurrentBrand from "./extractGenericDetails_ofCurrentBrand";
 
@@ -22,19 +24,16 @@ const extractDetails_ofAllBrands_fromCurrentAllBrandsPage = async (
     );
 
     //extract details of the brand
-    const brandDetails = await extractDetails_ofCurrentBrand(page);
-
-    log.info(
-      brandDetails.unit_price,
-      "in extractDetails_ofAllBrands_fromCurrentAllBrandsPage.ts"
-    );
+    const response = await extractDetails_ofCurrentBrand(page);
+    const brandDetails: BrandDetails = response.brandDetails;
+    page = response.page;
 
     log.info(
       `Details extracted successfully for ${curr_brandOveriew.brandName} ${curr_brandOveriew.strength}`
     );
 
     //! ------------------ new code for extracting details of generic ------------------
-    await extractGenericDetails_ofCurrentBrand(page);
+    page = await extractGenericDetails_ofCurrentBrand(page);
     //! ------------------ ends here ------------------
 
     // back to the previous page
@@ -42,12 +41,13 @@ const extractDetails_ofAllBrands_fromCurrentAllBrandsPage = async (
     log.info(`Back to the previous page`);
 
     // data entry to the database
-    await entryToDB_BrandDetails(
+    /* await entryToDB_BrandDetails(
       curr_brandOveriew.brandName,
       curr_brandOveriew.strength,
       curr_brandOveriew.dosageForm.name,
       brandDetails
-    );
+    ); */
+
   }
 };
 

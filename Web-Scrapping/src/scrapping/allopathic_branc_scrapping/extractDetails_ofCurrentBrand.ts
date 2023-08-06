@@ -55,15 +55,13 @@ const extractDetails_ofCurrentBrand = async (page: Page) => {
         spans.forEach((span) => {
           unit_price += span.textContent?.trim();
         });
-           
-    
 
         return unit_price;
       }
     );
   }
 
-  log.info(brandDetails.unit_price)
+  log.info(brandDetails.unit_price);
 
   // Extract indications
   if (await page.$("#indications + .ac-body")) {
@@ -161,7 +159,7 @@ const extractDetails_ofCurrentBrand = async (page: Page) => {
     );
   }
 
-  return brandDetails;
+  return { brandDetails, page };
 };
 
 export default extractDetails_ofCurrentBrand;
