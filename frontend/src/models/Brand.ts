@@ -75,7 +75,10 @@ export interface GenericAttributes {
   name: string;
   type: string;
 }
-
+export interface ManufacturerDescription {
+  Manufacturer: ManufacturerAttributes;
+  availableBrands: BrandInfo[];
+}
 export interface ManufacturerAttributes {
   id: number;
   name: string;

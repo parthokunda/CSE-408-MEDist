@@ -27,7 +27,7 @@ const MedCard: FC<{ medicine: BrandInfo }> = (props) => {
       </CardHeader>
       <CardContent>
         <Link to={`/generic/${props.medicine.Generic.id}`}><p className="hover:text-cyan-700">{props.medicine.Generic.name}</p></Link>
-        <p className="text-c1">{props.medicine.Manufacturer.name}</p>
+        <Link to={`/manufacturer/${props.medicine.Manufacturer.id}`}><p className="opacity-50 hover:text-cyan-700">{props.medicine.Manufacturer.name}</p></Link>
       </CardContent>
     </Card>
   );
