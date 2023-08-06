@@ -4,7 +4,7 @@ import MedCard from "../SearchMedicines/MedCard";
 import { useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { AiOutlineArrowRight } from "react-icons/ai";
-const MedCards: FC<{
+const AvailableBrandCards: FC<{
   brandFetchedData: BrandInfo[];
 }> = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -101,4 +101,4 @@ const MedCards: FC<{
   }
 };
 
-export default MedCards;
+export default AvailableBrandCards;
