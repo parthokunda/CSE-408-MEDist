@@ -6,7 +6,12 @@ import jwtService from "../../utils/jwt";
 
 export interface UserRepositoryInterface {
   createUser(_newUser: Partial<User>): Promise<User>;
+  findUserByEmail_and_Password(
+    _email: string,
+    _password: string
+  ): Promise<User>;
   findUserByEmail(_email: string): Promise<User>;
+  deleteUserById(_id: number): Promise<void>;
 }
 
 class UserRepository implements UserRepositoryInterface {
@@ -22,6 +27,25 @@ class UserRepository implements UserRepositoryInterface {
     _newUser.password = passwordHash;
 
     return await User.create(_newUser);
+  }
+
+  async findUserByEmail_and_Password(
+    _email: string,
+    _password: string
+  ): Promise<User> {
+    const existingUser = await this.findUserByEmail(_email);
+    if (existingUser) {
+      const ok = jwtService.validatePassword(
+        _email,
+        _password,
+        existingUser.password,
+        existingUser.salt
+      );
+
+      if (ok) return existingUser;
+    }
+
+    return null;
   }
 
   async findUserByEmail(_email: string): Promise<User> {
@@ -56,6 +80,5 @@ class UserRepository implements UserRepositoryInterface {
     } else return null;
   }
 }
-
 
 export default new UserRepository();

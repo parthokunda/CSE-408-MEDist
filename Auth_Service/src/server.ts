@@ -10,6 +10,3 @@ import { notFoundHandler, defaultErrorHandler } from "./utils/error-handler";
 import dbInit from "./database/init";
 dbInit();
 
-// message broker
-import brokerService from "./utils/broker";
-const channel = brokerService.createChannel();

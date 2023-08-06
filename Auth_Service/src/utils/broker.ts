@@ -12,26 +12,18 @@ export interface RPC_Request_Payload {
   data: object;
 }
 
+export interface RPC_Response_Payload {
+  status: "success" | "error" | "not found" | "unauthorized";
+  data: object;
+}
+
 export interface BrokerServiceInterface {
-  createChannel(): Promise<Channel>;
-
-  publishMessage(
-    channel: Channel,
-    toService: string,
-    message: string
-  ): Promise<void>;
-
-  subscribeMessage(channel: Channel, toService: string): Promise<void>;
-
   RPC_Request(
     RPC_QUEUE_NAME: string,
     requestPayload: RPC_Request_Payload
-  ): Promise<any>;
+  ): Promise<RPC_Response_Payload>;
 
-  RPC_Observer(
-    RPC_QUEUE_NAME: string,
-    userService: UserServiceInterface
-  ): Promise<void>;
+  RPC_Observer(userService: UserServiceInterface): Promise<void>;
 }
 
 class BrokerService implements BrokerServiceInterface {
@@ -48,52 +40,10 @@ class BrokerService implements BrokerServiceInterface {
     return await this.amqlibConnection.createChannel();
   }
 
-  async createChannel(): Promise<Channel> {
-    const channel: Channel = await this.getChannel();
-    await channel.assertExchange(config.EXCHANGE_NAME, "direct", {
-      durable: true,
-    });
-    return channel;
-  }
-
-  // to notify other services that some event has occured
-  async publishMessage(
-    channel: Channel,
-    toService: string,
-    message: string
-  ): Promise<void> {
-    await channel.publish(
-      config.EXCHANGE_NAME,
-      toService,
-      Buffer.from(message)
-    );
-
-    log.info(`Message sent to ${toService} : ${message}`);
-  }
-
-  async subscribeMessage(channel: Channel, fromService: string): Promise<void> {
-    await channel.assertExchange(config.EXCHANGE_NAME, "direct", {
-      durable: true,
-    });
-
-    const q = await channel.assertQueue("", { exclusive: true });
-    log.info(`Waiting for messages in ${q.queue}`);
-
-    channel.bindQueue(q.queue, config.EXCHANGE_NAME, config.AUTH_SERVICE);
-
-    channel.consume(q.queue, (msg: Message | null) => {
-      if (msg.content) {
-        log.info(
-          `Received message from ${fromService} : ${msg.content.toString()}`
-        );
-      }
-    });
-  }
-
   async RPC_Request(
     RPC_QUEUE_NAME: string,
     requestPayload: RPC_Request_Payload
-  ) {
+  ): Promise<RPC_Response_Payload> {
     const uuid = uuidv4(); // correlation id
 
     const channel = await this.getChannel();
@@ -113,7 +63,7 @@ class BrokerService implements BrokerServiceInterface {
       // timeout for 8 seconds
       const timeout = setTimeout(() => {
         channel.close();
-        resolve("API could not fulfill the request");
+        reject(new Error("API could not fulfill the request"));
       }, 8000);
 
       // consume the response
@@ -123,11 +73,11 @@ class BrokerService implements BrokerServiceInterface {
         (msg: Message | null) => {
           if (msg.properties.correlationId === uuid) {
             // if correlation id matches, that means the response is for the request we sent
-            resolve(JSON.parse(msg.content.toString()));
+            resolve(JSON.parse(msg.content.toString()) as RPC_Response_Payload);
             clearTimeout(timeout);
           } else {
             // means the response is not for the request we sent
-            reject("Correlation ID mismatch. Data not found!");
+            reject(new Error("Correlation ID mismatch. Data not found!"));
           }
         },
         {
@@ -138,11 +88,10 @@ class BrokerService implements BrokerServiceInterface {
     });
   }
 
-  async RPC_Observer(
-    RPC_QUEUE_NAME: string,
-    userService: UserServiceInterface
-  ) {
+  async RPC_Observer(userService: UserServiceInterface) {
     const channel = await this.getChannel();
+
+    const RPC_QUEUE_NAME = config.SELF_RPC_QUEUE;
 
     await channel.assertQueue(RPC_QUEUE_NAME, { durable: false });
 
@@ -154,24 +103,54 @@ class BrokerService implements BrokerServiceInterface {
       RPC_QUEUE_NAME,
       async (msg: Message | null) => {
         if (msg.content) {
+          log.info(`Received RPC request: ${msg.content.toString()}`);
+
           const payload: RPC_Request_Payload = JSON.parse(
             msg.content.toString()
           ) as RPC_Request_Payload;
 
-          const response = await userService.serveRPCRequest(payload);
-          log.info(`Response to ${payload.type} : ${response}`);
+          try {
+            const response: RPC_Response_Payload =
+              await userService.serveRPCRequest(payload);
 
-          // send the response
-          channel.sendToQueue(
-            msg.properties.replyTo,
-            Buffer.from(JSON.stringify(response)),
-            {
-              correlationId: msg.properties.correlationId,
-            }
-          );
+            log.info(`Response to ${payload.type} : ${response}`);
 
-          // acknowledge the message
-          channel.ack(msg);
+            // send the response
+            channel.sendToQueue(
+              msg.properties.replyTo,
+              Buffer.from(JSON.stringify(response)),
+              {
+                correlationId: msg.properties.correlationId,
+              }
+            );
+
+            // acknowledge the message
+            channel.ack(msg);
+          } catch (error) {
+            // Handle the error gracefully
+            log.error(
+              `Error processing RPC request for ${payload.type}: ${error.message}`
+            );
+
+            //send an error response to the sender if needed.
+
+            const errorResponse: RPC_Response_Payload = {
+              status: "error",
+              data: {
+                message: "An error occurred while processing the request.",
+              },
+            };
+            channel.sendToQueue(
+              msg.properties.replyTo,
+              Buffer.from(JSON.stringify(errorResponse)),
+              {
+                correlationId: msg.properties.correlationId,
+              }
+            );
+
+            // Acknowledge the message even if there's an error, so it is removed from the queue.
+            channel.ack(msg);
+          }
         }
       },
       {

@@ -7,6 +7,7 @@ import { config } from "../config";
 
 export interface JWT_Payload {
   id: number;
+  email: string;
   role: string;
 }
 
@@ -22,6 +23,7 @@ export interface JWT_Service_Interface {
   validatePassword(
     email: string,
     enteredPassword: string,
+    savedPassword: string,
     salt: string
   ): Promise<boolean>;
 
@@ -49,10 +51,13 @@ class JWT_Service implements JWT_Service_Interface {
   async validatePassword(
     email: string,
     enteredPassword: string,
+    savedPassword: string,
     salt: string
   ): Promise<boolean> {
-    const tempPassword = `${email}${enteredPassword}`;
-    return await bcrypt.compare(tempPassword, salt);
+    return (
+      (await this.generatePasswordHash(email, enteredPassword, salt)) ===
+      savedPassword
+    );
   }
 
   async generateToken(payload: JWT_Payload): Promise<string> {

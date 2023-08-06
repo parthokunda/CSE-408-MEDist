@@ -4,6 +4,15 @@ import { NextFunction, Request, Response } from "express";
 // internal imports
 import { Signup_or_Login_Body_Input } from "schema/auth.schema";
 import userService, { UserServiceInterface } from "../services/user.service";
+import broker from "utils/broker";
+import { config } from "config";
+
+
+
+interface SignUp_or_Login_Response {
+  token: string;
+}
+
 
 interface Auth_Controller_Interface {
   signup(
@@ -11,7 +20,15 @@ interface Auth_Controller_Interface {
     res: Response,
     next: NextFunction
   );
+
+  login(
+    req: Request<{}, {}, Signup_or_Login_Body_Input>,
+    res: Response,
+    next: NextFunction
+  );
 }
+
+
 
 class Auth_Controller implements Auth_Controller_Interface {
   // ------------------------------ signup ------------------------------
@@ -22,14 +39,47 @@ class Auth_Controller implements Auth_Controller_Interface {
   ) {
     try {
       const { email, password, role } = req.body;
-      const { user, token } = await userService.SignUp({
+
+      const response_token = await userService.SignUp({
         email,
         password,
         role,
       });
-      res.status(201).json({ user, token });
+
+      const response: SignUp_or_Login_Response = {
+        token: response_token,
+      };
+      res.status(201).json(response);
     } catch (error) {
       next(error);
     }
+  }
+
+  // ---------------------------- Login -----------------------------------
+  async login(
+    req: Request<{}, {}, Signup_or_Login_Body_Input>,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+
+      const { email, password, role } = req.body;
+
+      const response_token = await userService.LogIn({
+        email,
+        password,
+        role,
+      });
+
+      const response: SignUp_or_Login_Response = {
+        token: response_token,
+      };
+
+      res.status(200).json(response);
+
+    } catch (error) {
+      next(error)
+    }
+
   }
 }
