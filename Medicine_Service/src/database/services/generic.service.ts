@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import Generic, { GenericAttributes } from "../models/Generic.model";
 import { BrandInfo } from "./brand.service";
 import createHttpError from "http-errors";
+import { GenericDescriptionAttributes } from "database/models/Generic.Description.model";
 
 export interface AllGenericInfo {
   Generic: GenericAttributes;
@@ -10,6 +11,7 @@ export interface AllGenericInfo {
 
 export interface SingleGenericInfo {
   Generic: GenericAttributes;
+  Description: GenericDescriptionAttributes;
   availableBrands: BrandInfo[];
 }
 
@@ -93,6 +95,10 @@ export default class dbService_Generic implements GenericInterface {
 
     if (!generic) throw new createHttpError.NotFound("Generic not found");
 
+    // get generic description
+    const description = await generic.getDescription();
+
+    // get all brands for this generic
     const brands = await generic.getBrands();
 
     const brandInfos = brands.map(async (brand) => {
@@ -113,6 +119,7 @@ export default class dbService_Generic implements GenericInterface {
 
     return {
       Generic: generic.dataValues,
+      Description: description.dataValues,
       availableBrands: await Promise.all(brandInfos),
     };
   }

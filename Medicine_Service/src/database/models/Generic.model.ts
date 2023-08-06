@@ -1,6 +1,8 @@
 // external import
 import {
   Association,
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
   DataTypes,
   HasManyAddAssociationMixin,
   HasManyCountAssociationsMixin,
@@ -14,6 +16,7 @@ import {
 import sequelizeConnection from "../config";
 import log from "../../utils/logger";
 import Brand from "./Brand.model";
+import Generic_Description from "./Generic.Description.model";
 
 export interface GenericAttributes {
   id: number;
@@ -30,6 +33,12 @@ class Generic extends Model implements GenericAttributes {
   public getBrands?: HasManyGetAssociationsMixin<Brand>;
   public addBrand!: HasManyAddAssociationMixin<Brand, number>;
   public countBrands!: HasManyCountAssociationsMixin;
+
+  public getDescription!: BelongsToGetAssociationMixin<Generic_Description>;
+  public setDescription!: BelongsToSetAssociationMixin<
+    Generic_Description,
+    number
+  >;
 
   public static associations: {
     brands: Association<Generic, Brand>;

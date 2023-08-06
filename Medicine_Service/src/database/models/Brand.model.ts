@@ -18,12 +18,12 @@ import Generic from "./Generic.model";
 import DosageForm from "./DosageForm.model";
 import Manufacturer from "./Manufacturer.model";
 import Description from "./Description.model";
+import Generic_Description from "./Generic.Description.model";
 
 interface BrandAttributes {
   id: number;
   name: string;
   strength: string;
-  manufacturer: string;
   description_url: string;
   unit_price: string;
 
@@ -37,7 +37,6 @@ class Brand extends Model implements BrandAttributes {
   public id!: number;
   public name!: string;
   public strength!: string;
-  public manufacturer: string;
   public description_url!: string;
   public unit_price!: string;
   public genericID!: number;
@@ -80,10 +79,6 @@ Brand.init(
     strength: {
       type: DataTypes.STRING(80),
       allowNull: false,
-    },
-    manufacturer: {
-      type: DataTypes.STRING(80),
-      allowNull: true,
     },
     description_url: {
       type: DataTypes.STRING(100),
@@ -136,6 +131,21 @@ Brand.belongsTo(Description, {
   },
 });
 Description.hasOne(Brand, {
+  foreignKey: {
+    name: "descriptionID",
+    allowNull: true,
+  },
+});
+
+// between Generic and Generic_Description
+// between Generic and Generic.Description
+Generic.belongsTo(Generic_Description, {
+  foreignKey: {
+    name: "descriptionID",
+    allowNull: true,
+  },
+});
+Generic_Description.hasOne(Generic, {
   foreignKey: {
     name: "descriptionID",
     allowNull: true,
