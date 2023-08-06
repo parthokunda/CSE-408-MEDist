@@ -68,7 +68,8 @@ const MedicineDescriptionPage: FC = () => {
         <p className="opacity-50">{medicine.DosageForm.name}</p>
         <Link to={`/generic/${medicine.Generic.id}`}><p className="hover:text-cyan-700">{medicine.Generic.name}</p></Link>
         <p>{medicine.Brand.strength}</p>
-        <p className=" opacity-50">{medicine.Manufacturer.name}</p>
+        <Link to={`/manufacturer/${medicine.Manufacturer.id}`}><p className=" opacity-50 hover:text-c2">{medicine.Manufacturer.name}</p></Link>
+        {/* <p className=" opacity-50 hover:text-c2">{medicine.Manufacturer.name}</p> */}
         <p>
           Unit price :
           {medicine.Description.unit_price
