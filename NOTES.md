@@ -1,3 +1,32 @@
+## Patient Service RPC call from Auth Service
+#### GET_ID
+```typescript
+const payload: RPC_Request_Payload = {
+      type: "GET_ID",
+      data: {
+        userID: existingUser.id,
+      },
+    };
+```
+> get patient id from patient service if patient exists ( signed up already )
+
+
+#### CREATE_NEW_ENTITY 
+```typescript
+  const payload: RPC_Request_Payload = {
+      type: "CREATE_NEW_ENTITY",
+      data: {
+        userID: newUser.id,
+      },
+    };
+```
+> create new patient entity in patient service if patient does not exist ( sign up first time )
+
+## Auth Service RPC call
+- `AUTHORIZATION` : check if the user is authorized to access the resource
+
+
+## message broker installation
 ```bash
 npm i jsonwebtoken bcrypt
 npm i -D @types/jsonwebtoken @types/bcrypt
@@ -7,7 +36,7 @@ npm i -D @types/amqplib
 
 ```
 
-
+## message broker configuration for future use
 ```typescript
 async createChannel(): Promise<Channel> {
     const channel: Channel = await this.getChannel();

@@ -4,18 +4,18 @@ import cors from "cors";
 
 //internal imports
 import log from "./utils/logger";
-import { config } from "./config";
 import router from "./routes/index";
 import { notFoundHandler, defaultErrorHandler } from "./utils/error-handler";
 
 // database
 import dbInit from "./database/init";
+import { config } from "./config";
 dbInit();
 
 // message broker
 import messageBroker from "./utils/broker";
-import userService from "./services/user.service";
-messageBroker.RPC_Observer(userService);
+import patientService from "./services/patient.service";
+messageBroker.RPC_Observer(patientService);
 
 const app = express();
 
@@ -23,7 +23,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
-
 
 // routes
 app.use(router);

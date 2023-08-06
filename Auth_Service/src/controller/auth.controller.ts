@@ -7,12 +7,9 @@ import userService, { UserServiceInterface } from "../services/user.service";
 import broker from "utils/broker";
 import { config } from "config";
 
-
-
 interface SignUp_or_Login_Response {
   token: string;
 }
-
 
 interface Auth_Controller_Interface {
   signup(
@@ -27,8 +24,6 @@ interface Auth_Controller_Interface {
     next: NextFunction
   );
 }
-
-
 
 class Auth_Controller implements Auth_Controller_Interface {
   // ------------------------------ signup ------------------------------
@@ -62,7 +57,6 @@ class Auth_Controller implements Auth_Controller_Interface {
     next: NextFunction
   ) {
     try {
-
       const { email, password, role } = req.body;
 
       const response_token = await userService.LogIn({
@@ -76,10 +70,15 @@ class Auth_Controller implements Auth_Controller_Interface {
       };
 
       res.status(200).json(response);
-
     } catch (error) {
-      next(error)
+      next(error);
     }
+  }
+
+  // ---------------------------- Logout -----------------------------------
+  async logout(req: Request, res: Response, next: NextFunction) {
 
   }
 }
+
+export default new Auth_Controller();

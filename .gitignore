@@ -5,6 +5,10 @@ Web-Scrapping/dist
 Auth_Service/node_modules
 Auth_Service/dist
 
+# Patient_Service
+Patient_Service/node_modules
+Patient_Service/dist
+
 # frontend
 frontend/logs
 frontend/*.log

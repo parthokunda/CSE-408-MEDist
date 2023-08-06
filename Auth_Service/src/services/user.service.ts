@@ -2,7 +2,7 @@
 import createHttpError from "http-errors";
 
 //internal imports
-import { Signup_or_Login_Body_Input } from "schema/auth.schema";
+import { Signup_or_Login_Body_Input } from "../schema/auth.schema";
 import userRepository, {
   UserRepositoryInterface,
 } from "../database/repository/user.repository";
@@ -10,15 +10,16 @@ import userRepository, {
 import broker, {
   RPC_Request_Payload,
   RPC_Response_Payload,
-} from "utils/broker";
-import { config } from "config";
-import jwtService, { JWT_Payload } from "utils/jwt";
-import { UserRole } from "database/models/User.model";
+} from "../utils/broker";
+import { config } from "../config";
+import jwtService, { JWT_Payload } from "../utils/jwt";
+import { UserRole } from "../database/models/User.model";
 
 // ============================== UserService ============================== //
 
 export interface UserServiceInterface {
   SignUp(userInput: Signup_or_Login_Body_Input): Promise<string>;
+  LogIn(userInput: Signup_or_Login_Body_Input): Promise<string>;
   serveRPCRequest(payload: RPC_Request_Payload): Promise<RPC_Response_Payload>;
   authorizeUser(token: string): Promise<RPC_Response_Payload>;
 }
@@ -122,6 +123,7 @@ class UserService implements UserServiceInterface {
 
     return token;
   }
+
 
   // ----------------------------------------- Authorize User ------------------------------------------ //
   async authorizeUser(token: string): Promise<RPC_Response_Payload> {
