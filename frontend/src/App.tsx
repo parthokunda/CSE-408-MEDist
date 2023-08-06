@@ -7,6 +7,9 @@ import GenericList from "./pages/Medicines/SearchMedicines/GenericList";
 import { Routes, Route, Navigate } from "react-router-dom";
 import GenericDescriptionPage from "./pages/Medicines/Generic/GenericDescriptionPage";
 
+const availableBrands=[
+  
+]
 const genericList = [
   {
     id: 2,

@@ -1,11 +1,11 @@
-import { Brand } from "@/models/Brand";
+import { BrandInfo } from "@/models/Brand";
 import { FC } from "react";
 import { useState } from "react";
 import MedCard from "./MedCard";
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
 
-const MedCards: FC<{ medicineList: Brand[] }> = (props) => {
+const MedCards: FC<{ medicineList: BrandInfo[] }> = (props) => {
     const [currentPage, setCurrentPage] = useState(1);
     const recordsPerPage = 4;
     const lastIndex= currentPage * recordsPerPage;

@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 const MedCard: FC<{ medicine: BrandInfo }> = (props) => {
   // const navigate = useNavigate();
   return (
-    <Card className="flex flex-col w-fit drop-shadow">
+    <Card className="flex flex-col w-fit drop-shadow overflow-hidden">
       <CardHeader className="text-c1">
         <CardTitle className="flex flex-row items-center">
           <Link to={`/medicine/${props.medicine.Brand.id}`}><p className="hover:text-c3">{props.medicine.Brand.name}</p></Link>
