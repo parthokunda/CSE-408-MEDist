@@ -139,8 +139,8 @@ const GenericDescriptionPage: FC = () => {
           />
         )}
       </div>
-      <div className="flex-[50%]">
-      <p className="text-xl mt-6 justify-center align-middle font-bold">Available Brands</p>
+      <div className="flex-[50%] mt-6 ml-3">
+      <p className="text-xl justify-center align-middle font-bold">Available Brands</p>
       <AvailableBrandCards brandFetchedData={generic.availableBrands} />
       </div>
     </div>

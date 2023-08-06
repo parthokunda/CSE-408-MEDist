@@ -27,8 +27,8 @@ const AvailableBrandCards: FC<{
     );
   }
   return (
-    <div className="ustify-center align-middle">
-      <div className="grid grid-cols-3 gap-2">
+    <div className="flex flex-col justify-center align-middle mt-6">
+      <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-2">
       {/* <div className="grid lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 mt-3 gap-5"> */}
         {props.brandFetchedData &&
           records.map((medicine) => (
