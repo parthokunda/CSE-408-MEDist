@@ -88,7 +88,7 @@ export const LoginPage: FC = () => {
                   <Input id="confirm_password" placeholder="Confirm Password" />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="loginAs">Login As</Label>
+                  <Label htmlFor="SignupAs">Sign Up As</Label>
                   <Select>
                     <SelectTrigger>
                       <SelectValue />
