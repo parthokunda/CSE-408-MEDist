@@ -1,7 +1,6 @@
-// import 'bootstrap/dist/css/bootstrap.min.css';
+
 import { FC, useEffect, useState } from "react";
 import SearchMed from "./SearchMed";
-// import { Brand } from "@/models/Brand";
 import {
   AllGenericInfo,
   BrandInfo,

@@ -24,7 +24,7 @@ const MedCardSingleBox: FC<{ boxHeader: string; boxText: string }> = (
 ) => {
   return (
     <div className="my-2">
-      <div className="bg-c3 text-xl text-c1 py-1 mx rounded-md">
+      <div className="bg-c3 text-xl text-c1 py-2 mt-2 rounded-md">
         <b className="ml-3">{props.boxHeader}</b>
       </div>
       <p className="ml-3 mt-1 break-normal whitespace-pre-wrap">
