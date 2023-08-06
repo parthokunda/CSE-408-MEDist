@@ -2,20 +2,19 @@ require("dotenv").config();
 
 import log from "../utils/logger";
 
-
 // import all models
 import Generic from "./models/Generic.model";
 import Brand from "./models/Brand.model";
 import DosageForm from "./models/DosageForm.model";
 import Manufacturer from "./models/Manufacturer.model";
 import Description from "./models/Description.model";
+import Generic_Description from "./models/Generic.Description.model";
 
 const isDev = process.env.NODE_ENV === "development";
 
-
-
 const dbInit = async () =>
   Promise.all([
+    Generic_Description.sync({ alter: isDev }),
     Generic.sync({ alter: isDev }),
     DosageForm.sync({ alter: isDev }),
     Manufacturer.sync({ alter: isDev }),

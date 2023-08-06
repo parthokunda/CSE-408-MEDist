@@ -24,7 +24,7 @@ const extractOverviews_ofAllBrands_FromAllBrandsPage = async (
   pageNo: number
 ) => {
   // wait for page to load
-  await page.waitForSelector(".hoverable-block");
+  await page.waitForSelector(".hoverable-block", { timeout: 60000});
   log.info(`All Brand Names Page ${pageNo} loaded`);
 
   // get all the brand overviews shown on the page

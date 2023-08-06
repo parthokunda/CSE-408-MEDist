@@ -5,8 +5,7 @@ import log from "./utils/logger";
 import dbInit from "./database/init";
 dbInit();
 
-
 // scrapping
 import start_scrapping from "./scrapping/allopathic_branc_scrapping/start_scrapping";
 
-start_scrapping(true);
+start_scrapping(false);
