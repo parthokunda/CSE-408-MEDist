@@ -45,11 +45,11 @@ const ManufacturerDescriptionPage: FC = () => {
     
 
   return (
-    <div>
-      <div className="font-bold text-2xl text-c1">
+    <div className="px-5">
+      <div className="py-3 font-bold text-2xl text-c1">
         {manufacturer.Manufacturer.name}
         </div>
-        <p className="text-xl mt-6 font-bold">
+        <p className="text-xl font-bold">
           Available Brands
         </p>
         <MedCards brandFetchedData={manufacturer.availableBrands} />
