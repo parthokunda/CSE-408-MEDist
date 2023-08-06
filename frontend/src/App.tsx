@@ -7,33 +7,8 @@ import GenericList from "./pages/Medicines/SearchMedicines/GenericList";
 import { Routes, Route, Navigate } from "react-router-dom";
 import GenericDescriptionPage from "./pages/Medicines/Generic/GenericDescriptionPage";
 import ManufacturerDescriptionPage from "./pages/Medicines/Manufacturer/ManufacturerPage";
+import { LoginPage } from "./pages/LoginPage/LoginPage";
 
-const availableBrands=[
-  
-]
-const genericList = [
-  {
-    id: 2,
-    name: "Genericfsdf sdfsdfsdfdsjjjjjjfffffffffffffffffgggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggfffffkjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk2",
-    description: "Generic 12 description",
-    type: "Generic",
-    availableBrands: 12,
-  },
-  {
-    id: 1,
-    name: "Generic 1",
-    description: "Generic 1 description",
-    type: "Generic",
-    availableBrands: 22,
-  },
-  {
-    id: 3,
-    name: "Generic 3",
-    description: "Generic 3 description",
-    type: "Generic",
-    availableBrands: 32,
-  },
-];
 
 const navList: navIcon[] = [
   { name: "Medicines", link: "/medicines" },
@@ -48,6 +23,7 @@ function App() {
     <>
       <NavBar navList={navList}/>
       <Routes>
+        <Route path="landing/" element={<LoginPage/>}/>
         <Route path="*" element={<Navigate to="/searchMedicines/" replace />} />
         <Route path="searchMedicines/" element={<MedicineSearchPage />}/>
         <Route path="medicine/:medicineId" element={<MedicineDescriptionPage/>}/>
