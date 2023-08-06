@@ -5,6 +5,9 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./src",
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+  },
+  "files": [
+    "./src/utils/custom.d.ts"
+  ]
 }

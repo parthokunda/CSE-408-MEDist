@@ -10,7 +10,7 @@ import broker, {
   RPC_Response_Payload,
 } from "../utils/broker";
 import { config } from "../config";
-import jwtService, { JWT_Payload } from "utils/jwt";
+
 
 export interface PatientServiceInterface {
   createInitialPatient(userID: number): Promise<RPC_Response_Payload>;

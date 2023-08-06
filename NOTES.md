@@ -23,7 +23,16 @@ const payload: RPC_Request_Payload = {
 > create new patient entity in patient service if patient does not exist ( sign up first time )
 
 ## Auth Service RPC call
-- `AUTHORIZATION` : check if the user is authorized to access the resource
+#### AUTHORIZATION 
+```typescript
+const payload: RPC_Request_Payload = {
+            type: "AUTHORIZATION",
+            data: {
+                token: token,
+            }
+        };
+```
+> check if the user is authorized to access the resource
 
 
 ## message broker installation

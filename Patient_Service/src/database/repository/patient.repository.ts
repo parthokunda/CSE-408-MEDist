@@ -2,7 +2,7 @@
 import Patient from "../models/Patient.model";
 
 //internal imports
-import jwtService from "../../utils/jwt";
+
 
 export interface PatientRepositoryInterface {
   createPatient_byUserId(userID: number): Promise<number>;
