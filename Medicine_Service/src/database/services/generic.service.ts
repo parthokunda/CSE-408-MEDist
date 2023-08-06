@@ -58,7 +58,8 @@ export default class dbService_Generic implements GenericInterface {
 
     let generics: Generic[];
 
-    if (searchBy === "" || searchBy === undefined || searchBy === null) {
+    try {
+      if (searchBy === "" || searchBy === undefined || searchBy === null) {
       // Fetch all brands without any search criteria
       generics = await Generic.findAll({
         offset,
@@ -87,40 +88,48 @@ export default class dbService_Generic implements GenericInterface {
     });
 
     return await Promise.all(genericInfos);
+    }
+    catch (error) {
+      throw error;
+    }
   }
 
   // when we click on a generic, we want to see all the brands that are available for that generic
   async getSingleGenericInfo(id: number): Promise<SingleGenericInfo> {
-    const generic = await Generic.findByPk(id);
+    try {
+      const generic = await Generic.findByPk(id);
 
-    if (!generic) throw new createHttpError.NotFound("Generic not found");
+      if (!generic) throw new createHttpError.NotFound("Generic not found");
 
-    // get generic description
-    const description = await generic.getDescription();
+      // get generic description
+      const description = await generic.getDescription();
 
-    // get all brands for this generic
-    const brands = await generic.getBrands();
+      // get all brands for this generic
+      const brands = await generic.getBrands();
 
-    const brandInfos = brands.map(async (brand) => {
-      const dosageForm = await brand.getDosageForm();
-      const manufacturer = await brand.getManufacturer();
+      const brandInfos = brands.map(async (brand) => {
+        const dosageForm = await brand.getDosageForm();
+        const manufacturer = await brand.getManufacturer();
+
+        return {
+          Brand: {
+            id: brand.id,
+            name: brand.name,
+            strength: brand.strength,
+          },
+          DosageForm: dosageForm.dataValues,
+          Generic: generic.dataValues,
+          Manufacturer: manufacturer.dataValues,
+        };
+      });
 
       return {
-        Brand: {
-          id: brand.id,
-          name: brand.name,
-          strength: brand.strength,
-        },
-        DosageForm: dosageForm.dataValues,
         Generic: generic.dataValues,
-        Manufacturer: manufacturer.dataValues,
+        Description: description.dataValues,
+        availableBrands: await Promise.all(brandInfos),
       };
-    });
-
-    return {
-      Generic: generic.dataValues,
-      Description: description.dataValues,
-      availableBrands: await Promise.all(brandInfos),
-    };
+    } catch (error) {
+      throw error;
+    }
   }
 }
