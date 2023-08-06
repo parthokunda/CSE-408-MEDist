@@ -60,6 +60,7 @@ export function isAllGenericInfoList(object:any) : object is AllGenericInfo[] {
 
 export interface GenericDescription {
   Generic: GenericAttributes;
+  Description: DescriptionAttributes;
   availableBrands: BrandInfo[];
 }
 

@@ -2,17 +2,23 @@ import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 import { GenericDescription } from "@/models/Brand";
 import { useQuery } from "@tanstack/react-query";
 import { FC } from "react";
-import {useParams} from "react-router-dom"
-import MedCards from "../SearchMedicines/MedCards";
+import { useParams } from "react-router-dom";
+import AvailableBrandCards from "./AvailableBrandCards";
 
-const fetchGenericDescription = async ({queryKey}) : Promise<GenericDescription> => {
+const fetchGenericDescription = async ({
+  queryKey,
+}): Promise<GenericDescription> => {
   const [_, genericId] = queryKey;
-  console.log(`http://localhost:3000/api/medicine/get_generic_info/${genericId}`);
-  const response = await fetch(`http://localhost:3000/api/medicine/get_generic_info/${genericId}`);
+  console.log(
+    `http://localhost:3000/api/medicine/get_generic_info/${genericId}`
+  );
+  const response = await fetch(
+    `http://localhost:3000/api/medicine/get_generic_info/${genericId}`
+  );
   const data = await response.json();
   console.log(data.result);
   return data.result;
-}
+};
 
 //show details of a generic
 const GenericSingleBox: FC<{ boxHeader: string; boxText: string }> = (
@@ -31,9 +37,13 @@ const GenericSingleBox: FC<{ boxHeader: string; boxText: string }> = (
 };
 
 const GenericDescriptionPage: FC = () => {
-  const {genericId} = useParams();
+  const { genericId } = useParams();
 
-  const {data:generic, isLoading, isError} = useQuery({
+  const {
+    data: generic,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["genericDescription", genericId],
     queryFn: fetchGenericDescription,
   });
@@ -45,14 +55,95 @@ const GenericDescriptionPage: FC = () => {
         <LoadingSpinner />
       </div>
     );
-  
+
   return (
-    <div className="flex flex-col m-3">
-      <p className="text-c1 font-bold text-2xl mt-3">{generic.Generic.name}</p>
-      <p className="opacity-50">{generic.Generic.type}</p>
-      <p className="text-xl mt-6 font-bold">Available Brands</p>
-      <MedCards brandFetchedData={generic.availableBrands} />
+    <div className="flex ">
+      <div className="flex-[70%] flex flex-col m-3">
+        <p className="text-c1 font-bold text-2xl mt-3">
+          {generic.Generic.name}
+        </p>
+        <p className="opacity-50">{generic.Generic.type}</p>
+
+        {generic.Description.indications && (
+          <GenericSingleBox
+            boxHeader="Indications"
+            boxText={generic.Description.indications}
+          />
+        )}
+
+        {generic.Description.compositions && (
+          <GenericSingleBox
+            boxHeader="Compositions"
+            boxText={generic.Description.compositions}
+          />
+        )}
+
+        {generic.Description.pharmacology && (
+          <GenericSingleBox
+            boxHeader="Pharmacology"
+            boxText={generic.Description.pharmacology}
+          />
+        )}
+        {generic.Description.dosage_and_administration && (
+          <GenericSingleBox
+            boxHeader="Dosage and Administration"
+            boxText={generic.Description.dosage_and_administration}
+          />
+        )}
+        {generic.Description.interaction && (
+          <GenericSingleBox
+            boxHeader="Interaction"
+            boxText={generic.Description.interaction}
+          />
+        )}
+        {generic.Description.contraindications && (
+          <GenericSingleBox
+            boxHeader="Contraindictions"
+            boxText={generic.Description.contraindications}
+          />
+        )}
+        {generic.Description.side_effects && (
+          <GenericSingleBox
+            boxHeader="Side Effects"
+            boxText={generic.Description.side_effects}
+          />
+        )}
+        {generic.Description.pregnancy_and_lactation && (
+          <GenericSingleBox
+            boxHeader="Pregnancy and Lactation"
+            boxText={generic.Description.pregnancy_and_lactation}
+          />
+        )}
+        {generic.Description.precautions_and_warnings && (
+          <GenericSingleBox
+            boxHeader="Precautions and Warning"
+            boxText={generic.Description.precautions_and_warnings}
+          />
+        )}
+        {generic.Description.overdose_effects && (
+          <GenericSingleBox
+            boxHeader="Overdose Effects"
+            boxText={generic.Description.overdose_effects}
+          />
+        )}
+        {generic.Description.therapeutic_class && (
+          <GenericSingleBox
+            boxHeader="Threpeutic Class"
+            boxText={generic.Description.therapeutic_class}
+          />
+        )}
+        {generic.Description.storage_conditions && (
+          <GenericSingleBox
+            boxHeader="Storage Conditions"
+            boxText={generic.Description.storage_conditions}
+          />
+        )}
+      </div>
+      <div className="flex-[50%]">
+      <p className="text-xl mt-6 justify-center align-middle font-bold">Available Brands</p>
+      <AvailableBrandCards brandFetchedData={generic.availableBrands} />
+      </div>
     </div>
   );
-          }
+};
 export default GenericDescriptionPage;
