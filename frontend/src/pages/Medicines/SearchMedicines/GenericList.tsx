@@ -12,7 +12,7 @@ const GenericList: FC<{ genericList: AllGenericInfo[] }> = (props) => {
             <Link to={`/generic/${generic.Generic.id}`}>
               <div className="font-bold text-c1">{generic.Generic.name}</div>
             </Link>
-            <div className="opacity-50">{generic.Generic.type}</div>
+            <div className="opacity-50">Available Brands: {generic.availableBrands}</div>
           </div>
         </div>
       ))}
