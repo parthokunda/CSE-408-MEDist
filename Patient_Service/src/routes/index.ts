@@ -8,6 +8,6 @@ const router = express.Router();
 
 router.get("/checkServer", (_, res) => res.sendStatus(200));
 
-router.use("/api/patient", patientRouter);
+router.use("/", patientRouter);
 
 export default router;

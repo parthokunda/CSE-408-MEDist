@@ -8,6 +8,6 @@ const router = express.Router();
 
 router.get("/checkServer", (_, res) => res.sendStatus(200));
 
-router.use("/api/auth", authRouter);
+router.use("/", authRouter);
 
 export default router;
