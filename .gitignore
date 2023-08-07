@@ -3,6 +3,13 @@ Web-Scrapping/dist
 
 Medicine_Service/node_modules
 Medicine_Service/dist
+# Auth_Service
+Auth_Service/node_modules
+Auth_Service/dist
+
+# Patient_Service
+Patient_Service/node_modules
+Patient_Service/dist
 
 # frontend
 frontend/logs
