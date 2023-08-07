@@ -9,7 +9,7 @@ const fetchMedicineDescription = async ({
 }): Promise<BrandDescription> => {
   const [_, medicineId] = queryKey;
   const response = await fetch(
-    `http://localhost:3000/api/medicine/get_medicine_info/${medicineId}`
+    `${import.meta.env.VITE_DB_URL}:${import.meta.env.VITE_DB_PORT}/api/medicine/get_medicine_info/${medicineId}`
   );
   const data = await response.json();
   console.log(

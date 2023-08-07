@@ -21,7 +21,7 @@ function App() {
     <>
       {/* <NavBar navList={navList}/> */}
       <Routes>
-        <Route path="/" element={<LoginPage/>}/>
+        <Route path="/landing" element={<LoginPage/>}/>
         <Route path="*" element={<Navigate to="/searchMedicines/" replace />} />
         <Route  element={<NavBar navList={navList} />}>
           {/* <Route index element={<NavBar navList={navList} />} /> */}

@@ -55,7 +55,7 @@ const AvailableBrandCards: FC<{
             </li>
           )}
           {pages.map((page) => (
-            <li>
+            <li key={page}>
               <a
                 className={
                   page === currentPage

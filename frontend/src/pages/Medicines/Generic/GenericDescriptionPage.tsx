@@ -9,11 +9,8 @@ const fetchGenericDescription = async ({
   queryKey,
 }): Promise<GenericDescription> => {
   const [_, genericId] = queryKey;
-  console.log(
-    `http://localhost:3000/api/medicine/get_generic_info/${genericId}`
-  );
   const response = await fetch(
-    `http://localhost:3000/api/medicine/get_generic_info/${genericId}`
+    `${import.meta.env.VITE_DB_URL}:${import.meta.env.VITE_DB_PORT}/api/medicine/get_generic_info/${genericId}`
   );
   const data = await response.json();
   console.log(data.result);

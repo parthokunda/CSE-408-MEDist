@@ -10,11 +10,8 @@ const fetchManufacturerDescription = async ({
   queryKey,
 }): Promise<SingleManufacturerInfo> => {
   const [_, manufacturerId] = queryKey;
-  console.log(
-    `http://localhost:3000/api/medicine/get_manufacturer_info/${manufacturerId}`
-  );
   const response = await fetch(
-    `http://localhost:3000/api/medicine/get_manufacturer_info/${manufacturerId}`
+    `${import.meta.env.VITE_DB_URL}:${import.meta.env.VITE_DB_PORT}/api/medicine/get_manufacturer_info/${manufacturerId}`
   );
   const data = await response.json();
 

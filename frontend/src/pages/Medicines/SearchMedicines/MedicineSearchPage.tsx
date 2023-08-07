@@ -23,7 +23,7 @@ const fetchMedList = async (
     formData
   );
   const response = await fetch(
-    `http://localhost:3000/api/medicine/get_all_medicines?searchBy=${formData.searchText}&filterBy=${formData.filterBy}&pagination=60`
+    `${import.meta.env.VITE_DB_URL}:${import.meta.env.VITE_DB_PORT}/api/medicine/get_all_medicines?searchBy=${formData.searchText}&filterBy=${formData.filterBy}&pagination=60`
   );
   const data = await response.json();
   // await new Promise(resolve => setTimeout(resolve,1000));
