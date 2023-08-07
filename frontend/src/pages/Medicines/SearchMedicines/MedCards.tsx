@@ -1,18 +1,18 @@
-import { BrandInfo } from "@/models/Brand";
+import { SearchBrandOutput } from "@/models/Brand";
 import { FC } from "react";
 import MedCard from "./MedCard";
 import { useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { AiOutlineArrowRight } from "react-icons/ai";
 const MedCards: FC<{
-  brandFetchedData: BrandInfo[];
+  brandFetchedData: SearchBrandOutput;
 }> = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 15;
   const lastIndex = currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
-  const records = props.brandFetchedData.slice(firstIndex, lastIndex);
-  const nPages = Math.ceil(props.brandFetchedData.length / recordsPerPage);
+  const records = props.brandFetchedData.brandInfos.slice(firstIndex, lastIndex);
+  const nPages = Math.ceil(props.brandFetchedData.brandInfos.length / recordsPerPage);
   const array = [
     currentPage - 2,
     currentPage - 1,
@@ -21,7 +21,7 @@ const MedCards: FC<{
     currentPage + 2,
   ];
   const pages = array.filter((page) => page > 0 && page <= nPages);
-  if (props.brandFetchedData && props.brandFetchedData.length === 0) {
+  if (props.brandFetchedData.brandInfos && props.brandFetchedData.brandInfos.length === 0) {
     return (
       <div className="flex justify-center align-middle">No Item Found</div>
     );
@@ -29,7 +29,7 @@ const MedCards: FC<{
   return (
     <div className="">
       <div className="grid lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 mt-3 gap-5">
-        {props.brandFetchedData &&
+        {props.brandFetchedData.brandInfos &&
           records.map((medicine) => (
             <MedCard medicine={medicine} key={medicine.Brand.id} />
           ))}
@@ -54,7 +54,7 @@ const MedCards: FC<{
             </li>
           )}
           {pages.map((page) => (
-            <li>
+            <li key={page}>
               <a
                 className={
                   page === currentPage

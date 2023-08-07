@@ -2,10 +2,10 @@
 import { FC, useEffect, useState } from "react";
 import SearchMed from "./SearchMed";
 import {
-  AllGenericInfo,
-  BrandInfo,
-  isAllGenericInfoList,
-  isBrandInfoList,
+  SearchBrandOutput,
+  SearchGenericOutput,
+  isSearchBrandOutput,
+  isSearchGenericOutput,
 } from "@/models/Brand";
 import MedCards from "./MedCards";
 import { z } from "zod";
@@ -17,7 +17,7 @@ import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 
 const fetchMedList = async (
   formData: z.infer<typeof MedSearchForm>
-): Promise<BrandInfo[] | AllGenericInfo[]> => {
+): Promise<SearchBrandOutput | SearchGenericOutput> => {
   console.log(
     "🚀 ~ file: MedicineSearchPage.tsx:65 ~ fetchMedList ~ formData:",
     formData
@@ -67,12 +67,13 @@ const MedicineSearchPage: FC = () => {
           <LoadingSpinner />
         </div>
       )}
-      {searchFormData.filterBy === "generics" && isAllGenericInfoList(data) && (
+      {searchFormData.filterBy === "generics" && data && isSearchGenericOutput(data) && (
         <GenericList genericList={data} />
       )}
-      {searchFormData.filterBy === "brands" && isBrandInfoList(data) && (
+      {searchFormData.filterBy === "brands" && data && isSearchBrandOutput(data) && (
         <MedCards brandFetchedData={data} />
       )}
+      
       {/* {searchFormData.filterBy === "brands" && <>Find Brand List</>} */}
     </div>
   );

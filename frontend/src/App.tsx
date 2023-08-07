@@ -2,8 +2,6 @@ import NavBar from "./components/customUI/NavBar";
 import { navIcon } from "./models/navIcon";
 import MedicineDescriptionPage from "./pages/Medicines/Medicine/MedicineDescriptionPage";
 import MedicineSearchPage from "./pages/Medicines/SearchMedicines/MedicineSearchPage";
-import SearchMed from "./pages/Medicines/SearchMedicines/SearchMed";
-import GenericList from "./pages/Medicines/SearchMedicines/GenericList";
 import { Routes, Route, Navigate } from "react-router-dom";
 import GenericDescriptionPage from "./pages/Medicines/Generic/GenericDescriptionPage";
 import ManufacturerDescriptionPage from "./pages/Medicines/Manufacturer/ManufacturerPage";
@@ -28,7 +26,7 @@ function App() {
         <Route  element={<NavBar navList={navList} />}>
           {/* <Route index element={<NavBar navList={navList} />} /> */}
           <Route path="searchMedicines/" element={<MedicineSearchPage />}/>
-          <Route path="brand/:medicineId" element={<MedicineDescriptionPage/>}/>
+          <Route path="medicine/:medicineId" element={<MedicineDescriptionPage/>}/>
           <Route path="generic/:genericId" element={<GenericDescriptionPage/>} />
           <Route path="manufacturer/:manufacturerId" element={<ManufacturerDescriptionPage/>} />
         </Route>

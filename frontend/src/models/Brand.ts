@@ -10,8 +10,14 @@
 //   };
 // }
 
+
 export interface SearchBrandOutput {
   brandInfos: BrandInfo[];
+  totalCount: number;
+}
+
+export interface SearchGenericOutput {
+  genericInfos: AllGenericInfo[];
   totalCount: number;
 }
 
@@ -43,25 +49,9 @@ export interface AllGenericInfo {
   type?: "AllGenericInfo"
 }
 
+
 //TODO: ask dhrubo for a discriminator or type flag to be added to proper check 
 
-export function isBrandInfoList(object: any): object is BrandInfo[] {
-  console.log(object);
-  return (
-    Array.isArray(object) &&
-    object.every((item) => {
-      return item.Brand && item.DosageForm && item.Generic && item.Manufacturer;
-    })
-  );
-}
-
-export function isAllGenericInfoList(object:any) : object is AllGenericInfo[] {
-  return (
-    Array.isArray(object) && object.every(item => {
-      return item.Generic && item.availableBrands;
-    })
-  )
-}
 
 
 export interface GenericDescription {
@@ -129,4 +119,23 @@ export interface GenericDescriptionAttributes {
   storage_conditions: string | null;
   createdAt ?: Date | null;
   updatedAt ?: Date | null;
+}
+export function isSearchBrandOutput(object: any): object is SearchBrandOutput {
+  // console.log(object);
+  return (
+    object.totalCount &&
+    Array.isArray(object.brandInfos) &&
+    object.brandInfos.every((item : BrandInfo) => {
+      return item.Brand && item.DosageForm && item.Generic && item.Manufacturer;
+    })
+  );
+}
+
+export function isSearchGenericOutput(object:any) : object is SearchGenericOutput {
+  return (
+    object.totalCount && 
+    Array.isArray(object.genericInfos) && object.genericInfos.every((item: AllGenericInfo) => {
+      return item.Generic && item.availableBrands;
+    })
+  )
 }
