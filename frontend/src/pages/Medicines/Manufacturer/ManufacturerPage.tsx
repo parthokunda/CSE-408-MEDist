@@ -1,5 +1,5 @@
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
-import { ManufacturerDescription } from "@/models/Brand";
+import { SingleManufacturerInfo } from "@/models/Brand";
 import { useQuery } from "@tanstack/react-query";
 import { FC } from "react";
 import { useParams } from "react-router-dom";
@@ -8,7 +8,7 @@ import MedCards from "../SearchMedicines/MedCards";
 
 const fetchManufacturerDescription = async ({
   queryKey,
-}): Promise<ManufacturerDescription> => {
+}): Promise<SingleManufacturerInfo> => {
   const [_, manufacturerId] = queryKey;
   console.log(
     `http://localhost:3000/api/medicine/get_manufacturer_info/${manufacturerId}`
