@@ -6,6 +6,7 @@
     "rootDir": "./src",
     "baseUrl": "./src",
     "esModuleInterop": true,
+    "strict" : true,
   },
   "files": [
     "./src/utils/custom.d.ts"
