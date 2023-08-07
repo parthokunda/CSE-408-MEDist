@@ -21,14 +21,18 @@ const navList: navIcon[] = [
 function App() {
   return (
     <>
-      <NavBar navList={navList}/>
+      {/* <NavBar navList={navList}/> */}
       <Routes>
-        <Route path="landing/" element={<LoginPage/>}/>
-        <Route path="*" element={<Navigate to="/searchMedicines/" replace />} />
-        <Route path="searchMedicines/" element={<MedicineSearchPage />}/>
-        <Route path="medicine/:medicineId" element={<MedicineDescriptionPage/>}/>
-        <Route path="generic/:genericId" element={<GenericDescriptionPage/>} />
-        <Route path="manufacturer/:manufacturerId" element={<ManufacturerDescriptionPage/>} />
+        <Route path="/" element={<LoginPage/>}/>
+        <Route path="*" element={<Navigate to="/medicine/searchMedicines/" replace />} />
+        <Route  element={<NavBar navList={navList} />}>
+          {/* <Route index element={<NavBar navList={navList} />} /> */}
+          <Route path="searchMedicines/" element={<MedicineSearchPage />}/>
+          <Route path="brand/:medicineId" element={<MedicineDescriptionPage/>}/>
+          <Route path="generic/:genericId" element={<GenericDescriptionPage/>} />
+          <Route path="manufacturer/:manufacturerId" element={<ManufacturerDescriptionPage/>} />
+        </Route>
+        
       </Routes>
       {/* <NavBar navList={navList} />
       <SearchMed />

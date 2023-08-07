@@ -9,6 +9,12 @@
 //     icon: string;
 //   };
 // }
+
+export interface SearchBrandOutput {
+  brandInfos: BrandInfo[];
+  totalCount: number;
+}
+
 export interface BrandInfo {
   Brand: {
     id: number;
