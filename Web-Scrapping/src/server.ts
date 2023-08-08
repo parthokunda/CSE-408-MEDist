@@ -13,6 +13,6 @@ import start_scrapping_page_by_page from "./scrapping/allopathic_branc_scrapping
 
 
 
-// page by page done : 10 - 11
+// page by page done : 1,2,3,4,10,11,446,447,602,603 
 
-start_scrapping_page_by_page(10, 11, false);
+start_scrapping_page_by_page(602, 603, false);
