@@ -26,7 +26,7 @@ const start_scrapping_page_by_page = async (
         await extractOverviews_OfAllBrands_FromAllBrandsPage(page, i);
 
       // entry those brand overviews to database
-      //await entryToDB_BrandOverviews(brandOverviews);
+      await entryToDB_BrandOverviews(brandOverviews);
 
       // get the brand details
       await extractDetails_ofAllBrands_fromCurrentAllBrandsPage(

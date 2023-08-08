@@ -10,7 +10,8 @@ import Manufacturer from "./models/Manufacturer.model";
 import Description from "./models/Description.model";
 import Generic_Description from "./models/Generic.Description.model";
 
-const isDev = process.env.NODE_ENV === "development";
+// const isDev = process.env.NODE_ENV === "development";
+const isDev = false;
 
 const dbInit = async () =>
   Promise.all([

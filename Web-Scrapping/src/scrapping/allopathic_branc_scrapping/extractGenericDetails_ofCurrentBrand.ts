@@ -181,8 +181,8 @@ const extractGenericDetails_ofCurrentBrand = async (page: Page) => {
   //log.info(genericDetails);
 
   // entry to the database
-  //await entryToDB_GenericDetails(genericName, genericDetails);
-  //log.info(`generic details of ${genericName} inserted into the database`);
+  await entryToDB_GenericDetails(genericName, genericDetails);
+  log.info(`generic details of ${genericName} inserted into the database`);
 
   // Go back to the previous page
   await page.goBack();

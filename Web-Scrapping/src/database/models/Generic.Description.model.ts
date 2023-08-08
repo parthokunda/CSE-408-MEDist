@@ -112,7 +112,7 @@ Description.init(
       allowNull: true,
     },
     storage_conditions: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true,
     },
   },
