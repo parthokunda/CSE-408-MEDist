@@ -63,6 +63,22 @@ class Medicine_Schema implements Medicine_Schema_Interface {
       ),
     }),
   });
+
+  // get_manufacturer_info_v2
+  get_manufacturer_info_v2_Schema = object({
+    params: object({
+      manufacturerId: union([number(), string()]).transform((val) =>
+        Number(val)
+      ),
+      currentPage: union([number(), string()]).transform((val) => Number(val)),
+    }),
+
+    query: object({
+      pagination: union([number(), string()])
+        .optional()
+        .transform((val) => (val ? Number(val) : 5)),
+    }).optional(),
+  });
 }
 
 export default new Medicine_Schema();
@@ -86,3 +102,11 @@ export type Get_Generic_Info_Params_Input = TypeOf<
 export type Get_Manufacturer_Info_Params_Input = TypeOf<
   Medicine_Schema["get_manufacturer_info_Schema"]
 >["params"];
+
+export type Get_Manufacturer_Info_v2_Params_Input = TypeOf<
+  Medicine_Schema["get_manufacturer_info_v2_Schema"]
+>["params"];
+
+export type Get_Manufacturer_Info_v2_Queries_Input = TypeOf<
+  Medicine_Schema["get_manufacturer_info_v2_Schema"]
+>["query"];

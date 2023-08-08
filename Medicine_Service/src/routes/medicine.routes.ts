@@ -41,4 +41,11 @@ medicineRouter.get(
   medicineController.get_manufacturer_info
 );
 
+// get selected manufacturer details v2
+medicineRouter.get(
+  "/get_manufacturer_info_v2/:manufacturerId/:currentPage",
+  validateRequest(medicineSchema.get_manufacturer_info_v2_Schema),
+  medicineController.get_manufacturer_info_v2
+);
+
 export default medicineRouter;

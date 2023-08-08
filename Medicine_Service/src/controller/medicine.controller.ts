@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import {
   Get_Generic_Info_Params_Input,
   Get_Manufacturer_Info_Params_Input,
+  Get_Manufacturer_Info_v2_Params_Input,
+  Get_Manufacturer_Info_v2_Queries_Input,
   Get_Medicine_Info_Params_Input,
   Search_All_Medicine_Params_Input,
   Search_All_Medicine_Queries_Input,
@@ -38,8 +40,13 @@ interface Medicine_Controller_Interface {
 
   get_generic_info(req: Request<Get_Generic_Info_Params_Input>, res: Response);
 
-  get_manufacturer_info(
-    req: Request<Get_Manufacturer_Info_Params_Input>,
+  get_manufacturer_info_v2(
+    req: Request<
+      Get_Manufacturer_Info_v2_Params_Input,
+      {},
+      {},
+      Get_Manufacturer_Info_v2_Queries_Input
+    >,
     res: Response
   );
 }
@@ -174,6 +181,44 @@ class Medicine_Controller implements Medicine_Controller_Interface {
       resultsFor: "Signle Manufacturer Info",
       result,
     });
+  }
+
+  async get_manufacturer_info_v2(
+    req: Request<
+      Get_Manufacturer_Info_v2_Params_Input,
+      {},
+      {},
+      Get_Manufacturer_Info_v2_Queries_Input
+    >,
+    res: Response
+  ) {
+    const manufacturerId = req.params.manufacturerId as number;
+    const pagination = req.query.pagination as number;
+    const currentPage = req.params.currentPage
+      ? (req.params.currentPage as number)
+      : 1;
+
+    log.info(
+      `get_manufacturer_info_v2 called with manufacturerId: ${manufacturerId} and pagination: ${pagination} and currentPage: ${currentPage}`
+    );
+
+    try {
+      const result: SingleManufacturerInfo =
+        await dbService.manufacturerService.getSingleManufacturerInfo_v2(
+          manufacturerId,
+          pagination,
+          currentPage
+        );
+
+      log.info(result, "result: ");
+
+      res.status(200).json({
+        resultsFor: "Signle Manufacturer Info",
+        result,
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

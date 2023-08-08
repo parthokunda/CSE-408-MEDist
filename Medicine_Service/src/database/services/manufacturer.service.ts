@@ -31,6 +31,12 @@ interface ManufacturerInterface {
   ): Promise<AllManufacturerInfo[]>;
 
   getSingleManufacturerInfo(id: number): Promise<SingleManufacturerInfo>;
+
+  getSingleManufacturerInfo_v2(
+    id: number,
+    pagination: number,
+    currentPage: number
+  ): Promise<SingleManufacturerInfo>;
 }
 
 export default class dbService_Manufacturer implements ManufacturerInterface {
@@ -107,6 +113,55 @@ export default class dbService_Manufacturer implements ManufacturerInterface {
 
     const brands = await manufacturer.getBrands();
     const totalCount = await manufacturer.countBrands();
+
+    const brandInfos = brands.map(async (brand) => {
+      const dosageForm = await brand.getDosageForm();
+      const generic = await brand.getGeneric();
+
+      return {
+        Brand: {
+          id: brand.id,
+          name: brand.name,
+          strength: brand.strength,
+        },
+        DosageForm: dosageForm.dataValues,
+        Generic: generic.dataValues,
+        Manufacturer: manufacturer.dataValues,
+      };
+    });
+
+    return {
+      Manufacturer: manufacturer.dataValues,
+      availableBrands: {
+        brandInfos: await Promise.all(brandInfos),
+        totalCount,
+      },
+    };
+  }
+
+  async getSingleManufacturerInfo_v2(
+    id: number,
+    pagination: number,
+    currentPage: number
+  ): Promise<SingleManufacturerInfo> {
+    const manufacturer = await Manufacturer.findByPk(id);
+
+    if (manufacturer === null)
+      throw new createHttpError.NotFound("Manufacturer not found");
+
+    // if pagination is not provided then return all brands
+    if (pagination === null || pagination === undefined || isNaN(pagination))
+      return this.getSingleManufacturerInfo(id);
+
+    const totalCount = await manufacturer.countBrands();
+
+    const itemsPerPage = pagination;
+    const offset = (currentPage - 1) * itemsPerPage;
+
+    const brands = await manufacturer.getBrands({
+      offset,
+      limit: itemsPerPage,
+    });
 
     const brandInfos = brands.map(async (brand) => {
       const dosageForm = await brand.getDosageForm();
