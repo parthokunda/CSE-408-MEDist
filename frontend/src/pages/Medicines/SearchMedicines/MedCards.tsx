@@ -6,13 +6,16 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import { AiOutlineArrowRight } from "react-icons/ai";
 const MedCards: FC<{
   brandFetchedData: SearchBrandOutput;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
 }> = (props) => {
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
+  const { currentPage, setCurrentPage } = props;
   const recordsPerPage = 15;
-  const lastIndex = currentPage * recordsPerPage;
+  const lastIndex = props.currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
-  const records = props.brandFetchedData.brandInfos.slice(firstIndex, lastIndex);
-  const nPages = Math.ceil(props.brandFetchedData.brandInfos.length / recordsPerPage);
+  const records = props.brandFetchedData.brandInfos;
+  const nPages = Math.ceil(props.brandFetchedData.totalCount / recordsPerPage);
   const array = [
     currentPage - 2,
     currentPage - 1,
@@ -26,6 +29,9 @@ const MedCards: FC<{
       <div className="flex justify-center align-middle">No Item Found</div>
     );
   }
+
+  console.log(props.brandFetchedData.brandInfos);
+
   return (
     <div className="">
       <div className="grid lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 mt-3 gap-5">
@@ -91,6 +97,7 @@ const MedCards: FC<{
   function nextPage() {
     if (currentPage < nPages) {
       setCurrentPage(currentPage + 1);
+      //console.log(currentPage);
     }
   }
   function prevPage() {
