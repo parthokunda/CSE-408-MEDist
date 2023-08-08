@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get("/checkServer", (_, res) => res.sendStatus(200));
 
-router.use("/api/medicine", medicineRouter);
+router.use("/", medicineRouter);
 
 
 export default router;
