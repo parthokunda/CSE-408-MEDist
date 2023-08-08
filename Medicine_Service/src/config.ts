@@ -9,11 +9,11 @@ export const config = {
   DB: {
     URL: `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
   },
-  JWT_SECRET: process.env.JWT_SECRET,
   MSG_QUEUE_URL: process.env.MSG_QUEUE_URL as string,
   ENVIRONMENT: process.env.NODE_ENV,
 
-  SELF_RPC_QUEUE: "AUTH_RPC",
+  SELF_RPC_QUEUE: "MEDICINE_RPC",
   PATIENT_RPC_QUEUE: "PATIENT_RPC",
   DOCTOR_RPC_QUEUE: "DOCTOR_RPC",
+  AUTH_RPC_QUEUE: "AUTH_RPC",
 };

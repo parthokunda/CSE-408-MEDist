@@ -2,15 +2,13 @@ import dotenv from "dotenv";
 import { Dialect } from "sequelize";
 
 dotenv.config();
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
+
 
 export const config = {
   PORT: process.env.PORT,
   DB: {
-    NAME: process.env.DB_NAME as string,
-    USER: process.env.DB_USER as string,
-    HOST: process.env.DB_HOST,
-    DRIVER: process.env.DB_DRIVER as Dialect,
-    PASSWORD: process.env.DB_PASSWORD,
+    URL: `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`,
   },
   JWT_SECRET: process.env.JWT_SECRET,
   MSG_QUEUE_URL: process.env.MSG_QUEUE_URL as string,
