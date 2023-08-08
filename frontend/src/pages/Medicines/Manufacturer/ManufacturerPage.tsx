@@ -6,54 +6,53 @@ import { useParams } from "react-router-dom";
 // import AvailableBrandCards from "./AvailableBrandCards";
 import MedCards from "../SearchMedicines/MedCards";
 
-// const fetchManufacturerDescription = async ({
-//   queryKey,
-// }): Promise<SingleManufacturerInfo> => {
-//   const [_, manufacturerId] = queryKey;
-//   const response = await fetch(
-//     `${import.meta.env.VITE_DB_URL}:${
-//       import.meta.env.VITE_DB_PORT
-//     // }/api/medicine/get_manufacturer_info/${manufacturerId}`
-//     }get_manufacturer_info_v2/${manufacturerId}/${currentPage}?pagination=15`
-//   );
-//   const data = await response.json();
+const fetchManufacturerDescription = async ({
+  queryKey,
+}): Promise<SingleManufacturerInfo> => {
+  const [_, {manufacturerId,currentPage}] = queryKey;
+  const response = await fetch(
+    `${import.meta.env.VITE_DB_URL}:${
+      import.meta.env.VITE_DB_PORT
+    }/api/medicine/get_manufacturer_info_v2/${manufacturerId}/${currentPage}?pagination=15`
+  );
+  const data = await response.json();
 
-//   console.log("here ", data.result);
-//   return data.result;
-// };
+  console.log("here ", data.result);
+  return data.result;
+};
 
 //show details of a manufacturer
 const ManufacturerDescriptionPage: FC = () => {
   const { manufacturerId } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const fetchManufacturerDescription = async ({
-    queryKey,
-  }): Promise<SingleManufacturerInfo> => {
-    const [_, manufacturerId] = queryKey;
-    const response = await fetch(
-      `${import.meta.env.VITE_DB_URL}:${
-        import.meta.env.VITE_DB_PORT
-        // }/api/medicine/get_manufacturer_info/${manufacturerId}`
-      }/api/medicine/get_manufacturer_info_v2/${manufacturerId}/${currentPage}?pagination=15`
-    );
-    const data = await response.json();
-    console.log(
-      `${import.meta.env.VITE_DB_URL}:${
-        import.meta.env.VITE_DB_PORT
-        // }/api/medicine/get_manufacturer_info/${manufacturerId}`
-      }/api/medicine/get_manufacturer_info_v2/${manufacturerId}/${currentPage}?pagination=15`
-    );
-    console.log("here ", data.result);
-    return data.result;
-  };
+  // const fetchManufacturerDescription = async ({
+  //   queryKey,
+  // }): Promise<SingleManufacturerInfo> => {
+  //   const [_, manufacturerId] = queryKey;
+  //   const response = await fetch(
+  //     `${import.meta.env.VITE_DB_URL}:${
+  //       import.meta.env.VITE_DB_PORT
+  //       // }/api/medicine/get_manufacturer_info/${manufacturerId}`
+  //     }/api/medicine/get_manufacturer_info_v2/${manufacturerId}/${currentPage}?pagination=15`
+  //   );
+  //   const data = await response.json();
+  //   console.log(
+  //     `${import.meta.env.VITE_DB_URL}:${
+  //       import.meta.env.VITE_DB_PORT
+  //       // }/api/medicine/get_manufacturer_info/${manufacturerId}`
+  //     }/api/medicine/get_manufacturer_info_v2/${manufacturerId}/${currentPage}?pagination=15`
+  //   );
+  //   console.log("here ", data.result);
+  //   return data.result;
+  // };
 
   const {
     data: manufacturer,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["manufacturerDescription", manufacturerId],
+    queryKey: ["manufacturerDescription", {manufacturerId, currentPage}],
     queryFn: fetchManufacturerDescription,
   });
   useEffect(() => {
