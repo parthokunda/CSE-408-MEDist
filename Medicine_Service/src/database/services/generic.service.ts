@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import Generic, { GenericAttributes } from "../models/Generic.model";
-import { BrandInfo } from "./brand.service";
+import { BrandInfo, SearchBrandOutput } from "./brand.service";
 import createHttpError from "http-errors";
 import { GenericDescriptionAttributes } from "database/models/Generic.Description.model";
 
@@ -18,6 +18,12 @@ export interface SingleGenericInfo {
   Generic: GenericAttributes;
   Description: GenericDescriptionAttributes;
   availableBrands: BrandInfo[];
+}
+
+export interface SingleGenericInfoV2 {
+  Generic: GenericAttributes;
+  Description: GenericDescriptionAttributes;
+  availableBrands: SearchBrandOutput;
 }
 
 const createEmptyGenericDescriptionInfo = (): GenericDescriptionAttributes => {
@@ -50,6 +56,12 @@ interface GenericInterface {
   ): Promise<SearchGenericOutput>;
 
   getSingleGenericInfo(id: number): Promise<SingleGenericInfo>;
+
+  getSingleGenericInfo_v2(
+    id: number,
+    pagination: number,
+    currentPage: number
+  ): Promise<SingleGenericInfoV2>;
 }
 
 export default class dbService_Generic implements GenericInterface {
@@ -185,6 +197,63 @@ export default class dbService_Generic implements GenericInterface {
           ? description.dataValues
           : createEmptyGenericDescriptionInfo(),
         availableBrands: await Promise.all(brandInfos),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getSingleGenericInfo_v2(
+    id: number,
+    pagination: number,
+    currentPage: number
+  ): Promise<SingleGenericInfoV2> {
+    try {
+      const generic = await Generic.findByPk(id);
+
+      if (!generic) throw new createHttpError.NotFound("Generic not found");
+
+      // get generic description
+      const description = await generic.getDescription();
+
+      const totalCount = await generic.countBrands();
+
+      if (pagination === null || pagination === undefined || isNaN(pagination))
+        pagination = totalCount;
+
+      const itemsPerPage = pagination;
+      const offset = (currentPage - 1) * itemsPerPage;
+
+      const brands = await generic.getBrands({
+        offset,
+        limit: itemsPerPage,
+      });
+
+      const brandInfos = brands.map(async (brand) => {
+        const dosageForm = await brand.getDosageForm();
+        const manufacturer = await brand.getManufacturer();
+
+        return {
+          Brand: {
+            id: brand.id,
+            name: brand.name,
+            strength: brand.strength,
+          },
+          DosageForm: dosageForm.dataValues,
+          Generic: generic.dataValues,
+          Manufacturer: manufacturer.dataValues,
+        };
+      });
+
+      return {
+        Generic: generic.dataValues,
+        Description: description
+          ? description.dataValues
+          : createEmptyGenericDescriptionInfo(),
+        availableBrands: {
+          brandInfos: await Promise.all(brandInfos),
+          totalCount,
+        },
       };
     } catch (error) {
       throw error;

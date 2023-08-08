@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import {
   Get_Generic_Info_Params_Input,
+  Get_Generic_Info_Params_Input_v2,
+  Get_Generic_Info_Queries_Input_v2,
   Get_Manufacturer_Info_Params_Input,
   Get_Manufacturer_Info_v2_Params_Input,
   Get_Manufacturer_Info_v2_Queries_Input,
@@ -39,6 +41,16 @@ interface Medicine_Controller_Interface {
   );
 
   get_generic_info(req: Request<Get_Generic_Info_Params_Input>, res: Response);
+
+  get_generic_info_v2(
+    req: Request<
+      Get_Generic_Info_Params_Input_v2,
+      {},
+      {},
+      Get_Generic_Info_Queries_Input_v2
+    >,
+    res: Response
+  );
 
   get_manufacturer_info_v2(
     req: Request<
@@ -157,6 +169,41 @@ class Medicine_Controller implements Medicine_Controller_Interface {
       resultsFor: "Signle Generic Info",
       result,
     });
+  }
+
+  async get_generic_info_v2(
+    req: Request<
+      Get_Generic_Info_Params_Input_v2,
+      {},
+      {},
+      Get_Generic_Info_Queries_Input_v2
+    >,
+    res: Response
+  ) {
+    const genericId = req.params.genericId as number;
+    const pagination = req.query.pagination as number;
+    const currentPage = req.params.currentPage ? req.params.currentPage : 1;
+
+    log.info(
+      `get_generic_info_v2 called with genericId: ${genericId} and pagination: ${pagination} and currentPage: ${currentPage}`
+    );
+
+    try {
+      const result = await dbService.genericService.getSingleGenericInfo_v2(
+        genericId,
+        pagination,
+        currentPage
+      );
+
+      log.info(result, "result: ");
+
+      res.status(200).json({
+        resultsFor: "Signle Generic Info",
+        result,
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   // ------------------------------ get_manufacturer_info ------------------------------
