@@ -30,16 +30,9 @@ const MedicineSearchPage: FC = (props) => {
     }&filterBy=${formData.filterBy}&pagination=15`;
     console.log(str);
     const response = await fetch(
-      // `${import.meta.env.VITE_DB_URL}:${
-      //   import.meta.env.VITE_DB_PORT
-      // }/api/medicine/get_all_medicines/${currentPage}?searchBy=${
-      //   formData.searchText
-      // }&filterBy=${formData.filterBy}&pagination=15`
       str
     );
     const data = await response.json();
-    // await new Promise(resolve => setTimeout(resolve,1000));
-    // console.log(currentPage);
     console.log(
       "🚀 ~ file: MedicineSearchPage.tsx:20 ~ fetchMedList ~ results:",
       data.results
