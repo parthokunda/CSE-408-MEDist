@@ -39,7 +39,9 @@ const MedicineSearchPage: FC = (props) => {
     );
     return data.results;
   };
-
+  function ResetCurrentPage(): void {
+    setCurrentPage(1);
+  }
   const [searchFormData, setSearchFormData] = useState<
     z.infer<typeof MedSearchForm>
   >({ searchText: "", filterBy: "brands" });
@@ -49,7 +51,9 @@ const MedicineSearchPage: FC = (props) => {
   const updateFormData = (formData: z.infer<typeof MedSearchForm>): void => {
     setSearchFormData(formData);
   };
-
+  useEffect(() => {
+    ResetCurrentPage();
+  } , [searchFormData.searchText, searchFormData.filterBy]);
   useEffect(() => {
     mutate(searchFormData);
   }, [searchFormData, currentPage]);
