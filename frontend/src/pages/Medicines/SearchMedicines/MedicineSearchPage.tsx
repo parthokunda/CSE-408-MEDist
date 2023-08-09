@@ -29,9 +29,7 @@ const MedicineSearchPage: FC = (props) => {
       formData.searchText
     }&filterBy=${formData.filterBy}&pagination=15`;
     console.log(str);
-    const response = await fetch(
-      str
-    );
+    const response = await fetch(str);
     const data = await response.json();
     console.log(
       "🚀 ~ file: MedicineSearchPage.tsx:20 ~ fetchMedList ~ results:",
@@ -53,7 +51,7 @@ const MedicineSearchPage: FC = (props) => {
   };
   useEffect(() => {
     ResetCurrentPage();
-  } , [searchFormData.searchText, searchFormData.filterBy]);
+  }, [searchFormData.searchText, searchFormData.filterBy]);
   useEffect(() => {
     mutate(searchFormData);
   }, [searchFormData, currentPage]);
@@ -80,6 +78,7 @@ const MedicineSearchPage: FC = (props) => {
       )}
       {searchFormData.filterBy === "generics" &&
         data &&
+        data.totalCount !== 0 &&
         isSearchGenericOutput(data) && (
           <GenericList
             genericList={data}
@@ -89,12 +88,27 @@ const MedicineSearchPage: FC = (props) => {
         )}
       {searchFormData.filterBy === "brands" &&
         data &&
+        data.totalCount !== 0 &&
         isSearchBrandOutput(data) && (
           <MedCards
             brandFetchedData={data}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
           />
+        )}
+      {searchFormData.filterBy === "brands" &&
+        data &&
+        data.totalCount === 0 && (
+          <p className="flex font-bold text-2xl m-3">
+            No Brand Found
+          </p>
+        )}
+      {searchFormData.filterBy === "generics" &&
+        data &&
+        data.totalCount === 0 && (
+          <p className="flex font-bold text-2xl m-3">
+            No Generic Found
+          </p>
         )}
 
       {/* {searchFormData.filterBy === "brands" && <>Find Brand List</>} */}
