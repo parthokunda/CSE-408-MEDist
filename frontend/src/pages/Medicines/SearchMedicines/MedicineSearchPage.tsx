@@ -14,41 +14,47 @@ import { MedSearchForm } from "@/models/FormSchema";
 import GenericList from "./GenericList";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 
-const fetchMedList = async (
-  formData: z.infer<typeof MedSearchForm>
-): Promise<SearchBrandOutput | SearchGenericOutput> => {
-  console.log(
-    "🚀 ~ file: MedicineSearchPage.tsx:65 ~ fetchMedList ~ formData:",
-    formData
-  );
-  const response = await fetch(
-    `${import.meta.env.VITE_DB_URL}:${
-      import.meta.env.VITE_DB_PORT
-    }/api/medicine/get_all_medicines?searchBy=${formData.searchText}&filterBy=${
-      formData.filterBy
-    }&pagination=60`
-  );
-  const data = await response.json();
-  // await new Promise(resolve => setTimeout(resolve,1000));
-  console.log(
-    "🚀 ~ file: MedicineSearchPage.tsx:20 ~ fetchMedList ~ results:",
-    data.results
-  );
-  return data.results;
-};
+const MedicineSearchPage: FC = (props) => {
+  const fetchMedList = async (
+    formData: z.infer<typeof MedSearchForm>
+  ): Promise<SearchBrandOutput | SearchGenericOutput> => {
+    console.log(
+      "🚀 ~ file: MedicineSearchPage.tsx:65 ~ fetchMedList ~ formData:",
+      formData
+    );
 
-const MedicineSearchPage: FC = () => {
+    const str = `${import.meta.env.VITE_DB_URL}:${
+      import.meta.env.VITE_DB_PORT
+    }/api/medicine/get_all_medicines/${currentPage}?searchBy=${
+      formData.searchText
+    }&filterBy=${formData.filterBy}&pagination=15`;
+    console.log(str);
+    const response = await fetch(str);
+    const data = await response.json();
+    console.log(
+      "🚀 ~ file: MedicineSearchPage.tsx:20 ~ fetchMedList ~ results:",
+      data.results
+    );
+    return data.results;
+  };
+  function ResetCurrentPage(): void {
+    setCurrentPage(1);
+  }
   const [searchFormData, setSearchFormData] = useState<
     z.infer<typeof MedSearchForm>
   >({ searchText: "", filterBy: "brands" });
 
+  const [currentPage, setCurrentPage] = useState(1);
+
   const updateFormData = (formData: z.infer<typeof MedSearchForm>): void => {
     setSearchFormData(formData);
   };
-
+  useEffect(() => {
+    ResetCurrentPage();
+  }, [searchFormData.searchText, searchFormData.filterBy]);
   useEffect(() => {
     mutate(searchFormData);
-  }, [searchFormData]);
+  }, [searchFormData, currentPage]);
 
   const { data, isError, isLoading, mutate } = useMutation({
     mutationKey: ["medList"],
@@ -72,10 +78,38 @@ const MedicineSearchPage: FC = () => {
       )}
       {searchFormData.filterBy === "generics" &&
         data &&
-        isSearchGenericOutput(data) && <GenericList genericList={data} />}
+        data.totalCount !== 0 &&
+        isSearchGenericOutput(data) && (
+          <GenericList
+            genericList={data}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
+        )}
       {searchFormData.filterBy === "brands" &&
         data &&
-        isSearchBrandOutput(data) && <MedCards brandFetchedData={data} />}
+        data.totalCount !== 0 &&
+        isSearchBrandOutput(data) && (
+          <MedCards
+            brandFetchedData={data}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
+        )}
+      {searchFormData.filterBy === "brands" &&
+        data &&
+        data.totalCount === 0 && (
+          <p className="flex font-bold text-2xl m-3">
+            No Brand Found
+          </p>
+        )}
+      {searchFormData.filterBy === "generics" &&
+        data &&
+        data.totalCount === 0 && (
+          <p className="flex font-bold text-2xl m-3">
+            No Generic Found
+          </p>
+        )}
 
       {/* {searchFormData.filterBy === "brands" && <>Find Brand List</>} */}
     </div>
