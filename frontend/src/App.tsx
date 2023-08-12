@@ -6,6 +6,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import GenericDescriptionPage from "./pages/Medicines/Generic/GenericDescriptionPage";
 import ManufacturerDescriptionPage from "./pages/Medicines/Manufacturer/ManufacturerPage";
 import { LoginPage } from "./pages/LoginPage/LoginPage";
+import {DoctorInfo} from "./pages/doctor/DoctorInfo";
 
 
 const navList: navIcon[] = [
@@ -29,6 +30,7 @@ function App() {
           <Route path="medicine/:medicineId" element={<MedicineDescriptionPage/>}/>
           <Route path="generic/:genericId" element={<GenericDescriptionPage/>} />
           <Route path="manufacturer/:manufacturerId" element={<ManufacturerDescriptionPage/>} />
+          <Route path="doctor/info" element={<DoctorInfo/>}/>
         </Route>
         
       </Routes>
