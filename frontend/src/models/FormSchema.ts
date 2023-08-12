@@ -11,7 +11,7 @@ export const LoginCardForm = z.object({
   email: z
     .string().email({message: "Invalid Email"}),
   password: z.string().min(4, { message: "Minimum Password Length is 4" }),
-  loginAs: z.union([z.literal('patient'), z.literal('doctor'), z.literal('assistant')]),
+  role: z.union([z.literal('patient'), z.literal('doctor'), z.literal('assistant'),z.literal('')]),
 });
 
 export type LoginCardFormType = z.infer<typeof LoginCardForm>
