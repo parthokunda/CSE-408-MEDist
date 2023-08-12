@@ -16,11 +16,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 const LoginCard: FC = () => {
   const loginForms = useForm<LoginCardFormType>({
-    defaultValues: {
-      name: "",
-      password: "",
-      loginAs: "assistant",
-    },
     resolver: zodResolver(LoginCardForm),
   });
   const onLoginSubmit: SubmitHandler<LoginCardFormType> = (data) => {
@@ -33,12 +28,12 @@ const LoginCard: FC = () => {
         <CardContent className="space-y-2 mt-2">
           <form onSubmit={loginForms.handleSubmit(onLoginSubmit)}>
             <Controller
-              name="name"
+              name="email"
               control={loginForms.control}
               render={({ field }) => (
                 <div className="space-y-1">
                   <Label htmlFor="email">Email</Label>
-                  <Input {...field} placeholder="Email" />
+                  <Input {...field} placeholder="Email"/>
                 </div>
               )}
             />

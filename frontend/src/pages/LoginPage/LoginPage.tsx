@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import LoginCard from "./LoginCard";
 
 export const LoginPage: FC = () => {
   return (
@@ -37,36 +38,7 @@ export const LoginPage: FC = () => {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="login">
-            <Card>
-              <CardContent className="space-y-2 mt-2">
-                <div className="space-y-1">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" placeholder="Email" />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="password">Password</Label>
-                  <Input type="password" placeholder="Password"></Input>
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="loginAs">Login As</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="doctor">Doctor</SelectItem>
-                      <SelectItem value="patient">Patient</SelectItem>
-                      <SelectItem value="assistant">Assitant</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex justify-center">
-                  <Button className="bg-c1 text-white hover:bg-c2 mt-4">
-                    Submit
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <LoginCard />
           </TabsContent>
           <TabsContent value="register">
             <Card>
