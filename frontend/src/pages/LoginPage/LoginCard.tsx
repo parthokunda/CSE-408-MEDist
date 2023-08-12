@@ -14,10 +14,10 @@ import { LoginCardForm, LoginCardFormType } from "@/models/FormSchema";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
+import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 
-const onLoginSubmit: SubmitHandler<LoginCardFormType> = async (
-  data
-): Promise<any> => {
+const postLogin = async (data: LoginCardFormType): Promise<object> => {
   const response = await axios.post(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
@@ -31,11 +31,20 @@ const onLoginSubmit: SubmitHandler<LoginCardFormType> = async (
 const LoginCard: FC = () => {
   const loginForms = useForm<LoginCardFormType>({
     defaultValues: {
-        email:"",
-        password:"",
-        role:"",
+      email: "",
+      password: "",
+      role: "",
     },
     resolver: zodResolver(LoginCardForm),
+  });
+
+  const onLoginSubmit = (formData: LoginCardFormType): void => {
+    mutate(formData);
+  };
+
+  const { data, isError, isLoading, mutate } = useMutation({
+    mutationKey: ["postLogin"],
+    mutationFn: postLogin,
   });
 
   return (
@@ -85,12 +94,17 @@ const LoginCard: FC = () => {
             </div>
 
             <div className="flex justify-center">
-              <Button
-                className="bg-c1 text-white hover:bg-c2 mt-4"
-                type="submit"
-              >
-                Submit
-              </Button>
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <Button
+                  className="bg-c1 text-white hover:bg-c2 mt-4"
+                  type="submit"
+                  disabled={!loginForms.formState.isValid}
+                >
+                  Submit
+                </Button>
+              )}
             </div>
           </form>
         </CardContent>
