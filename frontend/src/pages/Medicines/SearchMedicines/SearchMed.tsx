@@ -8,8 +8,10 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { FC, useEffect } from "react";
 import { MedSearchForm } from "@/models/FormSchema";
 
-
-export const SearchMed : FC<{ formValues : z.infer<typeof MedSearchForm>, formSubmitHandler: (formData: z.infer<typeof MedSearchForm>) => void }> = (props) => {
+export const SearchMed: FC<{
+  formValues: z.infer<typeof MedSearchForm>;
+  formSubmitHandler: (formData: z.infer<typeof MedSearchForm>) => void;
+}> = (props) => {
   const forms = useForm<z.infer<typeof MedSearchForm>>({
     defaultValues: {
       searchText: props.formValues.searchText,
@@ -43,7 +45,7 @@ export const SearchMed : FC<{ formValues : z.infer<typeof MedSearchForm>, formSu
           control={forms.control}
           render={({ field }) => (
             <div className=" relative w-1/2 ">
-              <AiOutlineSearch className="h-8 w-8  absolute p-1 box-border right-3 top-1/2 transform -translate-y-1/2" />
+              <AiOutlineSearch className="h-8 w-8 absolute p-1 box-border right-3 top-1/2 transform -translate-y-1/2" />
               <Input {...field} placeholder="Search" />
             </div>
           )}
@@ -57,7 +59,7 @@ export const SearchMed : FC<{ formValues : z.infer<typeof MedSearchForm>, formSu
               <RadioGroup
                 defaultValue={field.value}
                 onValueChange={field.onChange}
-                className="flex flex-row gap-2  items-center"
+                className="flex flex-row gap-2 items-center"
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="brands" id="brands" />
@@ -77,6 +79,6 @@ export const SearchMed : FC<{ formValues : z.infer<typeof MedSearchForm>, formSu
       </p>
     </>
   );
-}
+};
 
 export default SearchMed;

@@ -21,7 +21,7 @@ export const LoginPage: FC = () => {
         <p className="text-c1 text-2xl">Streamlining the whole process</p>
       </div>
       <div className=" flex items-center justify-center">
-        <Tabs defaultValue="register" className="w-[400px]">
+        <Tabs defaultValue="login" className="w-[400px]">
           <TabsList className="grid w-full grid-cols-2 ">
             <TabsTrigger
               value="login"
