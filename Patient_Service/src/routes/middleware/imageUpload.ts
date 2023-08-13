@@ -39,12 +39,13 @@ async function uploadImage(req, res, next) {
     }
 
     const file = req.file;
-    const userID = req.user_identity.id;
+    //const userID = req.user_identity.id;
 
     // create a reference to the storage bucket location
     const storageRef = ref(
       storage,
-      `profile_pictures/${userID}${file.originalname}`
+      //`profile_pictures/${userID}${file.originalname}`
+      `profile_pictures/${file.originalname}`
     );
 
     // define metadata
