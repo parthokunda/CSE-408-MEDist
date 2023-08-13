@@ -9,6 +9,10 @@ import { config } from "../config";
 import patientService from "../services/patient.service";
 import authorize from "./middleware/auth";
 import log from "../utils/logger";
+import uploadImage from "./middleware/imageUpload";
+
+import patientSchema from "../schema/patient.schema";
+import patientController from "../controller/patient.controller";
 
 const patientRouter = express.Router();
 
@@ -27,5 +31,9 @@ patientRouter.get("/", authorize, (req: Request, res: Response) => {
     role,
   });
 });
+
+
+// update patient info
+patientRouter.put("/update-info", authorize, uploadImage, validateRequest(patientSchema.Update_Patient_Info), patientController.updatePatientInfo);
 
 export default patientRouter;

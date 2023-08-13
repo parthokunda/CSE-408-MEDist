@@ -4,7 +4,6 @@ import { Dialect } from "sequelize";
 dotenv.config();
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 
-
 export const config = {
   PORT: process.env.PORT,
   DB: {
@@ -16,4 +15,14 @@ export const config = {
 
   SELF_RPC_QUEUE: "PATIENT_RPC",
   AUTH_RPC_QUEUE: "AUTH_RPC",
+
+  FIREBASE_CONFIG: {
+    apiKey: "AIzaSyCHZ4fFHB6mG2e1QfU8njqeZnbhmRnO9Go",
+    authDomain: "medist-photos-8c6bf.firebaseapp.com",
+    projectId: "medist-photos-8c6bf",
+    storageBucket: "medist-photos-8c6bf.appspot.com",
+    messagingSenderId: "488575338890",
+    appId: "1:488575338890:web:af4e96b6e455fcf9296073",
+    measurementId: "G-QB6RHMBMMK",
+  },
 };

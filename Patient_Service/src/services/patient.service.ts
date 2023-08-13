@@ -1,5 +1,13 @@
 // external imports
 import createHttpError from "http-errors";
+import { initializeApp } from "firebase/app";
+import {
+  getStorage,
+  ref,
+  getDownloadURL,
+  uploadBytesResumable,
+} from "firebase/storage";
+import multer from "multer";
 
 //internal imports
 import patientRepository, {
@@ -10,12 +18,25 @@ import broker, {
   RPC_Response_Payload,
 } from "../utils/broker";
 import { config } from "../config";
+import Patient, { UpdatePatientInfo } from "../database/models/Patient.model";
 
+//Initialize a firebase application
+initializeApp(config.FIREBASE_CONFIG);
+// Initialize Cloud Storage and get a reference to the service
+const storage = getStorage();
+// Setting up multer as a middleware to grab photo uploads
+const upload = multer({ storage: multer.memoryStorage() });
 
 export interface PatientServiceInterface {
   createInitialPatient(userID: number): Promise<RPC_Response_Payload>;
   getId_givenUserID(userID: number): Promise<RPC_Response_Payload>;
   serveRPCRequest(payload: RPC_Request_Payload): Promise<RPC_Response_Payload>;
+
+  //update patient info
+  updatePatientInfo(
+    patientID: number,
+    newPatientInfo: Partial<Patient>
+  ): Promise<Patient>;
 }
 
 class PatientService implements PatientServiceInterface {
@@ -86,6 +107,23 @@ class PatientService implements PatientServiceInterface {
     }
 
     return response;
+  }
+
+  // ----------------------------------------- Update Patient Info ------------------------------------------ //
+  async updatePatientInfo(
+    patientID: number,
+    newPatientInfo: Partial<Patient>
+  ): Promise<Patient> {
+    try {
+      const patient = await patientRepository.updatePatientInfo(
+        patientID,
+        newPatientInfo
+      );
+
+      return patient;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 
