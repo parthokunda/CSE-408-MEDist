@@ -13,10 +13,16 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/auth", proxy("http://localhost:3001"));
-app.use("/api/medicine", proxy("http://localhost:3002"));
-app.use("/api/patient", proxy("http://localhost:3003"));
+async function middlewares(req, res, next){
+  log.info(req.body, "request bbody");
+  log.info(req, "request");
+  next();
+}
+app.use("/api/auth", middlewares, proxy("http://localhost:3001"));
+app.use("/api/medicine", middlewares, proxy("http://localhost:3002"));
+app.use("/api/patient", middlewares, proxy("http://localhost:3003"));
 
 app.use(notFoundHandler);
 app.use(defaultErrorHandler);
