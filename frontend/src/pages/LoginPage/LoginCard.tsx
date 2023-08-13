@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 
 type postLoginReturn = {
@@ -54,13 +54,14 @@ const LoginCard: FC = () => {
     mutationKey: ["postLogin"],
     mutationFn: postLogin,
     onSuccess: (data) => {
-      setCookie("user", { token: data.token }, {maxAge: 1800});
-      console.log(cookies.user)
+      setCookie("user", { token: data.token, role: 'patient' }, {maxAge: 1800});
+      console.log(cookies.user);
+      navigate("patient/");
     },
     onError: () => {
       console.log("error detected");
       setTimeout(() => {
-        navigate(0);
+        navigate("/");
       }, 1500);
       return <p>Error Loading Page. Reloading...</p>;
     },
