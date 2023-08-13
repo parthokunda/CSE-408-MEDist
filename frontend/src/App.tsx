@@ -16,12 +16,15 @@ const navList: navIcon[] = [
   { name: "Logout", link: "/logout" }, // TODO: add a logout icon insted of this
 ];
 
+
+
 function App() {
+  
   return (
     <>
       {/* <NavBar navList={navList}/> */}
       <Routes>
-        <Route path="/landing" element={<LoginPage/>}/>
+        <Route path="/" element={<LoginPage/>}/>
         <Route path="*" element={<Navigate to="/searchMedicines/" replace />} />
         <Route  element={<NavBar navList={navList} />}>
           {/* <Route index element={<NavBar navList={navList} />} /> */}

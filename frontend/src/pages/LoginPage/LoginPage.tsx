@@ -7,7 +7,9 @@ export const LoginPage: FC = () => {
   return (
     <div className="grid grid-cols-2 h-screen">
       <div className="flex flex-col items-center justify-center">
-        <p className=" text-8xl font-bold text-c1 drop-shadow-xl py-2">MEDist</p>
+        <p className=" text-8xl font-bold text-c1 drop-shadow-xl py-2">
+          MEDist
+        </p>
         <p className="text-c1 text-2xl">Connecting Doctors and Patients</p>
         <p className="text-c1 text-2xl">Streamlining the whole process</p>
       </div>

@@ -16,19 +16,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
+import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
-const postLogin = async (data: LoginCardFormType): Promise<object> => {
+type postLoginReturn = {
+  token: string;
+};
+
+const postLogin = async (data: LoginCardFormType): Promise<postLoginReturn> => {
   const response = await axios.post(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
     }/api/auth/login`,
     data
   );
-  console.log(response.data);
   return response.data;
 };
 
 const LoginCard: FC = () => {
+  const navigate = useNavigate();
+  const [cookies, setCookie] = useCookies(["user"]);
+
   const loginForms = useForm<LoginCardFormType>({
     defaultValues: {
       email: "",
@@ -42,9 +50,20 @@ const LoginCard: FC = () => {
     mutate(formData);
   };
 
-  const { data, isError, isLoading, mutate } = useMutation({
+  const { isLoading, mutate } = useMutation({
     mutationKey: ["postLogin"],
     mutationFn: postLogin,
+    onSuccess: (data) => {
+      setCookie("user", { token: data.token }, {maxAge: 1800});
+      console.log(cookies.user)
+    },
+    onError: () => {
+      console.log("error detected");
+      setTimeout(() => {
+        navigate(0);
+      }, 1500);
+      return <p>Error Loading Page. Reloading...</p>;
+    },
   });
 
   return (
@@ -59,6 +78,7 @@ const LoginCard: FC = () => {
                 <div className="space-y-1">
                   <Label htmlFor="email">Email</Label>
                   <Input {...field} placeholder="Email" />
+                  <p>{loginForms.formState.errors.email?.message}</p>
                 </div>
               )}
             />
@@ -68,7 +88,12 @@ const LoginCard: FC = () => {
               render={({ field }) => (
                 <div className="space-y-1">
                   <Label htmlFor="password">Password</Label>
-                  <Input {...field} placeholder="Password"></Input>
+                  <Input
+                    {...field}
+                    placeholder="Password"
+                    type="password"
+                  ></Input>
+                  <p>{loginForms.formState.errors.password?.message}</p>
                 </div>
               )}
             />
@@ -88,6 +113,7 @@ const LoginCard: FC = () => {
                       <SelectItem value="patient">Patient</SelectItem>
                       <SelectItem value="assistant">Assistant</SelectItem>
                     </SelectContent>
+                    <p>{loginForms.formState.errors.role?.message}</p>
                   </Select>
                 )}
               />
