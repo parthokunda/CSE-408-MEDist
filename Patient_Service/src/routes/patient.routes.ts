@@ -32,6 +32,9 @@ patientRouter.get("/", authorize, (req: Request, res: Response) => {
   });
 });
 
+// get patient info
+patientRouter.get("/profile-info", authorize, patientController.getPatientInfo);
+
 // update patient info
 patientRouter.put(
   "/update-info",
@@ -40,17 +43,5 @@ patientRouter.put(
   validateRequest(patientSchema.Update_Patient_Info),
   patientController.updatePatientInfo
 );
-
-patientRouter.post(
-  "/demo-file-upload",
-  uploadImage,
-  (req: Request, res: Response) => {
-    log.info("image link:" + req.body.image);
-    res.status(200).json({
-      message: "File uploaded successfully",
-    });
-  }
-
-)
 
 export default patientRouter;

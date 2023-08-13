@@ -7,9 +7,12 @@ import { PatientStatus } from "../models/Patient.model";
 export interface PatientRepositoryInterface {
   // during registration and login
   createPatient_byUserId(userID: number): Promise<number>;
-  getId_givenUserID(userID: number): Promise<number>;
+  getId_givenUserID(userID: number): Promise<{ id: number; status: string }>;
 
-  // during update
+  // get patient info
+  getPatientInfo(patientID: number): Promise<Patient>;
+
+  // update info
   updatePatientInfo(
     patientID: number,
     newPatientInfo: Partial<Patient>
@@ -29,15 +32,36 @@ class PatientRepository implements PatientRepositoryInterface {
     }
   }
 
-  async getId_givenUserID(userID: number): Promise<number> {
+  async getId_givenUserID(
+    userID: number
+  ): Promise<{ id: number; status: string }> {
     const patient = await Patient.findOne({
       where: {
         userID: userID,
       },
     });
 
-    if (patient) return patient.id;
-    else return NaN;
+    if (patient)
+      return {
+        id: patient.id,
+        status: patient.status,
+      };
+    else
+      return {
+        id: NaN,
+        status: "",
+      };
+  }
+
+  async getPatientInfo(patientID: number): Promise<Patient> {
+    try {
+      const patient = await Patient.findByPk(patientID);
+
+      if (patient) return patient;
+      else throw new Error("Patient not found");
+    } catch (error) {
+      throw error;
+    }
   }
 
   async updatePatientInfo(

@@ -1,12 +1,15 @@
 // external imports
 import { NextFunction, Request, Response } from "express";
-import {} from "../utils/custom"
+import {} from "../utils/custom";
 
 //internal imports
 import patientService from "../services/patient.service";
 import { Update_Patient_Info_Body_Input } from "../schema/patient.schema";
 
 interface Patient_Controller_Interface {
+  //get profile / patient info
+  getPatientInfo(req: Request, res: Response, next: NextFunction);
+  
   //update patient info
   updatePatientInfo(
     req: Request<{}, {}, Update_Patient_Info_Body_Input>,
@@ -16,6 +19,19 @@ interface Patient_Controller_Interface {
 }
 
 class Patient_Controller implements Patient_Controller_Interface {
+  // ----------------------------------------- Get Patient Info ------------------------------------------ //
+  async getPatientInfo(req: Request, res: Response, next: NextFunction) {
+    try {
+      const patientID = req.user_identity?.id as number;
+
+      const patientInfo = await patientService.getPatientInfo(patientID);
+
+      res.status(200).json(patientInfo);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   // ----------------------------------------- Update Patient Info ------------------------------------------ //
   async updatePatientInfo(
     req: Request<{}, {}, Update_Patient_Info_Body_Input>,

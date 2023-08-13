@@ -9,6 +9,7 @@ export interface JWT_Payload {
   id: number;
   email: string;
   role: string;
+  profile_status: string;
 }
 
 export interface JWT_Service_Interface {

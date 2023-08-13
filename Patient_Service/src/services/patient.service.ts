@@ -32,6 +32,9 @@ export interface PatientServiceInterface {
   getId_givenUserID(userID: number): Promise<RPC_Response_Payload>;
   serveRPCRequest(payload: RPC_Request_Payload): Promise<RPC_Response_Payload>;
 
+  //get patient info
+  getPatientInfo(patientID: number): Promise<Patient>;
+
   //update patient info
   updatePatientInfo(
     patientID: number,
@@ -68,7 +71,10 @@ class PatientService implements PatientServiceInterface {
   // ----------------------------------------- Get ID given UserID ------------------------------------------ //
   async getId_givenUserID(userID: number): Promise<RPC_Response_Payload> {
     try {
-      const patientID = await this.repository.getId_givenUserID(userID);
+      const { id, status } = await this.repository.getId_givenUserID(userID);
+
+      const patientID = id;
+      const profile_status = status;
 
       if (isNaN(patientID)) {
         return {
@@ -81,6 +87,7 @@ class PatientService implements PatientServiceInterface {
         status: "success",
         data: {
           ID: patientID,
+          profile_status,
         },
       };
     } catch (error) {
@@ -109,12 +116,28 @@ class PatientService implements PatientServiceInterface {
     return response;
   }
 
+  // ----------------------------------------- Get Patient Info ------------------------------------------ //
+  async getPatientInfo(patientID: number): Promise<Patient> {
+    try {
+      const patient = await patientRepository.getPatientInfo(patientID);
+
+      return patient;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // ----------------------------------------- Update Patient Info ------------------------------------------ //
   async updatePatientInfo(
     patientID: number,
     newPatientInfo: Partial<Patient>
   ): Promise<Patient> {
     try {
+      // if newPatientInfo contains id, userID, status remove them
+      if (newPatientInfo.id) delete newPatientInfo.id;
+      if (newPatientInfo.userID) delete newPatientInfo.userID;
+      if (newPatientInfo.status) delete newPatientInfo.status;
+
       const patient = await patientRepository.updatePatientInfo(
         patientID,
         newPatientInfo

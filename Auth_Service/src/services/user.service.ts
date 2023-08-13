@@ -34,7 +34,7 @@ class UserService implements UserServiceInterface {
   private async requestID_fromOtherServices(
     role: string,
     payload: RPC_Request_Payload
-  ): Promise<number> {
+  ): Promise<{ ID: number; profile_status: string }> {
     let response: RPC_Response_Payload;
 
     if (role === UserRole.PATIENT) {
@@ -44,12 +44,14 @@ class UserService implements UserServiceInterface {
     }
 
     let ID: number = NaN;
+    let profile_status: string = "";
 
     if (response && response.status === "success") {
       ID = response.data["ID"];
+      profile_status = response.data["profile_status"];
     }
 
-    return ID;
+    return { ID, profile_status };
   }
 
   // ----------------------------------------- SignUP ------------------------------------------ //
@@ -71,7 +73,10 @@ class UserService implements UserServiceInterface {
       },
     };
 
-    const ID: number = await this.requestID_fromOtherServices(role, payload);
+    const { ID, profile_status } = await this.requestID_fromOtherServices(
+      role,
+      payload
+    );
 
     if (isNaN(ID)) {
       await this.repository.deleteUserById(newUser.id);
@@ -83,6 +88,7 @@ class UserService implements UserServiceInterface {
       id: ID,
       email: email,
       role: role,
+      profile_status: profile_status,
     };
 
     const token = await jwtService.generateToken(token_payload);
@@ -108,7 +114,10 @@ class UserService implements UserServiceInterface {
       },
     };
 
-    const ID: number = await this.requestID_fromOtherServices(role, payload);
+    const { ID, profile_status } = await this.requestID_fromOtherServices(
+      role,
+      payload
+    );
 
     if (isNaN(ID)) throw createHttpError(500, "Service Communication Failure");
 
@@ -117,13 +126,13 @@ class UserService implements UserServiceInterface {
       id: ID,
       email: email,
       role: role,
+      profile_status: profile_status,
     };
 
     const token = await jwtService.generateToken(token_payload);
 
     return token;
   }
-
 
   // ----------------------------------------- Authorize User ------------------------------------------ //
   async authorizeUser(token: string): Promise<RPC_Response_Payload> {
