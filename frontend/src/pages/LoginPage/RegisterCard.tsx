@@ -58,7 +58,7 @@ const RegisterCard: FC = () => {
       setCookie(
         "user",
         { token: data.token, role: "patient" },
-        { maxAge: import.meta.env.COOKIE_TIMEOUT }
+        { path: "/" }
       );
       console.log(cookies.user);
       navigate("patient/");
@@ -67,7 +67,7 @@ const RegisterCard: FC = () => {
       console.log("error detected");
       setTimeout(() => {
         navigate("/");
-      }, 1500);
+      }, 15000);
       return <p>Error Loading Page. Reloading...</p>;
     },
   });

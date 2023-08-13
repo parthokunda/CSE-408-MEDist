@@ -50,7 +50,7 @@ const LoginCard: FC = () => {
     mutationKey: ["postLogin"],
     mutationFn: postLogin,
     onSuccess: (data) => {
-      setCookie("user", { token: data.token, role: 'patient' }, {maxAge: import.meta.env.COOKIE_TIMEOUT});
+      setCookie("user", { token: data.token, role: 'patient' }, {path: "/"});
       console.log(cookies.user);
       navigate("patient/");
     },
