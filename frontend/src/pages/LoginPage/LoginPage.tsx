@@ -1,16 +1,7 @@
 import { FC } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import LoginCard from "./LoginCard";
+import RegisterCard from "./RegisterCard";
 
 export const LoginPage: FC = () => {
   return (
@@ -21,7 +12,7 @@ export const LoginPage: FC = () => {
         <p className="text-c1 text-2xl">Streamlining the whole process</p>
       </div>
       <div className=" flex items-center justify-center">
-        <Tabs defaultValue="register" className="w-[400px]">
+        <Tabs defaultValue="login" className="w-[400px]">
           <TabsList className="grid w-full grid-cols-2 ">
             <TabsTrigger
               value="login"
@@ -37,76 +28,10 @@ export const LoginPage: FC = () => {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="login">
-            <Card>
-              <CardContent className="space-y-2 mt-2">
-                <div className="space-y-1">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" placeholder="Email" />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="password">Password</Label>
-                  <Input type="password" placeholder="Password"></Input>
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="loginAs">Login As</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="doctor">Doctor</SelectItem>
-                      <SelectItem value="patient">Patient</SelectItem>
-                      <SelectItem value="assistant">Assitant</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex justify-center">
-                  <Button className="bg-c1 text-white hover:bg-c2 mt-4">
-                    Submit
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <LoginCard />
           </TabsContent>
           <TabsContent value="register">
-            <Card>
-              <CardContent className="space-y-1 mt-2">
-                <div className="space-y-1">
-                  <Label htmlFor="name">Name</Label>
-                  <Input id="name" placeholder="Name" />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" placeholder="Email" />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="password">Password</Label>
-                  <Input id="password" placeholder="Password" />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="confirm_password">Confirm Password</Label>
-                  <Input id="confirm_password" placeholder="Confirm Password" />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="SignupAs">Sign Up As</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="doctor">Doctor</SelectItem>
-                      <SelectItem value="patient">Patient</SelectItem>
-                      <SelectItem value="assistant">Assitant</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex justify-center">
-                  <Button className="bg-c1 text-white hover:bg-c2 mt-4">
-                    Submit
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <RegisterCard />
           </TabsContent>
         </Tabs>
       </div>
