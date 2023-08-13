@@ -22,7 +22,7 @@ const app = express();
 // pre-route middlewares
 app.use(express.json());
 app.use(cors());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
 // routes
 app.use(router);

@@ -52,12 +52,14 @@ class PatientService implements PatientServiceInterface {
   // ----------------------------------------- Create Initial Patient ------------------------------------------ //
   async createInitialPatient(userID: number): Promise<RPC_Response_Payload> {
     try {
-      const patientID = await this.repository.createPatient_byUserId(userID);
+      const { id: patientID, status: profile_status } =
+        await this.repository.createPatient_byUserId(userID);
 
       return {
         status: "success",
         data: {
           ID: patientID,
+          profile_status,
         },
       };
     } catch (error) {

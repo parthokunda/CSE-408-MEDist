@@ -8,6 +8,8 @@ import broker from "utils/broker";
 import { config } from "config";
 
 interface SignUp_or_Login_Response {
+  role: string;
+  profile_status: string;
   token: string;
 }
 
@@ -35,13 +37,21 @@ class Auth_Controller implements Auth_Controller_Interface {
     try {
       const { email, password, role } = req.body;
 
-      const response_token = await userService.SignUp({
+      // receive role as userRole, token as response_token
+
+      const {
+        role: userRole,
+        profile_status,
+        token: response_token,
+      } = await userService.SignUp({
         email,
         password,
         role,
       });
 
       const response: SignUp_or_Login_Response = {
+        role: userRole,
+        profile_status,
         token: response_token,
       };
       res.status(201).json(response);
@@ -59,13 +69,19 @@ class Auth_Controller implements Auth_Controller_Interface {
     try {
       const { email, password, role } = req.body;
 
-      const response_token = await userService.LogIn({
+      const {
+        role: userRole,
+        profile_status,
+        token: response_token,
+      } = await userService.LogIn({
         email,
         password,
         role,
       });
 
       const response: SignUp_or_Login_Response = {
+        role: userRole,
+        profile_status,
         token: response_token,
       };
 
@@ -76,9 +92,7 @@ class Auth_Controller implements Auth_Controller_Interface {
   }
 
   // ---------------------------- Logout -----------------------------------
-  async logout(req: Request, res: Response, next: NextFunction) {
-
-  }
+  async logout(req: Request, res: Response, next: NextFunction) {}
 }
 
 export default new Auth_Controller();

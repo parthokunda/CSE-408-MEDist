@@ -6,7 +6,9 @@ import { PatientStatus } from "../models/Patient.model";
 
 export interface PatientRepositoryInterface {
   // during registration and login
-  createPatient_byUserId(userID: number): Promise<number>;
+  createPatient_byUserId(
+    userID: number
+  ): Promise<{ id: number; status: string }>;
   getId_givenUserID(userID: number): Promise<{ id: number; status: string }>;
 
   // get patient info
@@ -20,13 +22,18 @@ export interface PatientRepositoryInterface {
 }
 
 class PatientRepository implements PatientRepositoryInterface {
-  async createPatient_byUserId(userID: number): Promise<number> {
+  async createPatient_byUserId(
+    userID: number
+  ): Promise<{ id: number; status: string }> {
     try {
       const patient = await Patient.create({
         userID: userID,
       });
 
-      return patient.id;
+      return {
+        id: patient.id,
+        status: patient.status,
+      };
     } catch (error) {
       throw error;
     }

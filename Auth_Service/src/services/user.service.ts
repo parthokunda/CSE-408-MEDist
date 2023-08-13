@@ -17,10 +17,23 @@ import { UserRole } from "../database/models/User.model";
 
 // ============================== UserService ============================== //
 
+export interface Signup_or_Login_Service_Output {
+  role: string;
+  profile_status: string;
+  token: string;
+}
+
 export interface UserServiceInterface {
-  SignUp(userInput: Signup_or_Login_Body_Input): Promise<string>;
-  LogIn(userInput: Signup_or_Login_Body_Input): Promise<string>;
+  SignUp(
+    userInput: Signup_or_Login_Body_Input
+  ): Promise<Signup_or_Login_Service_Output>;
+
+  LogIn(
+    userInput: Signup_or_Login_Body_Input
+  ): Promise<Signup_or_Login_Service_Output>;
+
   serveRPCRequest(payload: RPC_Request_Payload): Promise<RPC_Response_Payload>;
+
   authorizeUser(token: string): Promise<RPC_Response_Payload>;
 }
 
@@ -56,82 +69,92 @@ class UserService implements UserServiceInterface {
 
   // ----------------------------------------- SignUP ------------------------------------------ //
   async SignUp(userInput: Signup_or_Login_Body_Input) {
-    const { email, password, role } = userInput;
+    try {
+      const { email, password, role } = userInput;
 
-    const existingUser = await this.repository.findUserByEmail(email);
+      const existingUser = await this.repository.findUserByEmail(email);
 
-    if (existingUser)
-      throw createHttpError(409, `User with email ${email} already exists`);
+      if (existingUser)
+        throw createHttpError(409, `User with email ${email} already exists`);
 
-    const newUser = await this.repository.createUser(userInput);
+      const newUser = await this.repository.createUser(userInput);
 
-    // send RPC request to get Id from other service
-    const payload: RPC_Request_Payload = {
-      type: "CREATE_NEW_ENTITY",
-      data: {
-        userID: newUser.id,
-      },
-    };
+      // send RPC request to get Id from other service
+      const payload: RPC_Request_Payload = {
+        type: "CREATE_NEW_ENTITY",
+        data: {
+          userID: newUser.id,
+        },
+      };
 
-    const { ID, profile_status } = await this.requestID_fromOtherServices(
-      role,
-      payload
-    );
+      const { ID, profile_status } = await this.requestID_fromOtherServices(
+        role,
+        payload
+      );
 
-    if (isNaN(ID)) {
-      await this.repository.deleteUserById(newUser.id);
-      throw createHttpError(500, "Failed to create user");
+      if (isNaN(ID)) {
+        await this.repository.deleteUserById(newUser.id);
+        throw createHttpError(500, "Failed to create user");
+      }
+
+      // generate JWT token
+      const token_payload: JWT_Payload = {
+        id: ID,
+        email: email,
+        role: role,
+        profile_status: profile_status,
+      };
+
+      const token = await jwtService.generateToken(token_payload);
+
+      return { role, profile_status, token };
+    } catch (error) {
+      throw error;
     }
-
-    // generate JWT token
-    const token_payload: JWT_Payload = {
-      id: ID,
-      email: email,
-      role: role,
-      profile_status: profile_status,
-    };
-
-    const token = await jwtService.generateToken(token_payload);
-
-    return token;
   }
 
   async LogIn(userInput: Signup_or_Login_Body_Input) {
-    const { email, password, role } = userInput;
+    try {
+      const { email, password, role } = userInput;
 
-    const existingUser = await this.repository.findUserByEmail_and_Password(
-      email,
-      password
-    );
+      const existingUser = await this.repository.findUserByEmail_and_Password(
+        email,
+        password
+      );
 
-    if (!existingUser) throw createHttpError(400, "invalid email or password");
+      if (!existingUser)
+        throw createHttpError(400, "invalid email or password");
 
-    // send RPC request to get Id from other service
-    const payload: RPC_Request_Payload = {
-      type: "GET_ID",
-      data: {
-        userID: existingUser.id,
-      },
-    };
+      // send RPC request to get Id from other service
+      const payload: RPC_Request_Payload = {
+        type: "GET_ID",
+        data: {
+          userID: existingUser.id,
+        },
+      };
 
-    const { ID, profile_status } = await this.requestID_fromOtherServices(
-      role,
-      payload
-    );
+      const { ID, profile_status } = await this.requestID_fromOtherServices(
+        role,
+        payload
+      );
 
-    if (isNaN(ID)) throw createHttpError(500, "Service Communication Failure");
+      if (isNaN(ID))
+        throw createHttpError(500, "Service Communication Failure");
 
-    // generate JWT token
-    const token_payload: JWT_Payload = {
-      id: ID,
-      email: email,
-      role: role,
-      profile_status: profile_status,
-    };
+      // generate JWT token
+      const token_payload: JWT_Payload = {
+        id: ID,
+        email: email,
+        role: role,
+        profile_status: profile_status,
+      };
 
-    const token = await jwtService.generateToken(token_payload);
+      const token = await jwtService.generateToken(token_payload);
 
-    return token;
+      return { role, profile_status, token };
+    } catch (error) {
+      throw error;
+    }
   }
 
   // ----------------------------------------- Authorize User ------------------------------------------ //
