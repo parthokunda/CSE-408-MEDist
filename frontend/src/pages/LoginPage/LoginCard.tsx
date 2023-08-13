@@ -16,14 +16,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 
-type postLoginReturn = {
-  token: string;
-};
-
-const postLogin = async (data: LoginCardFormType): Promise<postLoginReturn> => {
+const postLogin = async (data: LoginCardFormType): Promise<{token:string}> => {
   const response = await axios.post(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
@@ -41,7 +37,7 @@ const LoginCard: FC = () => {
     defaultValues: {
       email: "",
       password: "",
-      role: "",
+      role: "patient",
     },
     resolver: zodResolver(LoginCardForm),
   });
@@ -54,7 +50,7 @@ const LoginCard: FC = () => {
     mutationKey: ["postLogin"],
     mutationFn: postLogin,
     onSuccess: (data) => {
-      setCookie("user", { token: data.token, role: 'patient' }, {maxAge: 1800});
+      setCookie("user", { token: data.token, role: 'patient' }, {maxAge: import.meta.env.COOKIE_TIMEOUT});
       console.log(cookies.user);
       navigate("patient/");
     },
@@ -105,7 +101,7 @@ const LoginCard: FC = () => {
                 name="role"
                 control={loginForms.control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

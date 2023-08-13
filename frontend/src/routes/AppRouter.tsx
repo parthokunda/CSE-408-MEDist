@@ -8,6 +8,7 @@ import MedicineSearchPage from "@/pages/Medicines/SearchMedicines/MedicineSearch
 import { FC } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import PatientRoute from "./PatientRouter";
+import AuthRoute from "./AuthRouter";
 
 const navList: navIcon[] = [
   { name: "Medicines", link: "/medicines" },
@@ -20,8 +21,7 @@ const navList: navIcon[] = [
 const AppRouter: FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<LoginPage />} />
-      <Route path="*" element={<Navigate to="/searchMedicines/" replace />} />
+      <Route path="/" element={<AuthRoute/>} />
       <Route element={<NavBar navList={navList} />}>
         <Route path="searchMedicines/" element={<MedicineSearchPage />} />
         <Route
@@ -33,8 +33,9 @@ const AppRouter: FC = () => {
           path="manufacturer/:manufacturerId"
           element={<ManufacturerDescriptionPage />}
         />
-        <Route path="/patient" element={<PatientRoute element={<>HELLO</>}/>} />
+        <Route path="/patient" element={<PatientRoute element={<>HELLO Patient</>}/>} />
       </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
