@@ -7,6 +7,7 @@ import GenericDescriptionPage from "./pages/Medicines/Generic/GenericDescription
 import ManufacturerDescriptionPage from "./pages/Medicines/Manufacturer/ManufacturerPage";
 import { LoginPage } from "./pages/LoginPage/LoginPage";
 import {DoctorInfo} from "./pages/doctor/DoctorInfo";
+import DoctorImage from "./pages/doctor/DoctorImage";
 
 
 const navList: navIcon[] = [
@@ -30,7 +31,7 @@ function App() {
           <Route path="medicine/:medicineId" element={<MedicineDescriptionPage/>}/>
           <Route path="generic/:genericId" element={<GenericDescriptionPage/>} />
           <Route path="manufacturer/:manufacturerId" element={<ManufacturerDescriptionPage/>} />
-          <Route path="doctor/info" element={<DoctorInfo/>}/>
+          <Route path="doctor/info" element={<DoctorImage/>}/>
         </Route>
         
       </Routes>
