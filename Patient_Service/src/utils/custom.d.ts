@@ -7,8 +7,9 @@ declare global {
         id: string;
         email: string;
         role: string;
-        // Add other properties if needed
       };
     }
   }
 }
+
+export {};
