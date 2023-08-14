@@ -24,19 +24,19 @@ const AppRouter: FC = () => {
     <Routes>
       <Route path="/" element={<AuthRoute/>} />
       <Route element={<NavBar navList={navList} />}>
-        <Route path="searchMedicines/" element={<MedicineSearchPage />} />
+        <Route path="/searchMedicines/" element={<MedicineSearchPage />} />
         <Route
-          path="medicine/:medicineId"
+          path="/medicine/:medicineId"
           element={<MedicineDescriptionPage />}
         />
-        <Route path="generic/:genericId" element={<GenericDescriptionPage />} />
+        <Route path="/generic/:genericId" element={<GenericDescriptionPage />} />
         <Route
-          path="manufacturer/:manufacturerId"
+          path="/manufacturer/:manufacturerId"
           element={<ManufacturerDescriptionPage />}
         />
-        <Route path="patient/" element={<PatientRoute element={<>HELLO Patient</>}/>} />
+        <Route path="/patient/" element={<PatientRoute element={<>HELLO Patient</>}/>} />
       </Route>
-      <Route path="logout/" element={<Logout/>}/>
+      <Route path="/logout/" element={<Logout/>}/>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

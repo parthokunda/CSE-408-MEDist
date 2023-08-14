@@ -59,10 +59,10 @@ const RegisterCard: FC = () => {
       setCookie(
         "user",
         { token: data.token, role: data.role, profile_status: data.profile_status },
-        
+        {path: "/"}
       );
       console.log(cookies.user);
-      navigate("patient/");
+      navigate("/patient/");
     },
     onError: () => {
       console.log("error detected");

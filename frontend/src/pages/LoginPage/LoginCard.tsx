@@ -60,9 +60,12 @@ const LoginCard: FC = () => {
           role: data.role,
           profile_status: data.profile_status,
         },
+        {
+          path: "/"
+        }
       );
       console.log(cookies.user);
-      navigate("patient/");
+      navigate("/patient/");
     },
     onError: () => {
       console.log("error detected");
