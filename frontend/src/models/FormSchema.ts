@@ -21,9 +21,9 @@ export const DoctorAdditionalInfoForm = z.object({
     gender: z.union([z.literal("male"),z.literal("female"),z.literal("other")]),
     dateOfBirth : z.date(),
     bmdcNumber: z.string().max(20, {message: "BMDC number cannot exceed 20 characters"}),
-    issueDate: z.date(),
-    department: z.string(),
-    degree : z.string().array().max(5, {message: "Maximum 5 degrees can be added"}),
+    issueDate: z.string(),
+    // department: z.string(),
+    // degree : z.string().array().max(5, {message: "Maximum 5 degrees can be added"}),
     
 });
 

@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import * as z from "zod";
+import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "../../components/ui/input";
 import { FC, useEffect } from "react";
@@ -8,7 +9,7 @@ import { useState } from "react";
 import { DoctorAdditionalInfoForm } from "@/models/FormSchema";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { CalendarIcon, Divide } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -16,11 +17,8 @@ export const DoctorInfo: FC = () => {
   const forms = useForm<z.infer<typeof DoctorAdditionalInfoForm>>({
     defaultValues: {
       gender: "male",
-      //   dateOfBirth: props.formValues.dateOfBirth,
-      //   bmdcNumber: props.formValues.bmdcNumber,
-      //   issueDate: props.formValues.issueDate,
-      //   department: props.formValues.department,
-      //   degree: props.formValues.degree,
+      dateOfBirth: new Date("2023-01-01"),
+      bmdcNumber: "",
     },
     resolver: zodResolver(DoctorAdditionalInfoForm),
   });
@@ -30,20 +28,7 @@ export const DoctorInfo: FC = () => {
   ) => {
     console.log(data);
   };
-
-  // console.log(forms.watch("filterByBrand"))
-  useEffect(() => {
-    const subscription = forms.watch(() => forms.handleSubmit(onSubmit)());
-    console.log(
-      "🚀 ~ file: test.tsx:32 ~ useEffect ~ subscription:",
-      subscription
-    );
-    return () => subscription.unsubscribe();
-  }, [forms.handleSubmit, forms.watch]);
   const [show, setShow] = useState(false);
-  const onEvan = () => {
-    console.log("Evan");
-  };
   return (
     <>
       <div className="text-black justify-center text-large font-bold ml-6">
@@ -62,9 +47,9 @@ export const DoctorInfo: FC = () => {
               <RadioGroup
                 defaultValue={field.value}
                 onValueChange={field.onChange}
-                className="flex flex-row gap-2  items-center"
+                className="flex gap-2 items-center"
               >
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 bg-#FFFFFF">
                   <RadioGroupItem value="male" id="male" />
                   <label htmlFor="option-one">Male</label>
                 </div>
@@ -116,10 +101,9 @@ export const DoctorInfo: FC = () => {
                       date > new Date() || date < new Date("1900-01-01")
                     }
                     initialFocus
+                    {...field}
                   />
                 )}
-
-                {/* <CalendarIcon className="h-8 w-8" /> */}
               </div>
             )}
           />
@@ -131,16 +115,23 @@ export const DoctorInfo: FC = () => {
             control={forms.control}
             render={({ field }) => (
               <div>
-                <Input
-                  {...field}
-                  placeholder="BMDC Number"
-                  onChange={() => console.log(field)}
-                />
+                <Input {...field} placeholder="BMDC Number" />
               </div>
             )}
           />
         </div>
-        <Button className="bg-c1 text-white hover:bg-c2 mt-4">Submit</Button>
+        <div className="flex gap-3">
+          Issue Date:
+          <Controller
+          control={forms.control}
+          name="issueDate"
+          render={({field}) => (
+            <div><Input type="date" {...field}/></div>
+          )}/>
+        </div>
+        <Button type="submit" className="bg-c1 text-white hover:bg-c2 mt-4" disabled={!forms.formState.isValid}>
+          Submit
+        </Button>
       </form>
     </>
   );
