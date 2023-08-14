@@ -17,6 +17,7 @@ export const LoginCardForm = z.object({
 
 export type LoginCardFormType = z.infer<typeof LoginCardForm>
 
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 export const DoctorAdditionalInfoForm = z.object({
     gender: z.union([z.literal("male"),z.literal("female"),z.literal("other")]),
     dateOfBirth : z.string(),
@@ -24,18 +25,27 @@ export const DoctorAdditionalInfoForm = z.object({
     issueDate: z.string(),
     department: z.string().nonempty(),
     degrees: z.string().nonempty({message: "Degrees cannot be empty"}),
-    image : z.any(),
+    image : z.any().refine(
+      (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
+      "Only .jpg, .jpeg, .png and .webp formats are supported."
+    ),
 });
 
-export const patientAdditionalInfoForm = z.object({
+export const PatientAdditionalInfoForm = z.object({
     gender : z.union([z.literal("male"),z.literal("female"),z.literal("other")]),
-    dateOfBirth : z.date(),
-    height : z.object({
-        feet : z.number().int().min(0).max(10),
-        inches : z.number().min(0).max(12)
-    }),
-    weight : z.number().min(0),
-    bloodGroup : z.union([z.literal("A+"),z.literal("A-"),z.literal("B+"),z.literal("B-"),z.literal("AB+"),z.literal("AB-"),z.literal("O+"),z.literal("O-")]),
+    dateOfBirth : z.string(),
+    // height : z.object({
+    //     feet : z.number().int().min(0).max(10),
+    //     inches : z.number().min(0).max(12)
+    // }),
+    height_feet: z.string().nonempty(),
+    height_inches: z.string().nonempty(),
+    weight : z.string().nonempty(),
+    bloodGroup : z.string().nonempty(),
+    image : z.any().refine(
+      (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
+      "Only .jpg, .jpeg, .png and .webp formats are supported."
+    ),
 });
 
 export const RegisterCardForm = z

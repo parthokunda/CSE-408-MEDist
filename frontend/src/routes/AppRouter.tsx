@@ -10,6 +10,7 @@ import PatientRoute from "./PatientRouter";
 import AuthRoute from "./AuthRouter";
 import Logout from "@/pages/LoginPage/Logout";
 import DoctorInfo from "@/pages/doctor/DoctorInfo";
+import PatientInfo from "@/pages/patient/PatientInfo";
 
 const navList: navIcon[] = [
   { name: "Medicines", link: "/medicines" },
@@ -43,6 +44,7 @@ const AppRouter: FC = () => {
           element={<PatientRoute element={<>HELLO Patient</>} />}
         />
         <Route path="/doctor/info/" element={<DoctorInfo />} />
+        <Route path="patient/info/"element={<PatientInfo/>}/>
       </Route>
       <Route path="/logout/" element={<Logout />} />
       <Route path="*" element={<Navigate to="/" replace />} />
