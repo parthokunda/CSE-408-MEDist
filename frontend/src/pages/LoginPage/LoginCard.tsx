@@ -18,8 +18,11 @@ import { useMutation } from "@tanstack/react-query";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import { LoginSignupToken } from "@/models/LoginSignUpSchema";
 
-const postLogin = async (data: LoginCardFormType): Promise<{token:string}> => {
+const postLogin = async (
+  data: LoginCardFormType
+): Promise<LoginSignupToken> => {
   const response = await axios.post(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
@@ -50,7 +53,14 @@ const LoginCard: FC = () => {
     mutationKey: ["postLogin"],
     mutationFn: postLogin,
     onSuccess: (data) => {
-      setCookie("user", { token: data.token, role: 'patient' }, {path: "/"});
+      setCookie(
+        "user",
+        {
+          token: data.token,
+          role: data.role,
+          profile_status: data.profile_status,
+        },
+      );
       console.log(cookies.user);
       navigate("patient/");
     },
@@ -101,7 +111,10 @@ const LoginCard: FC = () => {
                 name="role"
                 control={loginForms.control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

@@ -18,10 +18,11 @@ import { Controller, useForm } from "react-hook-form";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
+import { LoginSignupToken } from "@/models/LoginSignUpSchema";
 
 const postRegister = async (
   data: RegisterCardFormType
-): Promise<{ token: string }> => {
+): Promise<LoginSignupToken> => {
   const response = await axios.post(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
@@ -57,8 +58,8 @@ const RegisterCard: FC = () => {
     onSuccess: (data) => {
       setCookie(
         "user",
-        { token: data.token, role: "patient" },
-        { path: "/" }
+        { token: data.token, role: data.role, profile_status: data.profile_status },
+        
       );
       console.log(cookies.user);
       navigate("patient/");

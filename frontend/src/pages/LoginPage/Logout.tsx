@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 
 const Logout: FC = () => {
     const [cookie, addCookie, removeCookie] = useCookies(["user"]);
-    removeCookie("user", {path:"/"});
+    removeCookie("user");
     console.log(cookie.user);
     return <Navigate to="/" replace/>
 };
