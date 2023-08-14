@@ -9,6 +9,7 @@ import MedicineSearchPage from "@/pages/Medicines/SearchMedicines/MedicineSearch
 import PatientRoute from "./PatientRouter";
 import AuthRoute from "./AuthRouter";
 import Logout from "@/pages/LoginPage/Logout";
+import DoctorInfo from "@/pages/doctor/DoctorInfo";
 
 const navList: navIcon[] = [
   { name: "Medicines", link: "/medicines" },
@@ -22,21 +23,28 @@ const navList: navIcon[] = [
 const AppRouter: FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<AuthRoute/>} />
+      <Route path="/" element={<AuthRoute />} />
       <Route element={<NavBar navList={navList} />}>
         <Route path="/searchMedicines/" element={<MedicineSearchPage />} />
         <Route
           path="/medicine/:medicineId"
           element={<MedicineDescriptionPage />}
         />
-        <Route path="/generic/:genericId" element={<GenericDescriptionPage />} />
+        <Route
+          path="/generic/:genericId"
+          element={<GenericDescriptionPage />}
+        />
         <Route
           path="/manufacturer/:manufacturerId"
           element={<ManufacturerDescriptionPage />}
         />
-        <Route path="/patient/" element={<PatientRoute element={<>HELLO Patient</>}/>} />
+        <Route
+          path="/patient/"
+          element={<PatientRoute element={<>HELLO Patient</>} />}
+        />
+        <Route path="/doctor/info/" element={<DoctorInfo />} />
       </Route>
-      <Route path="/logout/" element={<Logout/>}/>
+      <Route path="/logout/" element={<Logout />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
