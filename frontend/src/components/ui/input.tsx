@@ -1,6 +1,4 @@
 import * as React from "react";
-import { AiOutlineSearch } from "react-icons/ai";
-
 import { cn } from "@/lib/utils";
 
 export interface InputProps

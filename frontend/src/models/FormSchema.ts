@@ -7,11 +7,34 @@ export const MedSearchForm = z.object({
   filterBy: z.union([z.literal("brands"), z.literal("generics")]),
 });
 
+const roleValidator = z.union([z.literal("patient"), z.literal("doctor"), z.literal("")])
+
 export const LoginCardForm = z.object({
-  email: z
-    .string().email({message: "Invalid Email"}),
+  email: z.string().email({ message: "Invalid Email" }),
   password: z.string().min(4, { message: "Minimum Password Length is 4" }),
-  role: z.union([z.literal('patient'), z.literal('doctor'), z.literal('assistant'),z.literal('')]),
+  role: roleValidator,
 });
 
-export type LoginCardFormType = z.infer<typeof LoginCardForm>
+export type LoginCardFormType = z.infer<typeof LoginCardForm>;
+
+export const RegisterCardForm = z
+  .object({
+    name: z
+      .string()
+      .min(3, { message: "Minimum Name Length is 3" })
+      .max(20, { message: "Maximum Name Length is 20" }),
+    email: z.string().email({ message: "Invalid Email" }),
+    password: z.string().min(4, { message: "Minimum Password Length is 4" }),
+    confirmPassword: z.string().min(4),
+    role: roleValidator,
+  })
+  .superRefine(({ confirmPassword, password }, ctx) => {
+    if (confirmPassword != password) {
+      ctx.addIssue({
+        code: "custom",
+        message: "The passwords did not match",
+      });
+    }
+  });
+
+export type RegisterCardFormType = z.infer<typeof RegisterCardForm>;
