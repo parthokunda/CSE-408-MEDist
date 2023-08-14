@@ -1,5 +1,5 @@
-import { Request ,Response, NextFunction } from "express";
-import { } from "../../utils/custom.d"
+import { Request, Response, NextFunction } from "express";
+import {} from "../../utils/custom.d";
 
 import createError from "http-errors";
 import messageBroker, {
@@ -7,13 +7,16 @@ import messageBroker, {
   RPC_Response_Payload,
 } from "../../utils/broker";
 import { config } from "../../config";
+import log from "../../utils/logger";
 
 const authorize = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
+    //log.debug(token, "token");
+
 
     if (!token) {
-      throw createError.Unauthorized();
+      return next(createError.Unauthorized());
     }
 
     const payload: RPC_Request_Payload = {
@@ -25,27 +28,33 @@ const authorize = async (req: Request, res: Response, next: NextFunction) => {
 
     const auth_response_payload: RPC_Response_Payload =
       await messageBroker.RPC_Request(config.AUTH_RPC_QUEUE, payload);
+    
+    //log.debug(auth_response_payload, "auth_response_payload");
 
     if (auth_response_payload) {
       // success and valid token
       if (auth_response_payload.status === "success") {
         // set the user_identity in req.locals
-        req.user_identity = {
-          id: auth_response_payload.data["id"],
-          email: auth_response_payload.data["email"],
-          role: auth_response_payload.data["role"],
-        };
-        next();
+        const role = auth_response_payload.data["role"];
+
+        if (role === "patient") {
+          req.user_identity = {
+            id: auth_response_payload.data["id"],
+            email: auth_response_payload.data["email"],
+            role,
+          };
+           return next();
+        }
       }
       // error in auth service
       else if (auth_response_payload.status === "error")
-        throw createError.InternalServerError();
-      // token expired or invalid
-      else if (auth_response_payload.status === "unauthorized")
-        throw createError.Unauthorized();
+        return next(createError.InternalServerError());
+
+      // invalid token
+      return next(createError.Unauthorized());
     }
     // error in message broker
-    else throw createError.InternalServerError();
+    next(createError.InternalServerError("Error in message broker"));
   } catch (error) {
     next(error);
   }

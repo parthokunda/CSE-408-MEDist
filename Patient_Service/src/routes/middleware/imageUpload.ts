@@ -11,6 +11,7 @@ import multer from "multer";
 // internal imports
 import { config } from "../../config";
 import log from "../../utils/logger";
+import createHttpError from "http-errors";
 
 //Initialize a firebase application
 initializeApp(config.FIREBASE_CONFIG);
@@ -33,14 +34,11 @@ const giveCurrentDateTime = () => {
 
 // ------------------------------ uploadImage ------------------------------
 async function uploadImage(req, res, next) {
-  log.info(req, "req");
-  log.info(req.body, "req.body");
-
   // as image is present in request, upload it to firebase storage
   upload.single("image")(req, res, async (err) => {
     if (err) {
       log.error(err);
-      throw new Error("Error getting image");
+      return next(createHttpError(500, "Error getting image"))
     }
 
     try {
@@ -70,13 +68,14 @@ async function uploadImage(req, res, next) {
       // get the download url
       const downloadURL = await getDownloadURL(uploadTask.ref);
 
-      req.body.image = downloadURL;
+      req.body.imageUrl = downloadURL;
       next();
     } catch (err) {
       log.error(err);
-      throw new Error("Error getting image");
+      next(createHttpError(500, "Error uploading image"));
     }
   });
 }
 
+// ------------------------------ delete image -----------------------------
 export default uploadImage;

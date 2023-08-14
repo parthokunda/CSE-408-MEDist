@@ -32,6 +32,14 @@ patientRouter.get("/", authorize, (req: Request, res: Response) => {
   });
 });
 
+// image upload
+patientRouter.post(
+  "/upload-image",
+  authorize,
+  uploadImage,
+  patientController.uploadImage
+);
+
 // get patient info
 patientRouter.get("/profile-info", authorize, patientController.getPatientInfo);
 

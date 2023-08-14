@@ -8,11 +8,16 @@ import {
 // internal imports
 
 export interface Patient_Schema_Interface {
+
   //patient update info
   Update_Patient_Info: object;
 }
 
 class PatientSchema implements Patient_Schema_Interface {
+    
+
+
+
   // ------------------------- Update Patient Info Schema -------------------------
   Update_Patient_Info = object({
     body: object({
