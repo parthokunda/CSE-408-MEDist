@@ -27,13 +27,13 @@ import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-// import { initializeApp } from "firebase/app";
-// import {
-//   getStorage,
-//   ref,
-//   getDownloadURL,
-//   uploadBytesResumable,
-// } from "firebase/storage";
+import { initializeApp } from "firebase/app";
+import {
+  getStorage,
+  ref,
+  getDownloadURL,
+  uploadBytesResumable,
+} from "firebase/storage";
 
 export const DoctorInfo: FC = () => {
   const forms = useForm<z.infer<typeof DoctorAdditionalInfoForm>>({
@@ -49,6 +49,7 @@ export const DoctorInfo: FC = () => {
   const onSubmit: SubmitHandler<z.infer<typeof DoctorAdditionalInfoForm>> = (
     data
   ) => {
+    uploadFile();
     console.log(data);
   };
   // const { register,handleSubmit,reset, control} = forms;
@@ -72,7 +73,6 @@ export const DoctorInfo: FC = () => {
     { key: 12, value: "Physical Medicine" },
   ];
 
-
   const FIREBASE_CONFIG = {
     apiKey: "AIzaSyCHZ4fFHB6mG2e1QfU8njqeZnbhmRnO9Go",
     authDomain: "medist-photos-8c6bf.firebaseapp.com",
@@ -82,7 +82,7 @@ export const DoctorInfo: FC = () => {
     appId: "1:488575338890:web:af4e96b6e455fcf9296073",
     measurementId: "G-QB6RHMBMMK",
   };
-  // const app = initializeApp(FIREBASE_CONFIG);
+  const app = initializeApp(FIREBASE_CONFIG);
   // const file = req.file;
   // const userID = req.user_identity.id;
 
@@ -120,6 +120,22 @@ export const DoctorInfo: FC = () => {
     setSelectedFile(file);
   };
 
+  const uploadFile = async () => {
+    if (selectedFile) {
+      const storage = getStorage();
+      const storageRef = ref(storage, "profile_pictures/" + selectedFile.name);
+      const metadata = {
+        contentType: selectedFile.type,
+      };
+      const uploadTask = await uploadBytesResumable(
+        storageRef,
+        selectedFile,
+        metadata
+      );
+      const downloadURL = await getDownloadURL(uploadTask.ref);
+      console.log(downloadURL);
+    }
+  };
   const handleImage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log(selectedFile);
@@ -270,7 +286,6 @@ export const DoctorInfo: FC = () => {
                       onChange(e.target.files?.[0]);
                       handleFileInput(e);
                     }}
-
                   />
                   {selectedFile && (
                     // src={URL.createObjectURL(selectedFile)};
