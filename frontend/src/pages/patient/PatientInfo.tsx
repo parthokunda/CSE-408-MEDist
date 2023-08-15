@@ -46,12 +46,7 @@ export const PatientInfo :FC = () => {
     },
     resolver: zodResolver(PatientAdditionalInfoForm),
   });
-  const onSubmit: SubmitHandler<z.infer<typeof PatientAdditionalInfoForm>> = (
-    data
-  ) => {
-    uploadFile();
-    console.log(data);
-  };
+  
   // const { register,handleSubmit,reset, control} = forms;
   // const [show, setShow] = useState(false);
   // const { fields, append, remove } = useFieldArray({
@@ -115,7 +110,7 @@ export const PatientInfo :FC = () => {
     const file = event.target.files ? event.target.files[0] : null;
     setSelectedFile(file);
   };
-
+  var downloadURL="";
   const uploadFile = async () => {
     if (selectedFile) {
       const storage = getStorage();
@@ -128,13 +123,34 @@ export const PatientInfo :FC = () => {
         selectedFile,
         metadata
       );
-      const downloadURL = await getDownloadURL(uploadTask.ref);
+      downloadURL = await getDownloadURL(uploadTask.ref);
       console.log(downloadURL);
+      return downloadURL;
     }
   };
   const handleImage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log(selectedFile);
+  };
+  // force image upload before full submission
+  
+
+
+  const onSubmit: SubmitHandler<z.infer<typeof PatientAdditionalInfoForm>> = (
+    data
+  ) => {
+    uploadFile().then((url) => {
+      data.image = url as string;
+      console.log(data);
+    });
+
+    console.log("here")
+    //console.log(data);
+    // while (downloadURL === "") {
+    //   console.log("waiting");
+    // }
+    
+    //console.log(data);
   };
   // if(selectedFile){
   //   console.log((selectedFile))
@@ -273,8 +289,9 @@ export const PatientInfo :FC = () => {
                     onBlur={onBlur}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      onChange(e.target.files?.[0]);
+                      
                       handleFileInput(e);
+                      onChange(downloadURL);
                     }}
                   />
                   {selectedFile && (

@@ -25,10 +25,7 @@ export const DoctorAdditionalInfoForm = z.object({
     issueDate: z.string(),
     department: z.string().nonempty(),
     degrees: z.string().nonempty({message: "Degrees cannot be empty"}),
-    image : z.any().refine(
-      (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
-      "Only .jpg, .jpeg, .png and .webp formats are supported."
-    ),
+    image : z.string(),
 });
 
 export const PatientAdditionalInfoForm = z.object({
@@ -42,10 +39,7 @@ export const PatientAdditionalInfoForm = z.object({
     height_inches: z.string().nonempty(),
     weight : z.string().nonempty(),
     bloodGroup : z.string().nonempty(),
-    image : z.any().refine(
-      (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
-      "Only .jpg, .jpeg, .png and .webp formats are supported."
-    ),
+    image : z.string(),
 });
 
 export const RegisterCardForm = z

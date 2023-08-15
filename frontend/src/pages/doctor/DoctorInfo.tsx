@@ -46,12 +46,7 @@ export const DoctorInfo: FC = () => {
     },
     resolver: zodResolver(DoctorAdditionalInfoForm),
   });
-  const onSubmit: SubmitHandler<z.infer<typeof DoctorAdditionalInfoForm>> = (
-    data
-  ) => {
-    uploadFile();
-    console.log(data);
-  };
+
   // const { register,handleSubmit,reset, control} = forms;
   // const [show, setShow] = useState(false);
   // const { fields, append, remove } = useFieldArray({
@@ -119,7 +114,7 @@ export const DoctorInfo: FC = () => {
     const file = event.target.files ? event.target.files[0] : null;
     setSelectedFile(file);
   };
-
+  var downloadURL = "";
   const uploadFile = async () => {
     if (selectedFile) {
       const storage = getStorage();
@@ -132,13 +127,24 @@ export const DoctorInfo: FC = () => {
         selectedFile,
         metadata
       );
-      const downloadURL = await getDownloadURL(uploadTask.ref);
+      downloadURL = await getDownloadURL(uploadTask.ref);
       console.log(downloadURL);
+      return downloadURL;
     }
   };
   const handleImage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log(selectedFile);
+  };
+  const onSubmit: SubmitHandler<z.infer<typeof DoctorAdditionalInfoForm>> = (
+    data
+  ) => {
+    uploadFile().then((url) => {
+      // console.log(url);
+      data.image = url as string;
+      console.log(data);
+    });
+    console.log("here");
   };
   // if(selectedFile){
   //   console.log((selectedFile))
@@ -283,8 +289,9 @@ export const DoctorInfo: FC = () => {
                     onBlur={onBlur}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      onChange(e.target.files?.[0]);
+                      // onChange(e.target.files?.[0]);
                       handleFileInput(e);
+                      onChange(downloadURL);
                     }}
                   />
                   {selectedFile && (
