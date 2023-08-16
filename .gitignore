@@ -16,6 +16,10 @@ Auth_Service/dist
 Patient_Service/node_modules
 Patient_Service/dist
 
+# Doctor_Service
+Doctor_Service/node_modules
+Doctor_Service/dist
+
 # frontend
 frontend/logs
 frontend/*.log
