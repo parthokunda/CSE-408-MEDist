@@ -29,7 +29,7 @@ const authorize = async (req: Request, res: Response, next: NextFunction) => {
     const auth_response_payload: RPC_Response_Payload =
       await messageBroker.RPC_Request(config.AUTH_RPC_QUEUE, payload);
     
-    //log.debug(auth_response_payload, "auth_response_payload");
+    log.debug(auth_response_payload, "auth_response_payload");
 
     if (auth_response_payload) {
       // success and valid token

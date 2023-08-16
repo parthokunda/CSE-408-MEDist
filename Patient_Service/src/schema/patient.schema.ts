@@ -8,16 +8,11 @@ import {
 // internal imports
 
 export interface Patient_Schema_Interface {
-
   //patient update info
   Update_Patient_Info: object;
 }
 
 class PatientSchema implements Patient_Schema_Interface {
-    
-
-
-
   // ------------------------- Update Patient Info Schema -------------------------
   Update_Patient_Info = object({
     body: object({
@@ -41,12 +36,13 @@ class PatientSchema implements Patient_Schema_Interface {
       ),
 
       // age must be <= 100
-      dob: date({
+      dob: string({
         required_error: "Date of birth is required",
       }).refine(
         (val) => {
           const today = new Date();
-          const age = today.getFullYear() - val.getFullYear();
+          const date = new Date(val);
+          const age = today.getFullYear() - date.getFullYear();
           return age <= 100;
         },
         {

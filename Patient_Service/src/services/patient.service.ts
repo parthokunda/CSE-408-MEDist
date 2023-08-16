@@ -1,13 +1,5 @@
 // external imports
 import createHttpError from "http-errors";
-import { initializeApp } from "firebase/app";
-import {
-  getStorage,
-  ref,
-  getDownloadURL,
-  uploadBytesResumable,
-} from "firebase/storage";
-import multer from "multer";
 
 //internal imports
 import patientRepository, {
@@ -18,14 +10,7 @@ import broker, {
   RPC_Response_Payload,
 } from "../utils/broker";
 import { config } from "../config";
-import Patient, { UpdatePatientInfo } from "../database/models/Patient.model";
-
-//Initialize a firebase application
-initializeApp(config.FIREBASE_CONFIG);
-// Initialize Cloud Storage and get a reference to the service
-const storage = getStorage();
-// Setting up multer as a middleware to grab photo uploads
-const upload = multer({ storage: multer.memoryStorage() });
+import Patient from "../database/models/Patient.model";
 
 export interface PatientServiceInterface {
   createInitialPatient(userID: number): Promise<RPC_Response_Payload>;

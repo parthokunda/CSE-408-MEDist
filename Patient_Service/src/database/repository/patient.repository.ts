@@ -1,5 +1,5 @@
 //import patient model
-import Patient, { UpdatePatientInfo } from "../models/Patient.model";
+import Patient from "../models/Patient.model";
 
 //internal imports
 import { PatientStatus } from "../models/Patient.model";

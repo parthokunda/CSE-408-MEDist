@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import proxy from "express-http-proxy";
 import dotenv from "dotenv";
+import bodyParser from "body-parser";
 dotenv.config();
 
 // internal imports
@@ -12,8 +13,8 @@ import { notFoundHandler, defaultErrorHandler } from "./utils/error-handler";
 const app = express();
 
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 async function middlewares(req, res, next) {
   log.info(req.body, "request body");

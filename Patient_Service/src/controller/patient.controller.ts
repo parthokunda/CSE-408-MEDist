@@ -11,12 +11,6 @@ interface Patient_Controller_Interface {
   //get profile / patient info
   getPatientInfo(req: Request, res: Response, next: NextFunction);
 
-
-  //upload image
-  uploadImage(req: Request, res: Response, next: NextFunction);
-
-  
-  
   //update patient info
   updatePatientInfo(
     req: Request<{}, {}, Update_Patient_Info_Body_Input>,
@@ -39,20 +33,6 @@ class Patient_Controller implements Patient_Controller_Interface {
     }
   }
 
-  // ----------------------------------------- Upload Image ------------------------------------------ //
-  async uploadImage(req: Request, res: Response, next: NextFunction) {
-    if (req.body.imageUrl) {
-      res.status(200).json({
-        message : "Image uploaded successfully",
-        imageUrl: req.body.imageUrl,
-      });
-    }
-    else {
-      throw createHttpError.InternalServerError("Error getting image url");
-    }
-
-  }
-
   // ----------------------------------------- Update Patient Info ------------------------------------------ //
   async updatePatientInfo(
     req: Request<{}, {}, Update_Patient_Info_Body_Input>,
@@ -61,11 +41,14 @@ class Patient_Controller implements Patient_Controller_Interface {
   ) {
     try {
       const patientID = req.user_identity?.id as number;
-      const newPatientInfo = req.body;
+      const patientInfo = {
+        ...req.body,
+        dob: new Date(req.body.dob),
+      };
 
       const updatedPatient = await patientService.updatePatientInfo(
         patientID,
-        newPatientInfo
+        patientInfo
       );
 
       res.status(200).json(updatedPatient);

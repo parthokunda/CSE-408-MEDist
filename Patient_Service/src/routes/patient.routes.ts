@@ -9,7 +9,6 @@ import { config } from "../config";
 import patientService from "../services/patient.service";
 import authorize from "./middleware/auth";
 import log from "../utils/logger";
-import uploadImage from "./middleware/imageUpload";
 
 import patientSchema from "../schema/patient.schema";
 import patientController from "../controller/patient.controller";
@@ -32,22 +31,13 @@ patientRouter.get("/", authorize, (req: Request, res: Response) => {
   });
 });
 
-// image upload
-patientRouter.post(
-  "/upload-image",
-  authorize,
-  uploadImage,
-  patientController.uploadImage
-);
-
-// get patient info
+// get profile / patient info
 patientRouter.get("/profile-info", authorize, patientController.getPatientInfo);
 
 // update patient info
 patientRouter.put(
   "/update-info",
   authorize,
-  uploadImage,
   validateRequest(patientSchema.Update_Patient_Info),
   patientController.updatePatientInfo
 );

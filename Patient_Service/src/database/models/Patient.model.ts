@@ -45,12 +45,6 @@ export interface PatientAttributes {
 
 interface PatientCreationAttributes extends Partial<PatientAttributes> {}
 
-export interface UpdatePatientInfo
-  extends Optional<
-    PatientAttributes,
-    "id" | "height" | "weight" | "image" | "userID" | "status"
-  > {}
-
 class Patient
   extends Model<PatientAttributes, PatientCreationAttributes>
   implements PatientAttributes

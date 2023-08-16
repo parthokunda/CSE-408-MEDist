@@ -1,6 +1,7 @@
 //external imports
 import express from "express";
 import cors from "cors";
+import bodyParser from "body-parser";
 
 //internal imports
 import log from "./utils/logger";
@@ -20,9 +21,9 @@ messageBroker.RPC_Observer(patientService);
 const app = express();
 
 // pre-route middlewares
-app.use(express.json());
+app.use(bodyParser.json());
 app.use(cors());
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // routes
 app.use(router);
