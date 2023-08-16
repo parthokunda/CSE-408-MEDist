@@ -7,7 +7,11 @@ export const MedSearchForm = z.object({
   filterBy: z.union([z.literal("brands"), z.literal("generics")]),
 });
 
-const roleValidator = z.union([z.literal("patient"), z.literal("doctor"), z.literal("")])
+const roleValidator = z.union([
+  z.literal("patient"),
+  z.literal("doctor"),
+  z.literal(""),
+]);
 
 export const LoginCardForm = z.object({
   email: z.string().email({ message: "Invalid Email" }),
@@ -15,31 +19,40 @@ export const LoginCardForm = z.object({
   role: roleValidator,
 });
 
-export type LoginCardFormType = z.infer<typeof LoginCardForm>
+export type LoginCardFormType = z.infer<typeof LoginCardForm>;
 
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
 export const DoctorAdditionalInfoForm = z.object({
-    gender: z.union([z.literal("male"),z.literal("female"),z.literal("other")]),
-    dateOfBirth : z.string(),
-    bmdcNumber: z.string().max(20, {message: "BMDC number cannot exceed 20 characters"}),
-    issueDate: z.string(),
-    department: z.string().nonempty(),
-    degrees: z.string().nonempty({message: "Degrees cannot be empty"}),
-    image : z.string(),
+  gender: z.union([z.literal("male"), z.literal("female"), z.literal("other")]),
+  dateOfBirth: z.string(),
+  bmdcNumber: z
+    .string()
+    .max(20, { message: "BMDC number cannot exceed 20 characters" }),
+  issueDate: z.string(),
+  mobileNumber: z.string().nonempty(),
+  department: z.string().nonempty(),
+  degrees: z.string().nonempty({ message: "Degrees cannot be empty" }),
+  image: z.string(),
 });
 
 export const PatientAdditionalInfoForm = z.object({
-    gender : z.union([z.literal("male"),z.literal("female"),z.literal("other")]),
-    dateOfBirth : z.string(),
-    // height : z.object({
-    //     feet : z.number().int().min(0).max(10),
-    //     inches : z.number().min(0).max(12)
-    // }),
-    height_feet: z.string().nonempty(),
-    height_inches: z.string().nonempty(),
-    weight : z.string().nonempty(),
-    bloodGroup : z.string().nonempty(),
-    image : z.string(),
+  gender: z.union([z.literal("male"), z.literal("female"), z.literal("other")]),
+  dateOfBirth: z.string(),
+  mobileNumber: z.string().nonempty(),
+  // height : z.object({
+  //     feet : z.number().int().min(0).max(10),
+  //     inches : z.number().min(0).max(12)
+  // }),
+  height_feet: z.string().nonempty(),
+  height_inches: z.string().nonempty(),
+  weight: z.string().nonempty(),
+  bloodGroup: z.string().nonempty(),
+  image: z.string(),
 });
 
 export const RegisterCardForm = z
@@ -63,3 +76,16 @@ export const RegisterCardForm = z
   });
 
 export type RegisterCardFormType = z.infer<typeof RegisterCardForm>;
+
+export const DoctorOnlineScheduleForm = z.object({
+  days: z
+    .object({
+      day: z.string().nonempty(),
+      startTime: z.string().nonempty(),
+      endTime: z.string().nonempty(),
+      slot: z.string().nonempty(),
+    })
+    .array(),
+  cost: z.string().nonempty(),
+  contact: z.string().nonempty(),
+});

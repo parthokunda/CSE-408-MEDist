@@ -226,6 +226,19 @@ export const DoctorInfo: FC = () => {
                 )}
               />
             </div>
+            <div className="flex gap-3">
+              Mobile Number :
+              <Controller
+                name="mobileNumber"
+                control={forms.control}
+                render={({ field }) => (
+                  <div>
+                    <Input {...field} placeholder="Mobile Number" />
+                    <p>{forms.formState.errors.mobileNumber?.message}</p>
+                  </div>
+                )}
+              />
+            </div>
             <div className="flex-[50%] width-10 gap-3">
               Department:
               <Controller

@@ -35,18 +35,18 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 
-export const PatientInfo :FC = () => {
+export const PatientInfo: FC = () => {
   const forms = useForm<z.infer<typeof PatientAdditionalInfoForm>>({
     defaultValues: {
       gender: "male",
       // dateOfBirth: "",
       // bmdcNumber: "",
       // issueDate: "",
-    //   department: "",
+      //   department: "",
     },
     resolver: zodResolver(PatientAdditionalInfoForm),
   });
-  
+
   // const { register,handleSubmit,reset, control} = forms;
   // const [show, setShow] = useState(false);
   // const { fields, append, remove } = useFieldArray({
@@ -110,7 +110,7 @@ export const PatientInfo :FC = () => {
     const file = event.target.files ? event.target.files[0] : null;
     setSelectedFile(file);
   };
-  var downloadURL="";
+  var downloadURL = "";
   const uploadFile = async () => {
     if (selectedFile) {
       const storage = getStorage();
@@ -133,8 +133,6 @@ export const PatientInfo :FC = () => {
     console.log(selectedFile);
   };
   // force image upload before full submission
-  
-
 
   const onSubmit: SubmitHandler<z.infer<typeof PatientAdditionalInfoForm>> = (
     data
@@ -144,12 +142,12 @@ export const PatientInfo :FC = () => {
       console.log(data);
     });
 
-    console.log("here")
+    console.log("here");
     //console.log(data);
     // while (downloadURL === "") {
     //   console.log("waiting");
     // }
-    
+
     //console.log(data);
   };
   // if(selectedFile){
@@ -165,7 +163,6 @@ export const PatientInfo :FC = () => {
         onSubmit={forms.handleSubmit(onSubmit)}
         className="flex flex-col w-screen justify-start gap-5 ml-6"
       >
-        {" "}
         <div className="flex">
           <div className="flex-[50%] flex flex-col gap-5">
             <div className="flex gap-3">
@@ -208,6 +205,18 @@ export const PatientInfo :FC = () => {
               />
             </div>
             <div className="flex gap-3">
+              Mobile Number:
+              <Controller
+                control={forms.control}
+                name="mobileNumber"
+                render={({ field }) => (
+                  <div>
+                    <Input {...field} placeholder="Mobile Number" />
+                  </div>
+                )}
+              />
+            </div>
+            <div className="flex gap-3">
               Height:
               <Controller
                 name="height_feet"
@@ -220,17 +229,17 @@ export const PatientInfo :FC = () => {
                   </div>
                 )}
               />
-                <Controller
+              <Controller
                 name="height_inches"
                 control={forms.control}
                 render={({ field }) => (
-                    <div>
-                        <Input {...field} placeholder="Height in inches" />
-                        Inches
-                        <p>{forms.formState.errors.height_inches?.message}</p>
-                    </div>
-                    )}
-                />
+                  <div>
+                    <Input {...field} placeholder="Height in inches" />
+                    Inches
+                    <p>{forms.formState.errors.height_inches?.message}</p>
+                  </div>
+                )}
+              />
             </div>
             <div className="flex gap-3">
               Weight:
@@ -239,7 +248,7 @@ export const PatientInfo :FC = () => {
                 name="weight"
                 render={({ field }) => (
                   <div>
-                    <Input {...field} placeholder="Weight in Kg"/>
+                    <Input {...field} placeholder="Weight in Kg" />
                   </div>
                 )}
               />
@@ -289,7 +298,7 @@ export const PatientInfo :FC = () => {
                     onBlur={onBlur}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      
+
                       handleFileInput(e);
                       onChange(downloadURL);
                     }}
