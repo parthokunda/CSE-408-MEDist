@@ -24,6 +24,7 @@ import { Doctor } from "../database/models";
 // repository instance
 import { doctorRepository } from "../database/repository";
 import { searchQuery_and_Params } from "../database/repository/doctor.repository";
+import log from "../utils/logger";
 
 export interface DoctorServiceInterface {
   // during registration and login
@@ -128,6 +129,8 @@ class DoctorService implements DoctorServiceInterface {
         DoctorAdditionalInfo_Excluded_Properties
       );
 
+      log.info(doctorInfo, "doctorInfo after excludeProperties");
+
       const specialization = await doctor.getSpecialization();
 
       return {
@@ -148,7 +151,6 @@ class DoctorService implements DoctorServiceInterface {
       if (newDoctorInfo.userID) delete newDoctorInfo.userID;
       if (newDoctorInfo.status) delete newDoctorInfo.status;
       if (newDoctorInfo.scheduleID) delete newDoctorInfo.scheduleID;
-      if (newDoctorInfo.email) delete newDoctorInfo.email;
 
       const doctor = await doctorRepository.updateDoctorAdditionalInfo(
         doctorID,

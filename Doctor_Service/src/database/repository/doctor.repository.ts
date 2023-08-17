@@ -116,8 +116,15 @@ class DoctorRepository implements Doctor_Repository_Interface {
             await specialization.addDoctor(doctor);
           } else throw new Error("Specialization not found.");
         }
-        await doctor.update(newDoctorInfo);
-        return doctor;
+
+        const updatedDoctor = await doctor.update(newDoctorInfo);
+        if (!updatedDoctor)
+          throw createHttpError.InternalServerError("Doctor update failed.");
+
+        updatedDoctor.status = DoctorStatus.FULLY_REGISTERED;
+        await updatedDoctor.save();
+
+        return updatedDoctor;
       } else throw new Error("Doctor not found.");
     } catch (error) {
       throw error;

@@ -138,18 +138,20 @@ class DoctorSchema implements Doctor_Schema_Interface {
   Search_Doctor = object({
     query: object({
       name: string().optional(),
-      specializationID: number().optional(),
-      pagination: union([number(), string()]).refine(
-        (val) => {
-          if (!val) return true;
+      specializationID: union([number(), string()]).optional(),
+      pagination: union([number(), string()])
+        .refine(
+          (val) => {
+            if (!val) return true;
 
-          const num = Number(val);
-          return num && Number.isInteger(num) && num > 0;
-        },
-        {
-          message: "Pagination must be a positive integer",
-        }
-      ),
+            const num = Number(val);
+            return num && Number.isInteger(num) && num > 0;
+          },
+          {
+            message: "Pagination must be a positive integer",
+          }
+        )
+        .optional(),
     }),
 
     params: object({

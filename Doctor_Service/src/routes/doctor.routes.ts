@@ -38,14 +38,14 @@ doctorRouter.get(
 // get doctor's additional info - only accessible to doctor
 doctorRouter.get(
   "/additional-info",
-  authorize,
+  authorize(true),
   doctorController.getDoctorAdditionalInfo
 );
 
 // update doctor's additional info - only accessible to doctor
 doctorRouter.put(
   "/additional-info",
-  authorize,
+  authorize(true),
   validateRequest(doctorSchema.Update_Doctor_Info),
   doctorController.updateDoctorAdditionalInfo
 );
@@ -53,7 +53,7 @@ doctorRouter.put(
 // create online schedule - only accessible to doctor
 doctorRouter.post(
   "/online-visit",
-  authorize,
+  authorize(true),
   validateRequest(doctorSchema.Create_Schedule),
   doctorController.createOnlineSchedule
 );
@@ -61,16 +61,9 @@ doctorRouter.post(
 // update online schedule - only accessible to doctor
 doctorRouter.put(
   "/online-visit",
-  authorize,
+  authorize(true),
   validateRequest(doctorSchema.Create_Schedule),
   doctorController.updateOnlineSchedule
-);
-
-// get doctor's profile info - accessible to doctor
-doctorRouter.get(
-  "/profile-info",
-  authorize,
-  doctorController.getDoctorProfileInfo
 );
 
 // get doctor's profile info - accessible to all
@@ -78,6 +71,13 @@ doctorRouter.get(
   "/profile-info/:doctorID",
   authorize(false),
   doctorController.getDoctorProfileInfo_givenID
+);
+
+// get doctor's profile info - accessible to doctor
+doctorRouter.get(
+  "/profile-info",
+  authorize(true),
+  doctorController.getDoctorProfileInfo
 );
 
 // search doctor - accessible to all

@@ -55,13 +55,13 @@ export interface DoctorAdditionalInfo {
     DoctorAttributes,
     "userID" | "scheduleID" | "specializationID"
   >;
-  Specialization: SpecializationAttributes;
+  Specialization: SpecializationAttributes | {};
 }
 
 export interface DoctorProfileInfo {
   DoctorInfo: DoctorAttributes;
-  Specialization: SpecializationAttributes;
-  OnlineSchedule: OnlineScheduleAttributes;
+  Specialization: SpecializationAttributes | {};
+  OnlineSchedule: OnlineScheduleAttributes | {};
 }
 
 export interface DoctorOverviewInfo {
@@ -70,7 +70,7 @@ export interface DoctorOverviewInfo {
     "userID" | "scheduleID" | "specializationID" | "status" | "dob" | "phone"
   >; // exclude userID, scheduleID, specializationID
 
-  Specialization: SpecializationAttributes;
+  Specialization: SpecializationAttributes | {};
 }
 
 export interface DoctorAttributes {

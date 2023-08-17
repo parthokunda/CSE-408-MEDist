@@ -15,8 +15,10 @@ import {
   Update_Doctor_Info_Body_Input,
 } from "../schema/doctor.schema";
 import { searchQuery_and_Params } from "../database/repository/doctor.repository";
+import log from "../utils/logger";
+import { SingleDaySchedule } from "../database/models/Online_Schedule.model";
 
-interface Doctor_Controller_Interface {
+export interface Doctor_Controller_Interface {
   //get Specialization list
   getSpecializationList(req: Request, res: Response, next: NextFunction);
 
@@ -62,13 +64,13 @@ class Doctor_Controller implements Doctor_Controller_Interface {
   }
 
   // ----------------------- Get Doctor Additional Info ----------------------- //
-  async getDoctorAdditionalInfo(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  async getDoctorAdditionalInfo(req, res, next) {
     try {
+      log.debug(req.user_identity, "req.user_identity");
+
       const doctorID = req.user_identity?.id as number;
+
+      log.debug(doctorID, "doctorID");
 
       const doctorInfo = await doctorService.getDoctorAdditionalInfo(doctorID);
 
@@ -93,7 +95,7 @@ class Doctor_Controller implements Doctor_Controller_Interface {
         dob: new Date(req.body.dob),
         issueDate: new Date(req.body.issueDate),
         degrees: req.body.degrees.split(",").map((degree) => degree.trim()),
-        email,
+        email: email,
       };
 
       const updatedDoctor = await doctorService.updateDoctorAdditionalInfo(
@@ -116,14 +118,19 @@ class Doctor_Controller implements Doctor_Controller_Interface {
     try {
       const doctorID = req.user_identity?.id as number;
 
-      const schedule = req.body.schedule.map((daySchedule) => {
-        return {
-          weekday: daySchedule.weekday,
-          startTime: daySchedule.startTime,
-          endTime: daySchedule.endTime,
-          totalSlots: daySchedule.totalSlots,
-        };
-      });
+      const schedule: SingleDaySchedule[] = [];
+
+      for (let singleSchedule of req.body.schedule) {
+        if (Object.keys(singleSchedule).length === 0) continue;
+
+        schedule.push({
+          weekday: singleSchedule.weekday,
+          startTime: singleSchedule.startTime,
+          endTime: singleSchedule.endTime,
+          totalSlots: singleSchedule.totalSlots,
+        });
+      }
+
       const scheduleInfo = {
         visitFee: req.body.visitFee,
         schedule,
@@ -149,14 +156,19 @@ class Doctor_Controller implements Doctor_Controller_Interface {
     try {
       const doctorID = req.user_identity?.id as number;
 
-      const schedule = req.body.schedule.map((daySchedule) => {
-        return {
-          weekday: daySchedule.weekday,
-          startTime: daySchedule.startTime,
-          endTime: daySchedule.endTime,
-          totalSlots: daySchedule.totalSlots,
-        };
-      });
+      const schedule: SingleDaySchedule[] = [];
+
+      for (let singleSchedule of req.body.schedule) {
+        if (Object.keys(singleSchedule).length === 0) continue;
+
+        schedule.push({
+          weekday: singleSchedule.weekday,
+          startTime: singleSchedule.startTime,
+          endTime: singleSchedule.endTime,
+          totalSlots: singleSchedule.totalSlots,
+        });
+      }
+
       const scheduleInfo = {
         visitFee: req.body.visitFee,
         schedule,

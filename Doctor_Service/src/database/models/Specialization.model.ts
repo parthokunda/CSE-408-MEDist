@@ -51,6 +51,7 @@ Specialization.init(
   {
     tableName: "specializations",
     sequelize: sequelizeConnection,
+    timestamps: false,
   }
 );
 
