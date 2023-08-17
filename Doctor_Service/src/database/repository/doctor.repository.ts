@@ -1,9 +1,22 @@
 //import models
 import Specialization from "../models/Specialization.model";
-import Doctor from "../models/Doctor.model";
+import { Doctor } from "../models";
 
 // internal imports
-import { DoctorStatus } from "../models/Doctor.model";
+import {
+  DoctorOverviewInfo,
+  DoctorStatus,
+  SearchDoctorInfo,
+} from "../models/Doctor.model";
+import createHttpError from "http-errors";
+import { Op } from "sequelize";
+
+export interface searchQuery_and_Params {
+  doctorName: string;
+  specializationID: number;
+  pagination: number;
+  currentPage: number;
+}
 
 export interface Doctor_Repository_Interface {
   // during registration and login
@@ -13,12 +26,17 @@ export interface Doctor_Repository_Interface {
 
   getId_givenUserID(userID: number): Promise<{ id: number; status: string }>;
 
-  // after registration and login
+  // additional info
   getDoctorInfo(doctorID: number): Promise<Doctor>;
-  updateDoctorInfo(
+  updateDoctorAdditionalInfo(
     doctorID: number,
     newDoctorInfo: Partial<Doctor>
   ): Promise<Doctor>;
+
+  // search doctor
+  searchDoctor(
+    searchInfo: searchQuery_and_Params
+  ): Promise<{ doctors: Doctor[]; totalCount: number }>;
 }
 
 class DoctorRepository implements Doctor_Repository_Interface {
@@ -65,22 +83,21 @@ class DoctorRepository implements Doctor_Repository_Interface {
     }
   }
 
-  // ----------------- after registration and login -----------------
+  // ----------------- Additional Info -----------------
 
-  // get doctor info
+  // get doctor additional info
   async getDoctorInfo(doctorID: number): Promise<Doctor> {
     try {
       const doctor = await Doctor.findByPk(doctorID);
-
       if (doctor) return doctor;
-      else throw new Error("Doctor not found.");
+      else throw createHttpError.NotFound("Doctor not found.");
     } catch (error) {
       throw error;
     }
   }
 
   // update info
-  async updateDoctorInfo(
+  async updateDoctorAdditionalInfo(
     doctorID: number,
     newDoctorInfo: Partial<Doctor>
   ): Promise<Doctor> {
@@ -102,6 +119,130 @@ class DoctorRepository implements Doctor_Repository_Interface {
         await doctor.update(newDoctorInfo);
         return doctor;
       } else throw new Error("Doctor not found.");
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // ----------------- Search Doctor -----------------
+  async searchDoctor(
+    searchInfo: searchQuery_and_Params
+  ): Promise<{ doctors: Doctor[]; totalCount: number }> {
+    try {
+      const itemsPerPage = searchInfo.pagination;
+      const currentPage = searchInfo.currentPage;
+      const offset = (currentPage - 1) * itemsPerPage;
+
+      let doctors: Doctor[];
+      let totalCount: number;
+
+      if (searchInfo.doctorName === "" && searchInfo.specializationID === -1) {
+        doctors = await Doctor.findAll({
+          offset,
+          limit: itemsPerPage,
+        });
+
+        totalCount = await Doctor.count();
+      } else if (
+        searchInfo.doctorName === "" &&
+        searchInfo.specializationID !== -1
+      ) {
+        doctors = await Doctor.findAll({
+          where: {
+            specializationID: searchInfo.specializationID,
+          },
+          offset,
+          limit: itemsPerPage,
+        });
+
+        totalCount = await Doctor.count({
+          where: {
+            specializationID: searchInfo.specializationID,
+          },
+        });
+      } else if (
+        searchInfo.doctorName !== "" &&
+        searchInfo.specializationID === -1
+      ) {
+        doctors = await Doctor.findAll({
+          where: {
+            [Op.or]: [
+              {
+                name: {
+                  [Op.iLike]: `${searchInfo.doctorName}%`, // case insensitive starts with search
+                },
+              },
+              {
+                name: {
+                  [Op.iLike]: `%${searchInfo.doctorName}%`, // case insensitive contains search
+                },
+              },
+            ],
+          },
+          offset,
+          limit: itemsPerPage,
+        });
+
+        totalCount = await Doctor.count({
+          where: {
+            [Op.or]: [
+              {
+                name: {
+                  [Op.iLike]: `${searchInfo.doctorName}%`, // case insensitive starts with search
+                },
+              },
+              {
+                name: {
+                  [Op.iLike]: `%${searchInfo.doctorName}%`, // case insensitive contains search
+                },
+              },
+            ],
+          },
+        });
+      } else {
+        doctors = await Doctor.findAll({
+          where: {
+            specializationID: searchInfo.specializationID,
+            [Op.or]: [
+              {
+                name: {
+                  [Op.iLike]: `${searchInfo.doctorName}%`, // case insensitive starts with search
+                },
+              },
+              {
+                name: {
+                  [Op.iLike]: `%${searchInfo.doctorName}%`, // case insensitive contains search
+                },
+              },
+            ],
+          },
+          offset,
+          limit: itemsPerPage,
+        });
+
+        totalCount = await Doctor.count({
+          where: {
+            specializationID: searchInfo.specializationID,
+            [Op.or]: [
+              {
+                name: {
+                  [Op.iLike]: `${searchInfo.doctorName}%`, // case insensitive starts with search
+                },
+              },
+              {
+                name: {
+                  [Op.iLike]: `%${searchInfo.doctorName}%`, // case insensitive contains search
+                },
+              },
+            ],
+          },
+        });
+      }
+
+      return {
+        doctors,
+        totalCount,
+      };
     } catch (error) {
       throw error;
     }

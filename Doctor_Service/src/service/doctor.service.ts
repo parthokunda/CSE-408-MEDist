@@ -7,22 +7,23 @@ import broker, {
   RPC_Response_Payload,
 } from "../utils/broker";
 
+import {
+  DoctorAdditionalInfo,
+  DoctorAdditionalInfo_Excluded_Properties,
+  DoctorOverviewInfo,
+  DoctorOverviewInfo_Excluded_Properties,
+  DoctorProfileInfo,
+  SearchDoctorInfo,
+} from "../database/models/Doctor.model";
+
+import { excludeProperties } from "../utils/necessary_functions";
+
 // import models
-import Doctor, { DoctorAttributes } from "../database/models/Doctor.model";
+import { Doctor } from "../database/models";
 
 // repository instance
-import doctorRepository from "../database/repository/doctor.repository";
-import specializationRepository from "../database/repository/specialization.repository";
-
-export interface DoctorProfileInfo {
-  DoctorInfo: DoctorAttributes;
-  Specialization: string;
-}
-
-export interface DoctorOverviewInfo {
-  doctorID: number;
-  name: string;
-}
+import { doctorRepository } from "../database/repository";
+import { searchQuery_and_Params } from "../database/repository/doctor.repository";
 
 export interface DoctorServiceInterface {
   // during registration and login
@@ -31,11 +32,18 @@ export interface DoctorServiceInterface {
   serveRPCRequest(payload: RPC_Request_Payload): Promise<RPC_Response_Payload>;
 
   // after registration and login
-  getDoctorInfo(doctorID: number): Promise<DoctorProfileInfo>;
-  updateDoctorInfo(
+  getDoctorAdditionalInfo(doctorID: number): Promise<DoctorAdditionalInfo>;
+  updateDoctorAdditionalInfo(
     doctorID: number,
     newDoctorInfo: Partial<Doctor>
-  ): Promise<DoctorProfileInfo>;
+  ): Promise<DoctorAdditionalInfo>;
+
+  // after full registration
+  getDoctorOverviewInfo(doctorID: number): Promise<DoctorOverviewInfo>;
+  getDoctorProfileInfo(doctorID: number): Promise<DoctorProfileInfo>;
+
+  // search doctor
+  searchDoctor(searchInfo: searchQuery_and_Params): Promise<SearchDoctorInfo>;
 }
 
 class DoctorService implements DoctorServiceInterface {
@@ -109,39 +117,126 @@ class DoctorService implements DoctorServiceInterface {
   }
 
   // ----------------- after registration and login -----------------
-  async getDoctorInfo(doctorID: number): Promise<DoctorProfileInfo> {
+
+  async getDoctorAdditionalInfo(
+    doctorID: number
+  ): Promise<DoctorAdditionalInfo> {
     try {
       const doctor = await doctorRepository.getDoctorInfo(doctorID);
+      const doctorInfo = excludeProperties(
+        doctor.dataValues,
+        DoctorAdditionalInfo_Excluded_Properties
+      );
 
       const specialization = await doctor.getSpecialization();
 
       return {
-        DoctorInfo: doctor,
-        Specialization: specialization.name,
+        DoctorInfo: doctorInfo,
+        Specialization: specialization?.dataValues || {},
       };
     } catch (error) {
       throw error;
     }
   }
 
-  async updateDoctorInfo(
+  async updateDoctorAdditionalInfo(
     doctorID: number,
     newDoctorInfo: Partial<Doctor>
-  ): Promise<DoctorProfileInfo> {
+  ): Promise<DoctorAdditionalInfo> {
     try {
       if (newDoctorInfo.id) delete newDoctorInfo.id;
       if (newDoctorInfo.userID) delete newDoctorInfo.userID;
       if (newDoctorInfo.status) delete newDoctorInfo.status;
+      if (newDoctorInfo.scheduleID) delete newDoctorInfo.scheduleID;
+      if (newDoctorInfo.email) delete newDoctorInfo.email;
 
-      const doctor = await doctorRepository.updateDoctorInfo(
+      const doctor = await doctorRepository.updateDoctorAdditionalInfo(
         doctorID,
         newDoctorInfo
       );
+
+      const doctorInfo = excludeProperties(
+        doctor.dataValues,
+        DoctorAdditionalInfo_Excluded_Properties
+      );
+
       const specialization = await doctor.getSpecialization();
 
       return {
-        DoctorInfo: doctor,
-        Specialization: specialization.name,
+        DoctorInfo: doctorInfo,
+        Specialization: specialization?.dataValues || {},
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // ----------------- after full registration -----------------
+
+  // get doctor's overview info
+  async getDoctorOverviewInfo(doctorID: number): Promise<DoctorOverviewInfo> {
+    try {
+      const doctor = await doctorRepository.getDoctorInfo(doctorID);
+
+      const doctorInfo = excludeProperties(
+        doctor.dataValues,
+        DoctorOverviewInfo_Excluded_Properties
+      );
+
+      const specialization = await doctor.getSpecialization();
+
+      return {
+        DoctorInfo: doctorInfo,
+        Specialization: specialization?.dataValues || {},
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // get doctor's profile info
+  async getDoctorProfileInfo(doctorID: number): Promise<DoctorProfileInfo> {
+    try {
+      const doctor = await doctorRepository.getDoctorInfo(doctorID);
+      const specialization = await doctor.getSpecialization();
+      const onlineSchedule = await doctor.getOnlineSchedule();
+
+      return {
+        DoctorInfo: doctor.dataValues,
+        Specialization: specialization?.dataValues || {},
+        OnlineSchedule: onlineSchedule?.dataValues || {},
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // ----------------- search doctor -----------------
+  async searchDoctor(
+    searchInfo: searchQuery_and_Params
+  ): Promise<SearchDoctorInfo> {
+    try {
+      const { doctors, totalCount } = await doctorRepository.searchDoctor(
+        searchInfo
+      );
+
+      const doctorOverviews = await doctors.map(async (doctor) => {
+        const doctorInfo = excludeProperties(
+          doctor.dataValues,
+          DoctorOverviewInfo_Excluded_Properties
+        );
+
+        const specialization = await doctor.getSpecialization();
+
+        return {
+          DoctorInfo: doctorInfo,
+          Specialization: specialization?.dataValues || {},
+        };
+      });
+
+      return {
+        Doctors: await Promise.all(doctorOverviews),
+        totalCount,
       };
     } catch (error) {
       throw error;

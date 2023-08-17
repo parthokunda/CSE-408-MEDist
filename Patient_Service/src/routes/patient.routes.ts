@@ -5,8 +5,6 @@ import {} from "../utils/custom.d";
 
 // internal imports
 import validateRequest from "./middleware/validateRequest";
-import { config } from "../config";
-import patientService from "../services/patient.service";
 import authorize from "./middleware/auth";
 import log from "../utils/logger";
 
@@ -31,15 +29,19 @@ patientRouter.get("/", authorize, (req: Request, res: Response) => {
   });
 });
 
-// get profile / patient info
-patientRouter.get("/profile-info", authorize, patientController.getPatientInfo);
+// get patient's additional info - only accessible to patient
+patientRouter.get(
+  "/additional-info",
+  authorize,
+  patientController.getPatientAdditionalInfo
+);
 
-// update patient info
+// update patient's additional info - only accessible to patient
 patientRouter.put(
-  "/update-info",
+  "/additional-info",
   authorize,
   validateRequest(patientSchema.Update_Patient_Info),
-  patientController.updatePatientInfo
+  patientController.updatePatientAdditionalInfo
 );
 
 export default patientRouter;

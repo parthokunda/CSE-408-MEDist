@@ -24,6 +24,7 @@ async function middlewares(req, res, next) {
 app.use("/api/auth", middlewares, proxy("http://localhost:3001"));
 app.use("/api/medicine", middlewares, proxy("http://localhost:3002"));
 app.use("/api/patient", middlewares, proxy("http://localhost:3003"));
+app.use("/api/doctor", middlewares, proxy("http://localhost:3004"));
 
 app.use(notFoundHandler);
 app.use(defaultErrorHandler);

@@ -8,7 +8,11 @@ import Specialization, {
 
 // repository instance
 import specializationRepository from "../database/repository/specialization.repository";
-import { DoctorOverviewInfo } from "./doctor.service";
+import {
+  DoctorOverviewInfo,
+  DoctorOverviewInfo_Excluded_Properties,
+} from "../database/models/Doctor.model";
+import { excludeProperties } from "../utils/necessary_functions";
 
 export interface SingleSpecialization {
   Specialization: SpecializationAttributes;
@@ -60,14 +64,18 @@ class SpecializationService implements SpecializationServiceInterface {
       const doctors = await specialization.getDoctors();
 
       const doctorsOverview: DoctorOverviewInfo[] = doctors.map((doctor) => {
+        const doctorInfo = excludeProperties(
+          doctor.dataValues,
+          DoctorOverviewInfo_Excluded_Properties
+        );
         return {
-          doctorID: doctor.id,
-          name: doctor.name,
+          DoctorInfo: doctorInfo,
+          Specialization: specialization.dataValues,
         };
       });
 
       return {
-        Specialization: specialization,
+        Specialization: specialization.dataValues,
         Doctors: doctorsOverview,
       };
     } catch (error) {

@@ -5,11 +5,17 @@ import {
   BelongsToSetAssociationMixin,
   DataTypes,
   Model,
+  Optional,
 } from "sequelize";
 
 //internal import
 import sequelizeConnection from "../config";
-import Specialization from "./Specialization.model";
+import Specialization, {
+  SpecializationAttributes,
+} from "./Specialization.model";
+import OnlineSchedule, {
+  OnlineScheduleAttributes,
+} from "./Online_Schedule.model";
 
 export enum DoctorStatus {
   FULLY_REGISTERED = "fully_registered",
@@ -24,6 +30,49 @@ export enum DoctorGendar {
   OTHER = "other",
 }
 
+export const DoctorAdditionalInfo_Excluded_Properties: (
+  | "userID"
+  | "scheduleID"
+  | "specializationID"
+)[] = ["userID", "scheduleID", "specializationID"];
+
+export const DoctorOverviewInfo_Excluded_Properties: (
+  | "userID"
+  | "scheduleID"
+  | "specializationID"
+  | "status"
+  | "dob"
+  | "phone"
+)[] = ["userID", "scheduleID", "specializationID", "status", "dob", "phone"];
+
+export interface SearchDoctorInfo {
+  Doctors: DoctorOverviewInfo[];
+  totalCount: number;
+}
+
+export interface DoctorAdditionalInfo {
+  DoctorInfo: Omit<
+    DoctorAttributes,
+    "userID" | "scheduleID" | "specializationID"
+  >;
+  Specialization: SpecializationAttributes;
+}
+
+export interface DoctorProfileInfo {
+  DoctorInfo: DoctorAttributes;
+  Specialization: SpecializationAttributes;
+  OnlineSchedule: OnlineScheduleAttributes;
+}
+
+export interface DoctorOverviewInfo {
+  DoctorInfo: Omit<
+    DoctorAttributes,
+    "userID" | "scheduleID" | "specializationID" | "status" | "dob" | "phone"
+  >; // exclude userID, scheduleID, specializationID
+
+  Specialization: SpecializationAttributes;
+}
+
 export interface DoctorAttributes {
   id: number;
   status: string;
@@ -32,16 +81,17 @@ export interface DoctorAttributes {
   // additional info
   image: string;
   name: string;
+  email: string;
   phone: string;
   gendar: string;
-  dmdc: string;
+  dob: Date;
+  bmdc: string;
   issueDate: Date;
-  degrees: JSON;
+  degrees: string[];
 
   specializationID: number;
+  scheduleID: number;
 }
-
-interface DoctorCreationAttributes extends Partial<DoctorAttributes> {}
 
 class Doctor extends Model implements DoctorAttributes {
   public id!: number;
@@ -51,11 +101,13 @@ class Doctor extends Model implements DoctorAttributes {
 
   // additional info
   public image: string;
+  public email: string;
   public phone: string;
   public gendar: string;
-  public dmdc: string;
+  public dob: Date;
+  public bmdc: string;
   public issueDate: Date;
-  public degrees: JSON;
+  public degrees: string[];
 
   // define associations
   public specializationID!: number;
@@ -65,8 +117,16 @@ class Doctor extends Model implements DoctorAttributes {
     number
   >;
 
+  public scheduleID!: number;
+  public getOnlineSchedule!: BelongsToGetAssociationMixin<OnlineSchedule>;
+  public setOnlineSchedule!: BelongsToSetAssociationMixin<
+    OnlineSchedule,
+    number
+  >;
+
   public static associations: {
     specialization: Association<Doctor, Specialization>;
+    onlineSchedule: Association<Doctor, OnlineSchedule>;
   };
 }
 
@@ -79,6 +139,11 @@ Doctor.init(
     },
 
     name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    email: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -111,7 +176,12 @@ Doctor.init(
       defaultValue: DoctorGendar.OTHER,
     },
 
-    dmdc: {
+    dob: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+
+    bmdc: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -122,7 +192,7 @@ Doctor.init(
     },
 
     degrees: {
-      type: DataTypes.JSON,
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
     },
   },
@@ -142,6 +212,20 @@ Doctor.belongsTo(Specialization, {
 
 Specialization.hasMany(Doctor, {
   foreignKey: "specializationID",
+});
+
+// relation between Doctor and OnlineSchedule
+Doctor.belongsTo(OnlineSchedule, {
+  foreignKey: {
+    name: "scheduleID",
+    allowNull: true,
+  },
+});
+
+OnlineSchedule.hasOne(Doctor, {
+  foreignKey: {
+    name: "scheduleID",
+  },
 });
 
 export default Doctor;

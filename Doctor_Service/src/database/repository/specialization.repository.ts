@@ -1,6 +1,6 @@
 //import models
-import Specialization from "../models/Specialization.model";
-import Doctor from "../models/Doctor.model";
+import createHttpError from "http-errors";
+import { Specialization } from "../models";
 
 export interface Specialization_Repository_Interface {
   addNewSpecialization(specializationName: string): Promise<Specialization>;
@@ -55,7 +55,8 @@ class SpecializationRepository implements Specialization_Repository_Interface {
   // ----------------- delete specialization -----------------
   async deleteSpecialization(specializationID: number): Promise<void> {
     const specialization = await Specialization.findByPk(specializationID);
-    if (!specialization) throw new Error("Specialization not found");
+    if (!specialization)
+      throw createHttpError.NotFound("Specialization not found");
 
     await specialization.destroy();
   }
@@ -63,6 +64,8 @@ class SpecializationRepository implements Specialization_Repository_Interface {
   // ----------------- get all specializations -----------------
   async getAllSpecializations(): Promise<Specialization[]> {
     const specializations = await Specialization.findAll();
+    if (!specializations)
+      throw createHttpError.NotFound("Specializations not found");
     return specializations;
   }
 

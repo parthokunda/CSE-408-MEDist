@@ -8,11 +8,11 @@ import { Update_Patient_Info_Body_Input } from "../schema/patient.schema";
 import createHttpError from "http-errors";
 
 interface Patient_Controller_Interface {
-  //get profile / patient info
-  getPatientInfo(req: Request, res: Response, next: NextFunction);
+  //get profile / patient additional info
+  getPatientAdditionalInfo(req: Request, res: Response, next: NextFunction);
 
-  //update patient info
-  updatePatientInfo(
+  //update patient additional info
+  updatePatientAdditionalInfo(
     req: Request<{}, {}, Update_Patient_Info_Body_Input>,
     res: Response,
     next: NextFunction
@@ -20,8 +20,12 @@ interface Patient_Controller_Interface {
 }
 
 class Patient_Controller implements Patient_Controller_Interface {
-  // ----------------------------------------- Get Patient Info ------------------------------------------ //
-  async getPatientInfo(req: Request, res: Response, next: NextFunction) {
+  // ----------------------Get Patient Additional Info -------------------------- //
+  async getPatientAdditionalInfo(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const patientID = req.user_identity?.id as number;
 
@@ -33,8 +37,8 @@ class Patient_Controller implements Patient_Controller_Interface {
     }
   }
 
-  // ----------------------------------------- Update Patient Info ------------------------------------------ //
-  async updatePatientInfo(
+  // ---------------------------Update Patient Additional Info --------------------------------- //
+  async updatePatientAdditionalInfo(
     req: Request<{}, {}, Update_Patient_Info_Body_Input>,
     res: Response,
     next: NextFunction

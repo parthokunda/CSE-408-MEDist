@@ -32,7 +32,7 @@ export interface BrokerServiceInterface {
 }
 
 class BrokerService implements BrokerServiceInterface {
-  private amqlibConnection: Connection;
+  private amqlibConnection: Connection | null;
 
   constructor() {
     this.amqlibConnection = null;
@@ -76,7 +76,7 @@ class BrokerService implements BrokerServiceInterface {
         queue.queue,
 
         (msg: Message | null) => {
-          if (msg.properties.correlationId === uuid) {
+          if (msg && msg.properties.correlationId === uuid) {
             // if correlation id matches, that means the response is for the request we sent
             resolve(JSON.parse(msg.content.toString()) as RPC_Response_Payload);
             clearTimeout(timeout);
@@ -107,7 +107,7 @@ class BrokerService implements BrokerServiceInterface {
     channel.consume(
       RPC_QUEUE_NAME,
       async (msg: Message | null) => {
-        if (msg.content) {
+        if (msg && msg.content) {
           log.info(`Received RPC request: ${msg.content.toString()}`);
 
           const payload: RPC_Request_Payload = JSON.parse(
