@@ -89,3 +89,12 @@ export const DoctorOnlineScheduleForm = z.object({
   cost: z.string().nonempty(),
   contact: z.string().nonempty(),
 });
+
+export const DoctorSearchForm = z.object({
+  name: z.string(),
+  department: z.string(),
+});
+
+export const PatientSearchForm = z.object({
+  name: z.string(),
+});

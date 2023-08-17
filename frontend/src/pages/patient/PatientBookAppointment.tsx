@@ -94,55 +94,76 @@ export const BookAppointment: FC = () => {
       <div className="flex text-c1 text-large font-bold justify-center mt-6">
         Book Appointment
       </div>
-      <div className="flex flex-col ml-6 mt-5 gap-5">
-        <div className="flex gap-3">
-          <div className="flex gap-3">
-            Contact Number :
-            <div className="flex font-bold text-black">
-              {formValues.contact}
+      <div className="flex">
+        <div className="flex-[30%] flex-col">
+          <div className="flex flex-col ml-6 mt-5 gap-5">
+            <div className="flex gap-3">
+              <div className="flex gap-3">
+                Contact Number :
+                <div className="flex font-bold text-black">
+                  {formValues.contact}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col ml-6 mt-5 gap-5">
+            <div className="flex gap-3">
+              <div className="flex gap-3">
+                Cost :
+                <div className="flex font-bold text-black">
+                  {formValues.cost}
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="flex flex-col ml-6 mt-5 gap-5">
-        <div className="flex gap-3">
-          <div className="flex gap-3">
-            Cost :
-            <div className="flex font-bold text-black">{formValues.cost}</div>
-          </div>
+        <div className="flex-[60%] flex-col">
+          {formValues.days.map((day, index) => {
+            return (
+              // <RadioGroup
+              //   onValueChange={() => {
+              //     setDayIndex(index);
+              //   }}
+              // >
+              <div>
+                {Object.keys(day).length !== 0 && (
+                  <div className="grid grid-cols-4 ml-4 mt-4 gap-4">
+                    <div>
+                      <input
+                        type="radio"
+                        className="h-6 w-6 text-green-600 border-gray-300 focus:ring-green-400"
+                        name="day"
+                        id={index.toString()}
+                        onChange={() => {
+                          setDayIndex(index);
+                        }}
+                      />
+                      <label htmlFor={index.toString()}>{days[index]}</label>
+                    </div>
+                    <div>
+                      Start Time: <b>{day.startTime}</b>
+                    </div>
+                    <div>
+                      End Time: <b>{day.endTime}</b>
+                    </div>
+                    <div>
+                      Slot: <b>{day.slot}</b>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {formValues.days.map((day, index) => {
-        return (
-          // <RadioGroup
-          //   onValueChange={() => {
-          //     setDayIndex(index);
-          //   }}
-          // >
-          <div>
-            {Object.keys(day).length !== 0 && (
-              <div className="grid grid-cols-4 ml-4 mt-4 gap-4">
-                <div>
-                  <input type="radio" className="h-6 w-6 text-green-600 border-gray-300 focus:ring-green-400" name="day" id={index.toString()}
-                    onChange={() => {setDayIndex(index)}}
-                    
-                  />
-                  <label htmlFor={index.toString()}>{days[index]}</label>
-                </div>
-                <div>Start Time: <b>{day.startTime}</b></div>
-                <div>End Time: <b>{day.endTime}</b></div>
-                <div>Slot: <b>{day.slot}</b></div>
-              </div>
-            )}
-          </div>
-        );
-      })}
       <div className="flex justify-center mt-5">
-        <Button className="bg-c2 w-42 text-white rounded-lg hover:bg-c1"
+        <Button
+          className="bg-c2 w-42 text-white rounded-lg hover:bg-c1"
           onClick={() => {
             OnSubmit();
           }}
+          disabled={dayIndex === 8}
         >
           Book Now
         </Button>

@@ -13,6 +13,8 @@ import DoctorInfo from "@/pages/doctor/DoctorInfo";
 import PatientInfo from "@/pages/patient/PatientInfo";
 import AddSchedule from "@/pages/doctor/AddSchedule";
 import BookAppointment from "@/pages/patient/PatientBookAppointment";
+import DoctorSearchPage from "@/pages/patient/DoctorSearchPage";
+import PatientSearchPage from "@/pages/doctor/DoctorPendingAppointments";
 const navList: navIcon[] = [
   { name: "Medicines", link: "/medicines" },
   { name: "Prescriptions", link: "/prescriptions" },
@@ -47,7 +49,9 @@ const AppRouter: FC = () => {
         <Route path="/doctor/info/" element={<DoctorInfo />} />
         <Route path="patient/info/"element={<PatientInfo/>}/>
         <Route path="doctor/addSchedule" element={<AddSchedule/>}/>
+        <Route path="doctor/pendingAppointments" element={<PatientSearchPage/>}/>
         <Route path="patient/bookAppointment" element={<BookAppointment/>}/>
+        <Route path="patient/searchDoctor" element={<DoctorSearchPage/>}/>
       </Route>
       <Route path="/logout/" element={<Logout />} />
       <Route path="*" element={<Navigate to="/" replace />} />

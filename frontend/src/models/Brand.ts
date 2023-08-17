@@ -139,3 +139,27 @@ export function isSearchGenericOutput(object:any) : object is SearchGenericOutpu
     })
   )
 }
+
+export interface DoctorSearchAttributes {
+  img : string;
+  name : string;
+  degree : string;
+  department : string;
+  bmdcNumber : string;
+  cost : number;
+  contact : string;
+}
+
+export interface DoctorPendingAttributes {
+  appID : string;
+  name : string;
+  date : Date;
+  meetLink : string;
+}
+
+export interface PatientPendingAttributes {
+  appID : string;
+  name : string;
+  date : Date;
+  meetLink : string;
+}
