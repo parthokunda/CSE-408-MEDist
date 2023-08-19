@@ -8,8 +8,10 @@ import {
   Optional,
 } from "sequelize";
 
-//internal import
+// sequelize connection
 import sequelizeConnection from "../config";
+
+//internal import
 import Specialization, {
   SpecializationAttributes,
 } from "./Specialization.model";

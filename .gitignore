@@ -20,6 +20,10 @@ Patient_Service/dist
 Doctor_Service/node_modules
 Doctor_Service/dist
 
+# Appointment_Service
+Appointment_Service/node_modules
+Appointment_Service/dist
+
 # frontend
 frontend/logs
 frontend/*.log
