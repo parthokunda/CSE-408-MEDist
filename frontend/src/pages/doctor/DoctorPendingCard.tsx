@@ -16,13 +16,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 import { PatientPendingAttributes } from "@/models/Brand";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { DialogClose } from "@radix-ui/react-dialog";
+
 
 const DoctorPendingCard: FC<{ patient: PatientPendingAttributes }> = (props) => {
   // convert Date to date and time

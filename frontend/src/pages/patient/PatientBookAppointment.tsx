@@ -13,6 +13,19 @@ import { FC, useEffect } from "react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import DoctorDetailsCard  from "./doctorDetailsCard";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { DialogClose } from "@radix-ui/react-dialog";
+
 import { set } from "date-fns";
 
 export const BookAppointment: FC = () => {
@@ -66,6 +79,15 @@ export const BookAppointment: FC = () => {
       slot?: string;
     }[];
   };
+  const doctor={
+    img: "https://www.w3schools.com/howto/img_avatar.png",
+    name: "Dr. John Doe",
+    degree: "MBBS, FCPS, FRCS",
+    department: "ENT",
+    bmdcNumber: "123456",
+    cost: 500,
+    contact: "01712345678",
+  };
   const values = {
     contact: "01759881197",
     cost: "500",
@@ -81,11 +103,40 @@ export const BookAppointment: FC = () => {
   };
   const [formValues, setFormValues] = useState<FormValues>(values);
   const [dayIndex, setDayIndex] = useState(8);
+  const [payed, setPayed] = useState(false);
   const onCall = (obj: FormValues) => {
     setFormValues(obj);
     console.log(obj);
   };
   const OnSubmit: () => void = () => {
+    // <Dialog>
+    //   <DialogTrigger asChild>
+    //     <Button
+    //       className="bg-c2 w-42 text-white rounded-lg hover:bg-c1"
+    //       onClick={() => {
+    //         OnSubmit();
+    //       }}
+    //       disabled={dayIndex === 8}
+    //     >
+    //       Book Now
+    //     </Button>
+    //   </DialogTrigger>
+    //   <DialogContent className="sm:max-w-[425px] bg-c4">
+    //     <DialogHeader>
+    //       <DialogTitle>Payment Completed</DialogTitle>
+    //       <DialogDescription>
+    //         Your appointment is on : <b className="text-c1">{days[dayIndex]}</b>
+    //       </DialogDescription>
+    //     </DialogHeader>
+
+    //     <DialogFooter>
+    //       <DialogClose asChild>
+    //         <Button className="bg-c2 hover:bg-c1">Ok</Button>
+    //       </DialogClose>
+    //     </DialogFooter>
+    //   </DialogContent>
+    // </Dialog>
+    setPayed(true);
     console.log(dayIndex);
   };
   // onCall(values);
@@ -95,8 +146,8 @@ export const BookAppointment: FC = () => {
         Book Appointment
       </div>
       <div className="flex">
-        <div className="flex-[30%] flex-col">
-          <div className="flex flex-col ml-6 mt-5 gap-5">
+        <div className="flex-[10%] flex-col">
+          {/* <div className="flex flex-col ml-6 mt-5 gap-5">
             <div className="flex gap-3">
               <div className="flex gap-3">
                 Contact Number :
@@ -115,7 +166,8 @@ export const BookAppointment: FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
+          <DoctorDetailsCard doctor={doctor}/>
         </div>
         <div className="flex-[60%] flex-col">
           {formValues.days.map((day, index) => {
@@ -154,20 +206,42 @@ export const BookAppointment: FC = () => {
               </div>
             );
           })}
+
+<div className="flex justify-center mt-5">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              className="bg-c2 w-42 text-white rounded-lg hover:bg-c1"
+              onClick={() => {
+                OnSubmit();
+              }}
+              disabled={dayIndex === 8}
+            >
+              Book Now
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px] bg-c4">
+            <DialogHeader>
+              <DialogTitle>Payment Completed</DialogTitle>
+              <DialogDescription>
+                Your appointment is on :{" "}
+                <b className="text-c1">{days[dayIndex]}</b>
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button className="bg-c2 hover:bg-c1">Ok</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+
         </div>
       </div>
 
-      <div className="flex justify-center mt-5">
-        <Button
-          className="bg-c2 w-42 text-white rounded-lg hover:bg-c1"
-          onClick={() => {
-            OnSubmit();
-          }}
-          disabled={dayIndex === 8}
-        >
-          Book Now
-        </Button>
-      </div>
+      
     </>
   );
 };
