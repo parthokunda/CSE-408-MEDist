@@ -112,6 +112,7 @@ Appointment.init(
     status: {
       type: DataTypes.ENUM,
       values: Object.values(AppointmentStatus),
+      defaultValue: AppointmentStatus.PENDING,
       allowNull: false,
     },
 

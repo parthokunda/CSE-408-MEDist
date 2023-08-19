@@ -14,6 +14,7 @@ import broker, {
 import { config } from "../config";
 import jwtService, { JWT_Payload } from "../utils/jwt";
 import { UserRole } from "../database/models/User.model";
+import googleCalendarApi from "../utils/google.auth";
 
 // ============================== UserService ============================== //
 
@@ -78,6 +79,14 @@ class UserService implements UserServiceInterface {
         throw createHttpError(409, `User with email ${email} already exists`);
 
       const newUser = await this.repository.createUser(userInput);
+
+      const credentials = await googleCalendarApi.authorize();
+
+      if (!credentials)
+        throw createHttpError(500, "Failed to authorize google calendar");
+
+      newUser.google_token = credentials;
+      await newUser.save();
 
       // send RPC request to get Id from other service
       const payload: RPC_Request_Payload = {

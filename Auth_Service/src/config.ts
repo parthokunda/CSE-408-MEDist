@@ -12,6 +12,7 @@ export const config = {
   JWT_SECRET: process.env.JWT_SECRET,
   MSG_QUEUE_URL: process.env.MSG_QUEUE_URL as string,
   ENVIRONMENT: process.env.NODE_ENV,
+  CREDENTIALS: JSON.parse(process.env.CREDENTIALS),
 
   SELF_RPC_QUEUE: "AUTH_RPC",
   PATIENT_RPC_QUEUE: "PATIENT_RPC",

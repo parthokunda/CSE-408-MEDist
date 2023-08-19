@@ -11,6 +11,7 @@ Medicine_Service/dist
 # Auth_Service
 Auth_Service/node_modules
 Auth_Service/dist
+Auth_Service/token.json
 
 # Patient_Service
 Patient_Service/node_modules
