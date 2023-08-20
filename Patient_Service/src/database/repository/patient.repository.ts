@@ -15,7 +15,7 @@ export interface PatientRepositoryInterface {
   getPatientInfo(patientID: number): Promise<Patient>;
 
   // update info
-  updatePatientInfo(
+  updatePatientAdditionalInfo(
     patientID: number,
     newPatientInfo: Partial<Patient>
   ): Promise<Patient>;
@@ -71,7 +71,7 @@ class PatientRepository implements PatientRepositoryInterface {
     }
   }
 
-  async updatePatientInfo(
+  async updatePatientAdditionalInfo(
     patientID: number,
     newPatientInfo: Partial<Patient>
   ): Promise<Patient> {

@@ -26,12 +26,45 @@ export enum AppointmentType {
   PHYSICAL = "physical",
 }
 
+export interface Patient_or_Doctor_Info {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export interface PendingAppointmentOverviewInfo {
+  id: number;
+  type: AppointmentType;
+
+  patientInfo: Patient_or_Doctor_Info | null;
+
+  doctorInfo: Patient_or_Doctor_Info | null;
+
+  startTime: Date;
+  endTime: Date;
+
+  status: AppointmentStatus;
+
+  meetingLink: string;
+}
+
+export interface PendingAppointments {
+  appointments: PendingAppointmentOverviewInfo[];
+  totalCount: number;
+}
+
 export interface AppointmentAttributes {
   id: number;
   type: AppointmentType;
 
   patientID: number;
+  patientEmail: string;
+  patientName: string;
+
   doctorID: number;
+  doctorEmail: string;
+  doctorName: string;
+
   prescriptionID: number;
 
   startTime: Date;
@@ -51,7 +84,12 @@ class Appointment extends Model implements AppointmentAttributes {
   public type!: AppointmentType;
 
   public patientID!: number;
+  public patientEmail: string;
+  public patientName!: string;
+
   public doctorID!: number;
+  public doctorEmail!: string;
+  public doctorName!: string;
 
   public startTime!: Date;
   public endTime!: Date;
@@ -89,9 +127,29 @@ Appointment.init(
       allowNull: false,
     },
 
+    patientName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    patientEmail: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
     doctorID: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+
+    doctorEmail: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    doctorName: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
 
     prescriptionID: {

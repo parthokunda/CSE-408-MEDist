@@ -13,15 +13,36 @@ import googleCalendarApi, { calendarEvent } from "../../utils/google.auth";
 
 export interface AppointmentBookingInput {
   doctorID: number;
+  doctorName: string;
   doctorEmail: string;
 
   patientID: number;
+  patientName: string;
   patientEmail: string;
 
   patientCredentials: JSON;
 
   appointmentStartTime: Date;
   appointmentEndTime: Date;
+}
+
+export interface Appointment_List {
+  appointments: Appointment[];
+  totalCount: number;
+}
+
+export interface Search_Appointment_Input {
+  type: AppointmentType;
+  status: AppointmentStatus;
+
+  doctorID: number | null;
+  doctorName: string | null;
+
+  patientID: number | null;
+  patientName: string | null;
+
+  filterByStartTime: Date | null;
+  filterByEndTime: Date | null;
 }
 
 export interface Appointment_Repository_Interface {
@@ -48,9 +69,89 @@ export interface Appointment_Repository_Interface {
     day_startTime: Date,
     day_endTime: Date
   ): Promise<boolean>;
+
+  // search appointments
+  Search_Appointments(
+    req: Search_Appointment_Input,
+    pagination: number,
+    currentPage: number
+  ): Promise<Appointment_List>;
 }
 
 class AppointmentRepository implements Appointment_Repository_Interface {
+  private constructSearchAppointmentQuery(req: Search_Appointment_Input) {
+    let searchCriteria: any;
+
+    // include status and type in search criteria
+    searchCriteria.status = req.status;
+    searchCriteria.type = req.type;
+
+    // include doctorID or patientID in search criteria
+    if (req.doctorID) {
+      searchCriteria.doctorID = req.doctorID;
+    } else if (req.patientID) {
+      searchCriteria.patientID = req.patientID;
+    }
+
+    // include filter by date in search criteria
+    if (req.filterByStartTime && req.filterByEndTime) {
+      searchCriteria.startTime = {
+        [Op.between]: [req.filterByStartTime, req.filterByEndTime],
+      };
+    } else if (req.filterByStartTime) {
+      searchCriteria.startTime = {
+        [Op.gte]: req.filterByStartTime,
+      };
+    } else if (req.filterByEndTime) {
+      searchCriteria.startTime = {
+        [Op.lte]: req.filterByEndTime,
+      };
+    }
+
+    let searchQuery: any;
+
+    // if doctor name(partial or full) is given
+    if (req.doctorName) {
+      searchQuery = {
+        [Op.or]: [
+          {
+            doctorName: {
+              [Op.iLike]: `${req.doctorName}%`, // case insensitive starts with search
+            },
+            ...searchCriteria,
+          },
+          {
+            doctorName: {
+              [Op.iLike]: `%${req.doctorName}%`, // case insensitive contains search
+            },
+            ...searchCriteria,
+          },
+        ],
+      };
+    } else if (req.patientName) {
+      searchQuery = {
+        [Op.or]: [
+          {
+            patientName: {
+              [Op.iLike]: `${req.patientName}%`, // case insensitive starts with search
+            },
+            ...searchCriteria,
+          },
+          {
+            patientName: {
+              [Op.iLike]: `%${req.patientName}%`, // case insensitive contains search
+            },
+            ...searchCriteria,
+          },
+        ],
+      };
+    } else {
+      searchQuery = searchCriteria;
+    }
+
+    return searchQuery;
+  }
+
   // ----------------- Book Online Appointment ----------------- //
   async Book_Online_Appointment(
     req: AppointmentBookingInput
@@ -67,8 +168,9 @@ class AppointmentRepository implements Appointment_Repository_Interface {
         );
 
       const event: calendarEvent = {
-        summary: "Online Appointment",
-        description: "Online Appointment",
+        summary: "Online Appointment - Powered by MEDist",
+        description: `Appointment with Dr. ${req.doctorName}	
+        Patient Name: ${req.patientName}`,
 
         startTime: req.appointmentStartTime,
         endTime: req.appointmentEndTime,
@@ -81,7 +183,12 @@ class AppointmentRepository implements Appointment_Repository_Interface {
       // create appointment
       const appointment = await Appointment.create({
         doctorID: req.doctorID,
+        doctorEmail: req.doctorEmail,
+        doctorName: req.doctorName,
+
         patientID: req.patientID,
+        patientEmail: req.patientEmail,
+        patientName: req.patientName,
 
         startTime: req.appointmentStartTime,
         endTime: req.appointmentEndTime,
@@ -172,6 +279,39 @@ class AppointmentRepository implements Appointment_Repository_Interface {
       } else {
         return false;
       }
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Internal Server Error");
+    }
+  }
+
+  // ----------------- Search Appointments ----------------- //
+  async Search_Appointments(
+    req: Search_Appointment_Input,
+    pagination: number,
+    currentPage: number
+  ): Promise<Appointment_List> {
+    try {
+      const searchQuery = this.constructSearchAppointmentQuery(req);
+
+      const itemsPerPage = pagination;
+      const offset = (currentPage - 1) * itemsPerPage;
+
+      const appointments = await Appointment.findAll({
+        where: searchQuery,
+        order: [["startTime", "DESC"]],
+        offset,
+        limit: itemsPerPage,
+      });
+
+      const totalCount = await Appointment.count({
+        where: searchQuery,
+      });
+
+      return {
+        appointments,
+        totalCount,
+      };
     } catch (error) {
       log.error(error);
       throw createHttpError(500, "Internal Server Error");

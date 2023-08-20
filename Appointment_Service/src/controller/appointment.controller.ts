@@ -14,6 +14,8 @@ import {
 } from "../schema/appointment.schema";
 import createHttpError from "http-errors";
 import log from "../utils/logger";
+import { Search_Appointment_Input } from "../database/repository";
+import { AppointmentStatus, AppointmentType } from "../database/models";
 
 export interface SlotRequest {
   appointmentDay: Date;
@@ -25,7 +27,7 @@ export interface SlotRequest {
 }
 
 export interface Appointment_Controller_Interface {
-  //book online appointment - by patient
+  //book online appointment - access by patient
   Book_Online_Appointment(
     req: Request /* <
       Booking_Online_Appointment_Params_Input,
@@ -35,6 +37,9 @@ export interface Appointment_Controller_Interface {
     res: Response,
     next: NextFunction
   );
+
+  // view pending appointments - access by both patient and doctor
+  View_Pending_Appointments(req: Request, res: Response, next: NextFunction);
 }
 
 class Appointment_Controller implements Appointment_Controller_Interface {
@@ -125,6 +130,58 @@ class Appointment_Controller implements Appointment_Controller_Interface {
       res.status(200).json({
         message: "Appointment booked successfully",
         appointment,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // view pending appointments
+  async View_Pending_Appointments(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const role = req.user_identity?.role;
+
+    let search_appointment_input;
+
+    search_appointment_input.type = req.query.type
+      ? req.query.type
+      : AppointmentType.ONLINE;
+    search_appointment_input.status = AppointmentStatus.PENDING;
+
+    search_appointment_input.filterByStartTime = req.query.fromDate
+      ? new Date(req.query.fromDate as string)
+      : null;
+    search_appointment_input.filterByEndTime = req.query.toDate
+      ? new Date(req.query.toDate as string)
+      : null;
+
+    if (role === "patient") {
+      search_appointment_input.patientID = req.user_identity?.id;
+      search_appointment_input.doctoreName = req.query.searchByName
+        ? req.query.searchByName
+        : null;
+    } else if (role === "doctor") {
+      search_appointment_input.doctorID = req.user_identity?.id;
+      search_appointment_input.patientName = req.query.searchByName
+        ? req.query.searchByName
+        : null;
+    }
+
+    try {
+      const pendingAppointments =
+        await appointmentService.Search_Pending_Appointment(
+          search_appointment_input,
+          req.query.pagination ? Number(req.query.pagination) : 5,
+          req.params.currentPage ? Number(req.params.currentPage) : 1,
+          role === "patient"
+        );
+
+      res.status(200).json({
+        message: "Pending appointments fetched successfully",
+        pendingAppointments,
       });
     } catch (error) {
       next(error);

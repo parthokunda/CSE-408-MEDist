@@ -41,10 +41,12 @@ const authorize =
           if (onlyDoctor && role !== "doctor")
             return next(createError.Unauthorized());
 
+          // any user can access it
           req.user_identity = {
             id: auth_response_payload.data["id"],
             email: auth_response_payload.data["email"],
             role,
+            profile_status: auth_response_payload.data["profile_status"],
           };
           return next();
         }

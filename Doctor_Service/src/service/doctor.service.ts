@@ -30,7 +30,7 @@ export interface DoctorServiceInterface {
   // during registration and login
   createInitialDoctor(userID: number): Promise<RPC_Response_Payload>;
   getId_givenUserID(userID: number): Promise<RPC_Response_Payload>;
-  getEmail_givenID(doctorID: number): Promise<RPC_Response_Payload>;
+  getEmailandName_givenID(doctorID: number): Promise<RPC_Response_Payload>;
   serveRPCRequest(payload: RPC_Request_Payload): Promise<RPC_Response_Payload>;
 
   // after registration and login
@@ -97,16 +97,17 @@ class DoctorService implements DoctorServiceInterface {
     }
   }
 
-  async getEmail_givenID(doctorID: number): Promise<RPC_Response_Payload> {
+  async getEmailandName_givenID(
+    doctorID: number
+  ): Promise<RPC_Response_Payload> {
     try {
-      const email = await doctorRepository.getEmail_givenDoctorID(doctorID);
-
-      log.debug(email, "email");
+      const doctor = await doctorRepository.getDoctorInfo(doctorID);
 
       return {
         status: "success",
         data: {
-          email,
+          email: doctor.email,
+          name: doctor.name,
         },
       };
     } catch (error) {
@@ -133,8 +134,10 @@ class DoctorService implements DoctorServiceInterface {
       case "GET_ID":
         return await this.getId_givenUserID(payload.data["userID"]);
 
-      case "GET_EMAIL_FROM_ID":
-        return await this.getEmail_givenID(Number(payload.data["doctorID"]));
+      case "GET_EMAIL_AND_NAME_FROM_ID":
+        return await this.getEmailandName_givenID(
+          Number(payload.data["doctorID"])
+        );
 
       default:
         return response;
@@ -152,8 +155,6 @@ class DoctorService implements DoctorServiceInterface {
         doctor.dataValues,
         DoctorAdditionalInfo_Excluded_Properties
       );
-
-      log.info(doctorInfo, "doctorInfo after excludeProperties");
 
       const specialization = await doctor.getSpecialization();
 

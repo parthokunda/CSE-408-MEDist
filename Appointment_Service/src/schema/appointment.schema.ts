@@ -89,6 +89,62 @@ class Appointment_Schema implements Appointment_Schema_Interface {
       }),
     }), // end of body
   });
+
+  // ------------------ Search Pending Appointments ------------------ //
+  Search_Pending_Appointments = object({
+    params: object({
+      currentPage: union([number(), string()]).refine(
+        (val) => {
+          // must be a positive integer
+          const num = Number(val);
+          return !isNaN(num) && num > 0 && Number.isInteger(num);
+        },
+        {
+          message: "currentPage must be a positive integer",
+        }
+      ),
+    }).optional(),
+
+    query: object({
+      type: string().optional(),
+
+      pagination: union([number(), string()])
+        .refine(
+          (val) => {
+            // must be a positive integer
+            const num = Number(val);
+
+            return !isNaN(num) && num > 0 && Number.isInteger(num);
+          },
+          {
+            message: "pagination must be a positive integer",
+          }
+        )
+        .optional(),
+
+      searchByName: string().optional(),
+
+      fromDate: union([
+        date(),
+        string().refine((val) => {
+          // check date time format
+          const dateTimeRegex =
+            /^(?:(?:\d{4}-\d{2}-\d{2})|(?:\d{2}:\d{2}(?::\d{2})?)|(?:\d{4}-\d{2}-\d{2} \d{2}:\d{2}(?::\d{2})?))$/;
+          return dateTimeRegex.test(val);
+        }),
+      ]).optional(),
+
+      toDate: union([
+        date(),
+        string().refine((val) => {
+          // check date time format
+          const dateTimeRegex =
+            /^(?:(?:\d{4}-\d{2}-\d{2})|(?:\d{2}:\d{2}(?::\d{2})?)|(?:\d{4}-\d{2}-\d{2} \d{2}:\d{2}(?::\d{2})?))$/;
+          return dateTimeRegex.test(val);
+        }),
+      ]).optional(),
+    }),
+  });
 }
 
 export default new Appointment_Schema();
@@ -100,3 +156,11 @@ export type Booking_Online_Appointment_Params_Input = TypeOf<
 export type Booking_Online_Appointment_Body_Input = TypeOf<
   Appointment_Schema["Booking_Online_Appointment"]
 >["body"];
+
+export type Search_Pending_Appointments_Params_Input = TypeOf<
+  Appointment_Schema["Search_Pending_Appointments"]
+>["params"];
+
+export type Search_Pending_Appointments_Queries_Input = TypeOf<
+  Appointment_Schema["Search_Pending_Appointments"]
+>["query"];

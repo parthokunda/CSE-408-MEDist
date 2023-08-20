@@ -36,4 +36,11 @@ appointmentRouter.post(
   appointmentController.Book_Online_Appointment
 );
 
+// search pending appointments - accessible to both patient and doctor
+appointmentRouter.get(
+  "/view-pending-appointments",
+  authorize(false),
+  appointmentController.View_Pending_Appointments
+);
+
 export default appointmentRouter;
