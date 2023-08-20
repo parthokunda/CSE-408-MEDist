@@ -38,8 +38,9 @@ appointmentRouter.post(
 
 // search pending appointments - accessible to both patient and doctor
 appointmentRouter.get(
-  "/view-pending-appointments",
+  "/view-pending-appointments/:currentPage",
   authorize(false),
+  validateRequest(appointmentSchema.Search_Pending_Appointments),
   appointmentController.View_Pending_Appointments
 );
 

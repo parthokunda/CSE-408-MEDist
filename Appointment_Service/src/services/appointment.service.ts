@@ -254,24 +254,21 @@ class AppointmentService implements AppointmentServiceInterface {
           currentPage
         );
 
+      log.info(searchResults, "search results for pending appointments");
+
       // construct pending appointment overview info
       const appointments = searchResults.appointments.map((appointment) => {
-        let patientInfo: Patient_or_Doctor_Info | null = null;
-        let doctorInfo: Patient_or_Doctor_Info | null = null;
+        let patientInfo: Patient_or_Doctor_Info = {
+          id: appointment.patientID,
+          name: appointment.patientName,
+          email: appointment.patientEmail,
+        };
 
-        if (isPatient) {
-          patientInfo = {
-            id: appointment.patientID,
-            name: appointment.patientName,
-            email: appointment.patientEmail,
-          };
-        } else {
-          doctorInfo = {
-            id: appointment.doctorID,
-            name: appointment.doctorName,
-            email: appointment.doctorEmail,
-          };
-        }
+        let doctorInfo: Patient_or_Doctor_Info = {
+          id: appointment.doctorID,
+          name: appointment.doctorName,
+          email: appointment.doctorEmail,
+        };
 
         return {
           id: appointment.id,

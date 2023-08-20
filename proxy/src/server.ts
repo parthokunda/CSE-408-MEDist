@@ -17,8 +17,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 async function middlewares(req, res, next) {
+  log.info(
+    " ================== New Request Received ========================== "
+  );
   log.info(req.body, "request body");
   log.info(req, "request");
+  log.info(
+    " =================== End of Request info ========================== "
+  );
   next();
 }
 app.use("/api/auth", middlewares, proxy("http://localhost:3001"));

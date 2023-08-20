@@ -32,8 +32,8 @@ export interface Appointment_List {
 }
 
 export interface Search_Appointment_Input {
-  type: AppointmentType;
-  status: AppointmentStatus;
+  type: string;
+  status: string;
 
   doctorID: number | null;
   doctorName: string | null;
@@ -80,7 +80,7 @@ export interface Appointment_Repository_Interface {
 
 class AppointmentRepository implements Appointment_Repository_Interface {
   private constructSearchAppointmentQuery(req: Search_Appointment_Input) {
-    let searchCriteria: any;
+    let searchCriteria: any = {};
 
     // include status and type in search criteria
     searchCriteria.status = req.status;
@@ -148,6 +148,8 @@ class AppointmentRepository implements Appointment_Repository_Interface {
     } else {
       searchQuery = searchCriteria;
     }
+
+    log.info(searchQuery, "searchQuery in constructSearchAppointmentQuery");
 
     return searchQuery;
   }

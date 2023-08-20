@@ -44,12 +44,15 @@ export interface Appointment_Controller_Interface {
 
 class Appointment_Controller implements Appointment_Controller_Interface {
   private setAppointmentDay(weekday: number): Date {
+    log.debug(weekday, "weekday received in setAppointmentDay");
     const today = new Date().getDay();
     const appointmentDay = new Date();
     appointmentDay.setDate(
       appointmentDay.getDate() + (weekday - 2 - today) // -2 because weekday starts from 2
     );
     appointmentDay.setHours(0, 0, 0, 0);
+
+    log.debug(appointmentDay, "appointmentDay in setAppointmentDay");
     return appointmentDay;
   }
 
@@ -64,37 +67,37 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     return appointmentDayTime;
   }
 
+  constructor() {
+    this.Book_Online_Appointment = this.Book_Online_Appointment.bind(this);
+    this.View_Pending_Appointments = this.View_Pending_Appointments.bind(this);
+  }
+
   // ----------------- Book Online Appointment ----------------- //
   async Book_Online_Appointment(
-    req: Request /* <
-      Booking_Online_Appointment_Params_Input,
-      {},
-      Booking_Online_Appointment_Body_Input
-    >*/,
+    req: Request,
     res: Response,
     next: NextFunction
   ) {
     const doctorID = Number(req.params.doctorID);
     const patientID = Number(req.user_identity?.id);
-    const patientEmail = req.user_identity?.email;
-    const weekday = Number(req.body.weekday);
+    const patientEmail = req.user_identity?.email as string;
+    const weekday = req.body.weekday as number;
     const startTime = req.body.startTime as string;
     const endTime = req.body.endTime as string;
-    const totalSlots = Number(req.body.totalSlots);
+    const totalSlots = req.body.totalSlots as number;
 
     try {
       // check if week day is less than today
       const today = new Date().getDay();
-      if (req.body.weekday < today)
+      if (weekday < today)
         throw createHttpError(400, "You can't book appointment for past days");
 
       // construct appointmentDay from weekday
       const appointmentDay = this.setAppointmentDay(weekday);
 
       // construct appointment_day_start_time and appointment_day_end_time
-      const appointment_day_start_time = this.setAppointmentDayTime(
-        appointmentDay,
-        startTime
+      const appointment_day_start_time = new Date(
+        this.setAppointmentDayTime(appointmentDay, startTime)
       );
 
       const appointment_day_end_time = this.setAppointmentDayTime(
@@ -106,7 +109,7 @@ class Appointment_Controller implements Appointment_Controller_Interface {
       const timeInterval_forEachSlot = Math.floor(
         (appointment_day_end_time.getTime() -
           appointment_day_start_time.getTime()) /
-          req.body.totalSlots
+          totalSlots
       );
 
       // construct slotRequest
@@ -114,9 +117,9 @@ class Appointment_Controller implements Appointment_Controller_Interface {
         appointmentDay,
         day_startTime: appointment_day_start_time,
         day_endTime: appointment_day_end_time,
-        totalSlots: req.body.totalSlots,
+        totalSlots,
         timeInterval_forEachSlot,
-        patientEmail: req.user_identity?.email || "",
+        patientEmail,
       };
 
       // book online appointment
@@ -142,33 +145,50 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     res: Response,
     next: NextFunction
   ) {
+    log.info(req.user_identity, "user_identity in View_Pending_Appointments");
+    log.info(req.query, "query in View_Pending_Appointments");
+    log.info(req.params, "params in View_Pending_Appointments");
+
     const role = req.user_identity?.role;
 
-    let search_appointment_input;
+    // Initialize search_appointment_input with default values
+    let search_appointment_input: Search_Appointment_Input = {
+      type: req.query.type
+        ? (req.query.type as string)
+        : AppointmentType.ONLINE,
 
-    search_appointment_input.type = req.query.type
-      ? req.query.type
-      : AppointmentType.ONLINE;
-    search_appointment_input.status = AppointmentStatus.PENDING;
+      status: AppointmentStatus.PENDING,
 
-    search_appointment_input.filterByStartTime = req.query.fromDate
-      ? new Date(req.query.fromDate as string)
-      : null;
-    search_appointment_input.filterByEndTime = req.query.toDate
-      ? new Date(req.query.toDate as string)
-      : null;
+      filterByStartTime: req.query.fromDate
+        ? new Date(req.query.fromDate as string)
+        : null,
+
+      filterByEndTime: req.query.toDate
+        ? new Date(req.query.toDate as string)
+        : null,
+
+      patientID: null,
+      doctorID: null,
+      doctorName: null,
+      patientName: null,
+    };
 
     if (role === "patient") {
-      search_appointment_input.patientID = req.user_identity?.id;
-      search_appointment_input.doctoreName = req.query.searchByName
-        ? req.query.searchByName
+      search_appointment_input.patientID = req.user_identity?.id as number;
+      search_appointment_input.doctorName = req.query.searchByName
+        ? (req.query.searchByName as string)
         : null;
     } else if (role === "doctor") {
-      search_appointment_input.doctorID = req.user_identity?.id;
+      search_appointment_input.doctorID = req.user_identity?.id as number;
       search_appointment_input.patientName = req.query.searchByName
-        ? req.query.searchByName
+        ? (req.query.searchByName as string)
         : null;
     }
+
+    log.info(
+      search_appointment_input,
+      "search_appointment_input in View_Pending_Appointments"
+    );
 
     try {
       const pendingAppointments =

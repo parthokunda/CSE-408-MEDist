@@ -103,7 +103,7 @@ class Appointment_Schema implements Appointment_Schema_Interface {
           message: "currentPage must be a positive integer",
         }
       ),
-    }).optional(),
+    }),
 
     query: object({
       type: string().optional(),
@@ -143,7 +143,7 @@ class Appointment_Schema implements Appointment_Schema_Interface {
           return dateTimeRegex.test(val);
         }),
       ]).optional(),
-    }),
+    }).optional(),
   });
 }
 
