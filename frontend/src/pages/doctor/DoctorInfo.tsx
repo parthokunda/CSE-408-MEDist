@@ -35,7 +35,12 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 
+import { useCookies } from "react-cookie";
+import {DoctorAdditionalInfo} from "@/models/Brand";
+
 export const DoctorInfo: FC = () => {
+  const [cookies] = useCookies(["user"]);
+  var doctorInfo:DoctorAdditionalInfo;
   const forms = useForm<z.infer<typeof DoctorAdditionalInfoForm>>({
     defaultValues: {
       gender: "male",

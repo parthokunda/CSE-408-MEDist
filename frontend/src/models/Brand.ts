@@ -163,3 +163,35 @@ export interface PatientPendingAttributes {
   date : Date;
   meetLink : string;
 }
+
+export interface DoctorAttributes {
+  id: number;
+  status: string;
+  userID: number;
+
+  // additional info
+  image: string;
+  name: string;
+  email: string;
+  phone: string;
+  gendar: string;
+  dob: Date;
+  bmdc: string;
+  issueDate: Date;
+  degrees: string[];
+
+  specializationID: number;
+  scheduleID: number;
+}
+export interface SpecializationAttributes {
+  id: number;
+  name: string;
+}
+
+export interface DoctorAdditionalInfo {
+  DoctorInfo: Omit<
+    DoctorAttributes,
+    "userID" | "scheduleID" | "specializationID"
+  >;
+  Specialization: SpecializationAttributes | {};
+}

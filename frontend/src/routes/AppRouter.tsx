@@ -15,16 +15,25 @@ import AddSchedule from "@/pages/doctor/AddSchedule";
 import BookAppointment from "@/pages/patient/PatientBookAppointment";
 import DoctorSearchPage from "@/pages/patient/DoctorSearchPage";
 import PatientSearchPage from "@/pages/doctor/DoctorPendingAppointments";
-const navList: navIcon[] = [
-  { name: "Medicines", link: "/medicines" },
-  { name: "Prescriptions", link: "/prescriptions" },
-  { name: "Appointments", link: "/appointments" },
-  { name: "Account", link: "/account" },
-  { name: "Logout", link: "/logout/" }, //! careful with the first /. cookies path problem otherwise
-  // TODO: add a logout icon insted of this
-];
+import { useCookies } from "react-cookie";
+import {
+  UserRoles,
+  ProfileStatus,
+  LoginSignupToken,
+} from "@/models/LoginSignUpSchema";
 
 const AppRouter: FC = () => {
+  const [cookies] = useCookies(["user"]);
+  const role = cookies.user.role==='doctor'?'doctor':'patient';
+  const navList: navIcon[] = [
+    { name: "Medicines", link: "/searchMedicines" },
+    { name: "Prescriptions", link: "/prescriptions" },
+    { name: "Appointments", link: "/appointments", role: role},
+    { name: "Account", link: "/account" },
+    { name: "Logout", link: "/logout/" }, //! careful with the first /. cookies path problem otherwise
+    // TODO: add a logout icon insted of this
+  ];
+
   return (
     <Routes>
       <Route path="/" element={<AuthRoute />} />
@@ -44,14 +53,17 @@ const AppRouter: FC = () => {
         />
         <Route
           path="/patient/"
-          element={<PatientRoute element={<>HELLO Patient</>} />}
+          element={<PatientRoute element={<PatientInfo />} />}
         />
         <Route path="/doctor/info/" element={<DoctorInfo />} />
-        <Route path="patient/info/"element={<PatientInfo/>}/>
-        <Route path="doctor/addSchedule" element={<AddSchedule/>}/>
-        <Route path="doctor/pendingAppointments" element={<PatientSearchPage/>}/>
-        <Route path="patient/bookAppointment" element={<BookAppointment/>}/>
-        <Route path="patient/searchDoctor" element={<DoctorSearchPage/>}/>
+        <Route path="patient/info/" element={<PatientInfo />} />
+        <Route path="doctor/addSchedule" element={<AddSchedule />} />
+        <Route
+          path="doctor/pendingAppointments"
+          element={<PatientSearchPage />}
+        />
+        <Route path="patient/bookAppointment" element={<BookAppointment />} />
+        <Route path="patient/searchDoctor" element={<DoctorSearchPage />} />
       </Route>
       <Route path="/logout/" element={<Logout />} />
       <Route path="*" element={<Navigate to="/" replace />} />

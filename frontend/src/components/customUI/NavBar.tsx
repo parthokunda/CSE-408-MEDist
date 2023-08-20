@@ -13,6 +13,7 @@ import { Outlet } from "react-router-dom";
 const NavBar: FC<{ navList: navIcon[] }> = (props) => {
   return (
     <>
+    {console.log(props.navList)}
       <NavigationMenu>
         <div className="flex items-center w-screen h-14 bg-c1 font-inter ">
           <div className="font-bold text-3xl text-c4 ml-4 flex-grow">
@@ -23,10 +24,17 @@ const NavBar: FC<{ navList: navIcon[] }> = (props) => {
               <NavigationMenuItem
                 key={icon.name}
                 className="text-c4 hover:text-white"
-              >
-                <NavigationMenuLink href={icon.link ? icon.link : ""}>
+              >{ icon.link==="/appointments" &&icon.role==="doctor"?
+              <Link to ="doctor/pendingAppointments">
+              {icon.name}
+            </Link>:<NavigationMenuLink href={icon.link ? icon.link : ""}>
                   {icon.name}
                 </NavigationMenuLink>
+
+              }
+                {/* <NavigationMenuLink href={icon.link ? icon.link : ""}>
+                  {icon.name}
+                </NavigationMenuLink> */}
               </NavigationMenuItem>
             ))}
           </NavigationMenuList>
