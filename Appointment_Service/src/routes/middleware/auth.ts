@@ -10,7 +10,7 @@ import { config } from "../../config";
 import log from "../../utils/logger";
 
 const authorize =
-  (onlyDoctor: boolean) =>
+  (onlyPatient: boolean) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const token = req.headers.authorization?.split(" ")[1];
@@ -30,7 +30,7 @@ const authorize =
       const auth_response_payload: RPC_Response_Payload =
         await messageBroker.RPC_Request(config.AUTH_RPC_QUEUE, payload);
 
-      log.debug(auth_response_payload, "auth_response_payload");
+      //log.debug(auth_response_payload, "auth_response_payload");
 
       if (auth_response_payload) {
         // success and valid token
@@ -38,7 +38,7 @@ const authorize =
           // set the user_identity in req.locals
           const role = auth_response_payload.data["role"];
 
-          if (onlyDoctor && role !== "doctor")
+          if (onlyPatient && role !== "patient")
             return next(createError.Unauthorized());
 
           req.user_identity = {

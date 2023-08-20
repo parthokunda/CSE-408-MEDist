@@ -30,6 +30,7 @@ export interface DoctorServiceInterface {
   // during registration and login
   createInitialDoctor(userID: number): Promise<RPC_Response_Payload>;
   getId_givenUserID(userID: number): Promise<RPC_Response_Payload>;
+  getEmail_givenID(doctorID: number): Promise<RPC_Response_Payload>;
   serveRPCRequest(payload: RPC_Request_Payload): Promise<RPC_Response_Payload>;
 
   // after registration and login
@@ -96,6 +97,26 @@ class DoctorService implements DoctorServiceInterface {
     }
   }
 
+  async getEmail_givenID(doctorID: number): Promise<RPC_Response_Payload> {
+    try {
+      const email = await doctorRepository.getEmail_givenDoctorID(doctorID);
+
+      log.debug(email, "email");
+
+      return {
+        status: "success",
+        data: {
+          email,
+        },
+      };
+    } catch (error) {
+      return {
+        status: "error",
+        data: {},
+      };
+    }
+  }
+
   // ----------------- server side RPC request handler ----------------
   async serveRPCRequest(
     payload: RPC_Request_Payload
@@ -104,13 +125,16 @@ class DoctorService implements DoctorServiceInterface {
       status: "error",
       data: {},
     };
-
+    log.info(payload, "received payload");
     switch (payload.type) {
       case "CREATE_NEW_ENTITY":
         return await this.createInitialDoctor(payload.data["userID"]);
 
       case "GET_ID":
         return await this.getId_givenUserID(payload.data["userID"]);
+
+      case "GET_EMAIL_FROM_ID":
+        return await this.getEmail_givenID(Number(payload.data["doctorID"]));
 
       default:
         return response;

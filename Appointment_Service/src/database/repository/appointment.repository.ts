@@ -8,13 +8,19 @@ import log from "../../utils/logger";
 // import models
 import { Appointment, AppointmentStatus, AppointmentType } from "../models";
 
+// googleCalendarApi
+import googleCalendarApi, { calendarEvent } from "../../utils/google.auth";
+
 export interface Appointment_Repository_Interface {
   // book online appointment
   Book_Online_Appointment(
     doctorID: number,
     patientID: number,
     startTime: Date,
-    endTime: Date
+    endTime: Date,
+    credentials: any,
+    doctorEmail: string,
+    patientEmail: string
   ): Promise<Appointment>;
 
   // lastest booking appointment time
@@ -38,7 +44,10 @@ class AppointmentRepository implements Appointment_Repository_Interface {
     doctorID: number,
     patientID: number,
     startTime: Date,
-    endTime: Date
+    endTime: Date,
+    credentials: any,
+    doctorEmail: string,
+    patientEmail: string
   ): Promise<Appointment> {
     try {
       // check if patient has already booked an appointment
@@ -59,6 +68,24 @@ class AppointmentRepository implements Appointment_Repository_Interface {
       }
 
       // have to generate meet link
+      const authClient = await googleCalendarApi.createClient(credentials);
+      if (!authClient)
+        throw createHttpError(
+          500,
+          "Internal Server Error - creating authClient"
+        );
+
+      const event: calendarEvent = {
+        summary: "Online Appointment",
+        description: "Online Appointment",
+
+        startTime,
+        endTime,
+
+        otherAttendees: [doctorEmail, patientEmail],
+      };
+
+      const meetLink = await googleCalendarApi.createEvent(event, authClient);
 
       // create appointment
       const appointment = await Appointment.create({
@@ -67,6 +94,7 @@ class AppointmentRepository implements Appointment_Repository_Interface {
         startTime: startTime,
         endTime: endTime,
         type: AppointmentType.ONLINE,
+        meetingLink: meetLink,
       });
 
       return appointment;

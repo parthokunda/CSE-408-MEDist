@@ -26,6 +26,8 @@ export interface Doctor_Repository_Interface {
 
   getId_givenUserID(userID: number): Promise<{ id: number; status: string }>;
 
+  getEmail_givenDoctorID(doctorID: number): Promise<string>;
+
   // additional info
   getDoctorInfo(doctorID: number): Promise<Doctor>;
   updateDoctorAdditionalInfo(
@@ -78,6 +80,16 @@ class DoctorRepository implements Doctor_Repository_Interface {
           id: NaN,
           status: "",
         };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getEmail_givenDoctorID(doctorID: number): Promise<string> {
+    try {
+      const doctor = await Doctor.findByPk(doctorID);
+      if (doctor) return doctor.email;
+      else throw createHttpError.NotFound("Doctor not found.");
     } catch (error) {
       throw error;
     }

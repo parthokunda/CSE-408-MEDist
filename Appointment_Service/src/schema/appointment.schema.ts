@@ -1,5 +1,6 @@
 // external imports
 import { object, string, union, TypeOf, number, date, any } from "zod";
+import log from "../utils/logger";
 
 export interface Appointment_Schema_Interface {
   // booking online appointment
@@ -35,7 +36,7 @@ class Appointment_Schema implements Appointment_Schema_Interface {
           }
         ),
       ]),
-    }),
+    }), // end of params
 
     // body attributes
     body: object({
@@ -56,8 +57,10 @@ class Appointment_Schema implements Appointment_Schema_Interface {
         required_error: "startTime is required",
       }).refine(
         (val) => {
-          // must be a valid time format string
-          return !isNaN(Date.parse(val));
+          // must be a valid time format string (HH:MM )
+          // check string format
+          const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+          return timeRegex.test(val);
         },
         {
           message: "startTime must be a valid time format string (HH:MM)",
@@ -68,8 +71,10 @@ class Appointment_Schema implements Appointment_Schema_Interface {
         required_error: "endTime is required",
       }).refine(
         (val) => {
-          // must be a valid time format string
-          return !isNaN(Date.parse(val));
+          // must be a valid time format string (HH:MM )
+          // check string format
+          const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+          return timeRegex.test(val);
         },
         {
           message: "endTime must be a valid time format string (HH:MM)",
@@ -82,7 +87,7 @@ class Appointment_Schema implements Appointment_Schema_Interface {
         // must be a positive integer
         return !isNaN(val) && val > 0 && Number.isInteger(val);
       }),
-    }),
+    }), // end of body
   });
 }
 

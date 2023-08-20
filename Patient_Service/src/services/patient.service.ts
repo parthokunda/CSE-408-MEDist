@@ -11,6 +11,7 @@ import broker, {
 } from "../utils/broker";
 import { config } from "../config";
 import Patient from "../database/models/Patient.model";
+import log from "../utils/logger";
 
 export interface PatientServiceInterface {
   createInitialPatient(userID: number): Promise<RPC_Response_Payload>;
@@ -84,8 +85,11 @@ class PatientService implements PatientServiceInterface {
       };
     }
   }
+
   // ----------------- server side RPC request handler ----------------
   async serveRPCRequest(payload: RPC_Request_Payload) {
+    log.debug(payload, "Rpc request payload");
+
     let response: RPC_Response_Payload = {
       status: "error",
       data: {},
@@ -96,6 +100,7 @@ class PatientService implements PatientServiceInterface {
 
       case "GET_ID":
         return await this.getId_givenUserID(payload.data["userID"]);
+
       default:
         break;
     }

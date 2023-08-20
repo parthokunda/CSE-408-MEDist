@@ -27,7 +27,9 @@
     "pino-pretty": "^10.0.1",
     "sequelize": "^6.32.1",
     "uuid": "^9.0.0",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "@google-cloud/local-auth": "^2.1.0",
+    "googleapis": "^105.0.0"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.1",

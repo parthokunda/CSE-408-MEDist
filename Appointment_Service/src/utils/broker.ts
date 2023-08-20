@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 // internal imports
 import { config } from "../config";
 import log from "./logger";
-import { DoctorServiceInterface } from "../service/doctor.service";
+import { AppointmentServiceInterface } from "../services";
 
 export interface RPC_Request_Payload {
   type: string;
@@ -28,7 +28,7 @@ export interface BrokerServiceInterface {
     requestPayload: RPC_Request_Payload
   ): Promise<RPC_Response_Payload>;
 
-  RPC_Observer(userService: DoctorServiceInterface): Promise<void>;
+  RPC_Observer(userService: AppointmentServiceInterface): Promise<void>;
 }
 
 class BrokerService implements BrokerServiceInterface {
@@ -53,6 +53,12 @@ class BrokerService implements BrokerServiceInterface {
 
     const channel = await this.getChannel();
     const queue = await channel.assertQueue("", { exclusive: true });
+
+    log.info(
+      `Sending RPC request: ${JSON.stringify(
+        requestPayload
+      )} to ${RPC_QUEUE_NAME}`
+    );
 
     // send the request
     await channel.sendToQueue(
@@ -93,7 +99,7 @@ class BrokerService implements BrokerServiceInterface {
     });
   }
 
-  async RPC_Observer(userService: DoctorServiceInterface) {
+  async RPC_Observer(userService: AppointmentServiceInterface) {
     const channel = await this.getChannel();
 
     const RPC_QUEUE_NAME = config.SELF_RPC_QUEUE;
