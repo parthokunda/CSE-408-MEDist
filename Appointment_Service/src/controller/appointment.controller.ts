@@ -17,11 +17,11 @@ import log from "../utils/logger";
 
 export interface SlotRequest {
   appointmentDay: Date;
-  startTime: Date;
-  endTime: Date;
+  day_startTime: Date;
+  day_endTime: Date;
   totalSlots: number;
-  timeInterval: number;
-  patientEmail?: string;
+  timeInterval_forEachSlot: number;
+  patientEmail: string;
 }
 
 export interface Appointment_Controller_Interface {
@@ -38,6 +38,27 @@ export interface Appointment_Controller_Interface {
 }
 
 class Appointment_Controller implements Appointment_Controller_Interface {
+  private setAppointmentDay(weekday: number): Date {
+    const today = new Date().getDay();
+    const appointmentDay = new Date();
+    appointmentDay.setDate(
+      appointmentDay.getDate() + (weekday - 2 - today) // -2 because weekday starts from 2
+    );
+    appointmentDay.setHours(0, 0, 0, 0);
+    return appointmentDay;
+  }
+
+  private setAppointmentDayTime(appointmentDay: Date, time: string): Date {
+    const appointmentDayTime = new Date(appointmentDay);
+    appointmentDayTime.setHours(
+      Number(time.split(":")[0]),
+      Number(time.split(":")[1]),
+      0,
+      0
+    );
+    return appointmentDayTime;
+  }
+
   // ----------------- Book Online Appointment ----------------- //
   async Book_Online_Appointment(
     req: Request /* <
@@ -50,6 +71,11 @@ class Appointment_Controller implements Appointment_Controller_Interface {
   ) {
     const doctorID = Number(req.params.doctorID);
     const patientID = Number(req.user_identity?.id);
+    const patientEmail = req.user_identity?.email;
+    const weekday = Number(req.body.weekday);
+    const startTime = req.body.startTime as string;
+    const endTime = req.body.endTime as string;
+    const totalSlots = Number(req.body.totalSlots);
 
     try {
       // check if week day is less than today
@@ -58,63 +84,34 @@ class Appointment_Controller implements Appointment_Controller_Interface {
         throw createHttpError(400, "You can't book appointment for past days");
 
       // construct appointmentDay from weekday
-      const appointmentDay = new Date();
-
-      log.info(appointmentDay.getDay(), "current day");
-
-      // set appointmentDay according to weekday
-      appointmentDay.setDate(
-        appointmentDay.getDate() + (req.body.weekday - 2 - today) // -2 because weekday starts from 2
-      );
-      appointmentDay.setHours(0, 0, 0, 0);
-
-      log.info(appointmentDay.getDay(), "appointmentDay");
+      const appointmentDay = this.setAppointmentDay(weekday);
 
       // construct appointment_day_start_time and appointment_day_end_time
-      const appointment_day_start_time = new Date(appointmentDay);
-      appointment_day_start_time.setHours(
-        Number(req.body.startTime.split(":")[0]),
-        Number(req.body.startTime.split(":")[1]),
-        0,
-        0
+      const appointment_day_start_time = this.setAppointmentDayTime(
+        appointmentDay,
+        startTime
       );
 
-      log.info(
-        `${appointment_day_start_time.getHours()}:${appointment_day_start_time.getMinutes()}`,
-        "appointment_day_start_time"
-      );
-
-      const appointment_day_end_time = new Date(appointmentDay);
-      appointment_day_end_time.setHours(
-        Number(req.body.endTime.split(":")[0]),
-        Number(req.body.endTime.split(":")[1]),
-        0,
-        0
-      );
-
-      log.info(
-        `${appointment_day_end_time.getHours()}:${appointment_day_end_time.getMinutes()}`,
-        "appointment_day_end_time"
+      const appointment_day_end_time = this.setAppointmentDayTime(
+        appointmentDay,
+        endTime
       );
 
       // construct time interval for each slot according to totalSlots and startTime & endTime
-      // this difference is in milliseconds
-      const timeInterval = Math.floor(
+      const timeInterval_forEachSlot = Math.floor(
         (appointment_day_end_time.getTime() -
           appointment_day_start_time.getTime()) /
           req.body.totalSlots
       );
 
-      log.info(timeInterval, "timeInterval");
-
       // construct slotRequest
       const slotRequest: SlotRequest = {
         appointmentDay,
-        startTime: appointment_day_start_time,
-        endTime: appointment_day_end_time,
+        day_startTime: appointment_day_start_time,
+        day_endTime: appointment_day_end_time,
         totalSlots: req.body.totalSlots,
-        timeInterval: timeInterval,
-        patientEmail: req.user_identity?.email,
+        timeInterval_forEachSlot,
+        patientEmail: req.user_identity?.email || "",
       };
 
       // book online appointment

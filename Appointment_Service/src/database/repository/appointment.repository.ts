@@ -11,64 +11,55 @@ import { Appointment, AppointmentStatus, AppointmentType } from "../models";
 // googleCalendarApi
 import googleCalendarApi, { calendarEvent } from "../../utils/google.auth";
 
+export interface AppointmentBookingInput {
+  doctorID: number;
+  doctorEmail: string;
+
+  patientID: number;
+  patientEmail: string;
+
+  patientCredentials: JSON;
+
+  appointmentStartTime: Date;
+  appointmentEndTime: Date;
+}
+
 export interface Appointment_Repository_Interface {
   // book online appointment
-  Book_Online_Appointment(
-    doctorID: number,
-    patientID: number,
-    startTime: Date,
-    endTime: Date,
-    credentials: any,
-    doctorEmail: string,
-    patientEmail: string
-  ): Promise<Appointment>;
+  Book_Online_Appointment(req: AppointmentBookingInput): Promise<Appointment>;
 
   // lastest booking appointment time
-  Lastest_Booking_Appointment_Time(
+  Lastest_Booking_Appointment_Time_In_That_Day(
     doctorID: number,
-    startTime: Date,
-    endTime: Date
+    day_startTime: Date,
+    day_endTime: Date
   ): Promise<Date>;
 
   // total slot booked
-  Total_Slot_Booked(
+  Total_Slot_Booked_In_That_Day(
     doctorID: number,
-    startTime: Date,
-    endTime: Date
+    day_startTime: Date,
+    day_endTime: Date
   ): Promise<number>;
+
+  // check if patient has already booked an appointment
+  Patient_Booked_Appointment_In_That_Day(
+    patientID: number,
+    day_startTime: Date,
+    day_endTime: Date
+  ): Promise<boolean>;
 }
 
 class AppointmentRepository implements Appointment_Repository_Interface {
   // ----------------- Book Online Appointment ----------------- //
   async Book_Online_Appointment(
-    doctorID: number,
-    patientID: number,
-    startTime: Date,
-    endTime: Date,
-    credentials: any,
-    doctorEmail: string,
-    patientEmail: string
+    req: AppointmentBookingInput
   ): Promise<Appointment> {
     try {
-      // check if patient has already booked an appointment
-      const patientAppointment = await Appointment.findOne({
-        where: {
-          patientID: patientID,
-          startTime: {
-            [Op.between]: [startTime, endTime],
-          },
-        },
-      });
-
-      if (patientAppointment) {
-        throw createHttpError(
-          400,
-          "Patient has already booked an appointment in this time slot"
-        );
-      }
-
       // have to generate meet link
-      const authClient = await googleCalendarApi.createClient(credentials);
+      const authClient = await googleCalendarApi.createClient(
+        req.patientCredentials
+      );
       if (!authClient)
         throw createHttpError(
           500,
@@ -79,20 +70,22 @@ class AppointmentRepository implements Appointment_Repository_Interface {
         summary: "Online Appointment",
         description: "Online Appointment",
 
-        startTime,
-        endTime,
+        startTime: req.appointmentStartTime,
+        endTime: req.appointmentEndTime,
 
-        otherAttendees: [doctorEmail, patientEmail],
+        otherAttendees: [req.doctorEmail, req.patientEmail],
       };
 
       const meetLink = await googleCalendarApi.createEvent(event, authClient);
 
       // create appointment
       const appointment = await Appointment.create({
-        doctorID: doctorID,
-        patientID: patientID,
-        startTime: startTime,
-        endTime: endTime,
+        doctorID: req.doctorID,
+        patientID: req.patientID,
+
+        startTime: req.appointmentStartTime,
+        endTime: req.appointmentEndTime,
+
         type: AppointmentType.ONLINE,
         meetingLink: meetLink,
       });
@@ -105,10 +98,10 @@ class AppointmentRepository implements Appointment_Repository_Interface {
   }
 
   // ----------------- Lastest Booking Appointment Time ----------------- //
-  async Lastest_Booking_Appointment_Time(
+  async Lastest_Booking_Appointment_Time_In_That_Day(
     doctorID: number,
-    startTime: Date,
-    endTime: Date
+    day_startTime: Date,
+    day_endTime: Date
   ): Promise<Date> {
     try {
       // get lastest appointment time
@@ -118,7 +111,7 @@ class AppointmentRepository implements Appointment_Repository_Interface {
         where: {
           doctorID: doctorID,
           startTime: {
-            [Op.between]: [startTime, endTime],
+            [Op.between]: [day_startTime, day_endTime],
           },
         },
         order: [["startTime", "DESC"]],
@@ -127,7 +120,7 @@ class AppointmentRepository implements Appointment_Repository_Interface {
       if (lastestAppointment) {
         return lastestAppointment.startTime;
       } else {
-        return startTime;
+        return day_startTime;
       }
     } catch (error) {
       log.error(error);
@@ -136,22 +129,49 @@ class AppointmentRepository implements Appointment_Repository_Interface {
   }
 
   // ----------------- Total Slot Booked ----------------- //
-  async Total_Slot_Booked(
+  async Total_Slot_Booked_In_That_Day(
     doctorID: number,
-    startTime: Date,
-    endTime: Date
+    day_startTime: Date,
+    day_endTime: Date
   ): Promise<number> {
     try {
       const totalSlotBooked = await Appointment.count({
         where: {
           doctorID: doctorID,
           startTime: {
-            [Op.between]: [startTime, endTime],
+            [Op.between]: [day_startTime, day_endTime],
           },
         },
       });
 
       return totalSlotBooked;
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Internal Server Error");
+    }
+  }
+
+  // ----------------- Patient Booked Appointment In That Day ----------------- //
+  async Patient_Booked_Appointment_In_That_Day(
+    patientID: number,
+    day_startTime: Date,
+    day_endTime: Date
+  ): Promise<boolean> {
+    try {
+      const patientAppointment = await Appointment.findOne({
+        where: {
+          patientID: patientID,
+          startTime: {
+            [Op.between]: [day_startTime, day_endTime],
+          },
+        },
+      });
+
+      if (patientAppointment) {
+        return true;
+      } else {
+        return false;
+      }
     } catch (error) {
       log.error(error);
       throw createHttpError(500, "Internal Server Error");
