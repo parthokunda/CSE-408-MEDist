@@ -30,7 +30,7 @@ const authorize =
       const auth_response_payload: RPC_Response_Payload =
         await messageBroker.RPC_Request(config.AUTH_RPC_QUEUE, payload);
 
-      //log.debug(auth_response_payload, "auth_response_payload");
+      log.debug(auth_response_payload, "auth_response_payload");
 
       if (auth_response_payload) {
         // success and valid token
@@ -41,10 +41,12 @@ const authorize =
           if (onlyDoctor && role !== "doctor")
             return next(createError.Unauthorized());
 
+          // any user can access it
           req.user_identity = {
             id: auth_response_payload.data["id"],
             email: auth_response_payload.data["email"],
             role,
+            profile_status: auth_response_payload.data["profile_status"],
           };
           return next();
         }

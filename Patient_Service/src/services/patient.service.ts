@@ -10,18 +10,32 @@ import broker, {
   RPC_Response_Payload,
 } from "../utils/broker";
 import { config } from "../config";
-import Patient from "../database/models/Patient.model";
+import Patient, {
+  PatientAdditionalInfo,
+  PatientAdditionalInfo_Excluded_Properties,
+  PatientOverviewInfo,
+  PatientOverviewInfo_Excluded_Properties,
+} from "../database/models/Patient.model";
+import log from "../utils/logger";
+import { excludeProperties } from "../utils/necessary_functions";
 
 export interface PatientServiceInterface {
   createInitialPatient(userID: number): Promise<RPC_Response_Payload>;
   getId_givenUserID(userID: number): Promise<RPC_Response_Payload>;
+  getName_givenID(patientID: number): Promise<RPC_Response_Payload>;
   serveRPCRequest(payload: RPC_Request_Payload): Promise<RPC_Response_Payload>;
 
   //get patient info
   getPatientInfo(patientID: number): Promise<Patient>;
 
+  //get patient additional info
+  getPatientAdditionalInfo(patientID: number): Promise<PatientAdditionalInfo>;
+
+  //get patient overview info
+  getPatientOverviewInfo(patientID: number): Promise<PatientOverviewInfo>;
+
   //update patient info
-  updatePatientInfo(
+  updatePatientAdditionalInfo(
     patientID: number,
     newPatientInfo: Partial<Patient>
   ): Promise<Patient>;
@@ -84,8 +98,30 @@ class PatientService implements PatientServiceInterface {
       };
     }
   }
+
+  // ----------------------------------------- Get Name given ID ------------------------------------------ //
+  async getName_givenID(patientID: number): Promise<RPC_Response_Payload> {
+    try {
+      const patient = await this.repository.getPatientInfo(patientID);
+
+      return {
+        status: "success",
+        data: {
+          name: patient.name,
+        },
+      };
+    } catch (error) {
+      return {
+        status: "error",
+        data: {},
+      };
+    }
+  }
+
   // ----------------- server side RPC request handler ----------------
   async serveRPCRequest(payload: RPC_Request_Payload) {
+    log.debug(payload, "Rpc request payload");
+
     let response: RPC_Response_Payload = {
       status: "error",
       data: {},
@@ -96,6 +132,10 @@ class PatientService implements PatientServiceInterface {
 
       case "GET_ID":
         return await this.getId_givenUserID(payload.data["userID"]);
+
+      case "GET_NAME_FROM_ID":
+        return await this.getName_givenID(payload.data["patientID"]);
+
       default:
         break;
     }
@@ -114,8 +154,47 @@ class PatientService implements PatientServiceInterface {
     }
   }
 
+  async getPatientOverviewInfo(
+    patientID: number
+  ): Promise<PatientOverviewInfo> {
+    try {
+      const patient = await patientRepository.getPatientInfo(patientID);
+
+      const patientOverviewInfo = excludeProperties(
+        patient.dataValues,
+        PatientOverviewInfo_Excluded_Properties
+      );
+
+      return {
+        PatientInfo: patientOverviewInfo,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // ----------------------------------------- Get Patient Additional Info ------------------------------------------ //
+  async getPatientAdditionalInfo(
+    patientID: number
+  ): Promise<PatientAdditionalInfo> {
+    try {
+      const patient = await patientRepository.getPatientInfo(patientID);
+
+      const patientAdditionalInfo = excludeProperties(
+        patient.dataValues,
+        PatientAdditionalInfo_Excluded_Properties
+      );
+
+      return {
+        PatientInfo: patientAdditionalInfo,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // ----------------------------------------- Update Patient Info ------------------------------------------ //
-  async updatePatientInfo(
+  async updatePatientAdditionalInfo(
     patientID: number,
     newPatientInfo: Partial<Patient>
   ): Promise<Patient> {
@@ -125,7 +204,7 @@ class PatientService implements PatientServiceInterface {
       if (newPatientInfo.userID) delete newPatientInfo.userID;
       if (newPatientInfo.status) delete newPatientInfo.status;
 
-      const patient = await patientRepository.updatePatientInfo(
+      const patient = await patientRepository.updatePatientAdditionalInfo(
         patientID,
         newPatientInfo
       );

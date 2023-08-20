@@ -8,7 +8,10 @@ import { Update_Patient_Info_Body_Input } from "../schema/patient.schema";
 import createHttpError from "http-errors";
 
 interface Patient_Controller_Interface {
-  //get profile / patient additional info
+  //get patient profile info / profile info
+  getPatientProfileInfo(req: Request, res: Response, next: NextFunction);
+
+  //get patient additional info
   getPatientAdditionalInfo(req: Request, res: Response, next: NextFunction);
 
   //update patient additional info
@@ -20,6 +23,19 @@ interface Patient_Controller_Interface {
 }
 
 class Patient_Controller implements Patient_Controller_Interface {
+  // ----------------------Get Patient Profile Info -------------------------- //
+  async getPatientProfileInfo(req: Request, res: Response, next: NextFunction) {
+    try {
+      const patientID = req.user_identity?.id as number;
+
+      const patientInfo = await patientService.getPatientInfo(patientID);
+
+      res.status(200).json(patientInfo);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   // ----------------------Get Patient Additional Info -------------------------- //
   async getPatientAdditionalInfo(
     req: Request,
@@ -29,7 +45,9 @@ class Patient_Controller implements Patient_Controller_Interface {
     try {
       const patientID = req.user_identity?.id as number;
 
-      const patientInfo = await patientService.getPatientInfo(patientID);
+      const patientInfo = await patientService.getPatientAdditionalInfo(
+        patientID
+      );
 
       res.status(200).json(patientInfo);
     } catch (error) {
@@ -45,12 +63,14 @@ class Patient_Controller implements Patient_Controller_Interface {
   ) {
     try {
       const patientID = req.user_identity?.id as number;
+      const email = req.user_identity?.email as string;
       const patientInfo = {
         ...req.body,
         dob: new Date(req.body.dob),
+        email,
       };
 
-      const updatedPatient = await patientService.updatePatientInfo(
+      const updatedPatient = await patientService.updatePatientAdditionalInfo(
         patientID,
         patientInfo
       );

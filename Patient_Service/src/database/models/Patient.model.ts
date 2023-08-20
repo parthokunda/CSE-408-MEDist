@@ -26,12 +26,29 @@ export enum PatientBloodGroup {
   NOT_KNOWN = "not_known",
 }
 
+export interface PatientOverviewInfo {
+  PatientInfo: Omit<PatientAttributes, "userID" | "status" | "address">;
+}
+
+export interface PatientAdditionalInfo {
+  PatientInfo: Omit<PatientAttributes, "userID">;
+}
+
+export const PatientAdditionalInfo_Excluded_Properties: "userID"[] = ["userID"];
+
+export const PatientOverviewInfo_Excluded_Properties: (
+  | "userID"
+  | "status"
+  | "address"
+)[] = ["userID", "status", "address"];
+
 export interface PatientAttributes {
   id: number;
   status: string;
   userID: number;
 
   // additional info
+  email: string;
   image: string;
   name: string;
   phone: string;
@@ -55,6 +72,7 @@ class Patient
   public status: string;
 
   // additional info
+  public email: string;
   public image: string;
   public phone: string;
   public gendar: string;
@@ -74,6 +92,11 @@ Patient.init(
     },
 
     name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    email: {
       type: DataTypes.STRING,
       allowNull: true,
     },

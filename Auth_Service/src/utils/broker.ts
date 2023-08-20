@@ -13,7 +13,7 @@ export interface RPC_Request_Payload {
 }
 
 export interface RPC_Response_Payload {
-  status: "success" | "error" | "not found" | "unauthorized";
+  status: "success" | "error" | "not_found" | "unauthorized";
   data: object;
 }
 

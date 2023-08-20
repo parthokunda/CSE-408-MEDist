@@ -14,6 +14,8 @@ import broker, {
 import { config } from "../config";
 import jwtService, { JWT_Payload } from "../utils/jwt";
 import { UserRole } from "../database/models/User.model";
+import googleCalendarApi from "../utils/google.auth";
+import log from "../utils/logger";
 
 // ============================== UserService ============================== //
 
@@ -35,6 +37,8 @@ export interface UserServiceInterface {
   serveRPCRequest(payload: RPC_Request_Payload): Promise<RPC_Response_Payload>;
 
   authorizeUser(token: string): Promise<RPC_Response_Payload>;
+
+  sendGoogleCalendarToken(email: string): Promise<RPC_Response_Payload>;
 }
 
 class UserService implements UserServiceInterface {
@@ -78,6 +82,14 @@ class UserService implements UserServiceInterface {
         throw createHttpError(409, `User with email ${email} already exists`);
 
       const newUser = await this.repository.createUser(userInput);
+
+      const credentials = await googleCalendarApi.authorize();
+
+      if (!credentials)
+        throw createHttpError(500, "Failed to authorize google calendar");
+
+      newUser.google_token = credentials;
+      await newUser.save();
 
       // send RPC request to get Id from other service
       const payload: RPC_Request_Payload = {
@@ -183,6 +195,43 @@ class UserService implements UserServiceInterface {
     }
   }
 
+  // ----------------------------------- send google calendar token ------------------------------------ //
+  async sendGoogleCalendarToken(email: string): Promise<RPC_Response_Payload> {
+    try {
+      const user = await this.repository.findUserByEmail(email);
+
+      if (!user) {
+        return {
+          status: "not_found",
+          data: {},
+        };
+      }
+
+      const credentials = user.google_token;
+
+      log.debug(credentials, "credentials");
+
+      if (!credentials) {
+        return {
+          status: "not_found",
+          data: {},
+        };
+      }
+
+      return {
+        status: "success",
+        data: {
+          credentials,
+        },
+      };
+    } catch (error) {
+      return {
+        status: "error",
+        data: {},
+      };
+    }
+  }
+
   // server side RPC request handler
   async serveRPCRequest(payload: RPC_Request_Payload) {
     let response: RPC_Response_Payload = {
@@ -192,6 +241,8 @@ class UserService implements UserServiceInterface {
     switch (payload.type) {
       case "AUTHORIZATION":
         return await this.authorizeUser(payload.data["token"]);
+      case "GET_GOOGLE_CALENDAR_TOKEN":
+        return await this.sendGoogleCalendarToken(payload.data["email"]);
       default:
         break;
     }

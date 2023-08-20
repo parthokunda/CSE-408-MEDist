@@ -95,7 +95,7 @@ class Doctor_Controller implements Doctor_Controller_Interface {
         dob: new Date(req.body.dob),
         issueDate: new Date(req.body.issueDate),
         degrees: req.body.degrees.split(",").map((degree) => degree.trim()),
-        email: email,
+        email,
       };
 
       const updatedDoctor = await doctorService.updateDoctorAdditionalInfo(

@@ -32,14 +32,14 @@ patientRouter.get("/", authorize, (req: Request, res: Response) => {
 // get patient's additional info - only accessible to patient
 patientRouter.get(
   "/additional-info",
-  authorize,
+  authorize(true),
   patientController.getPatientAdditionalInfo
 );
 
 // update patient's additional info - only accessible to patient
 patientRouter.put(
   "/additional-info",
-  authorize,
+  authorize(true),
   validateRequest(patientSchema.Update_Patient_Info),
   patientController.updatePatientAdditionalInfo
 );

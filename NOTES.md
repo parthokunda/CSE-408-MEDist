@@ -35,6 +35,27 @@ const payload: RPC_Request_Payload = {
 > check if the user is authorized to access the resource
 
 
+## DateTime Regex
+```typescript
+const dateTimeRegex =
+            /^(?:(?:\d{4}-\d{2}-\d{2})|(?:\d{2}:\d{2}(?::\d{2})?)|(?:\d{4}-\d{2}-\d{2} \d{2}:\d{2}(?::\d{2})?))$/;
+
+return dateTimeRegex.test(val)
+```
+> Explanation of the regex:
+- `^`: Anchors the regex at the start of the string.
+- `(?: ... | ... | ...)`: This part uses non-capturing groups to allow for different patterns.
+- - `(?:\d{4}-\d{2}-\d{2})`: Matches the date pattern `YYYY-MM-DD`.
+- - `(?:\d{2}:\d{2}(?::\d{2})?)`: Matches the time pattern `HH:MM` or `HH:MM:SS`.
+- - `(?:\d{4}-\d{2}-\d{2} \d{2}:\d{2}(?::\d{2})?)`: Matches the date and time pattern `YYYY-MM-DD HH:MM` or `YYYY-MM-DD HH:MM:SS`.
+- - `$`: Anchors the regex at the end of the string.
+
+> This regex will match the following:
+- `YYYY-MM-DD`
+- `HH:MM` or `HH:MM:SS`
+- `YYYY-MM-DD HH:MM` or `YYYY-MM-DD HH:MM:SS`
+- `YYYY-MM-DDTHH:MM` or `YYYY-MM-DDTHH:MM:SS`
+
 ## message broker installation
 ```bash
 npm i jsonwebtoken bcrypt

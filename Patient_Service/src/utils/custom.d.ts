@@ -7,6 +7,7 @@ declare global {
         id: number;
         email: string;
         role: string;
+        profile_status: string;
       };
 
       file?: any;
