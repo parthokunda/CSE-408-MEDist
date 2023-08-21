@@ -15,7 +15,7 @@ const validateRequest =
       });
       next();
     } catch (err: any) {
-      throw createError(400, err.message);
+      throw createError(400, err.issues);
     }
   };
 

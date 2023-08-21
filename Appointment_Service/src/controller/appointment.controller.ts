@@ -200,7 +200,7 @@ class Appointment_Controller implements Appointment_Controller_Interface {
         );
 
       res.status(200).json({
-        message: "Pending appointments fetched successfully",
+        // message: "Pending appointments fetched successfully",
         pendingAppointments,
       });
     } catch (error) {

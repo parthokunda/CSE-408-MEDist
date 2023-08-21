@@ -88,6 +88,10 @@ class DoctorSchema implements Doctor_Schema_Interface {
         required_error: "Visit fee is required",
       }),
 
+      schedule : any({
+        required_error: "Schedule is required",
+      })
+
       // shedule is an array of objects which may be empty object or with the following structure
       // {
       //   weekday: number
@@ -96,43 +100,45 @@ class DoctorSchema implements Doctor_Schema_Interface {
       //   totalSlots: number
       // }
 
-      schedule: any({
-        required_error: "Schedule is required",
-      }).refine(
-        (val) => {
-          if (!Array.isArray(val)) return false;
+    //   schedule: any({
+    //     required_error: "Schedule is required",
+    //   }).refine(
+    //     (val) => {
+    //       //if (!Array.isArray(val)) return false;
 
-          for (const schedule of val) {
-            // check schedule is an empty object or not
-            if (Object.keys(schedule).length === 0) continue;
+    //       for (const schedule of val) {
+    //         // check schedule is an empty object or not
+    //         if (Object.keys(schedule).length === 0) continue;
 
-            // check schedule has the following structure or not
-            if (
-              !(
-                schedule.weekday &&
-                schedule.startTime &&
-                schedule.endTime &&
-                schedule.totalSlots
-              )
-            )
-              return false;
-          }
+    //         // check schedule has the following structure or not
+    //         if (
+    //           !(
+    //             schedule.weekday &&
+    //             schedule.startTime &&
+    //             schedule.endTime &&
+    //             schedule.totalSlots
+    //           )
+    //         )
+    //           return false;
+    //       }
 
-          return true;
-        },
-        {
-          message: `Schedule must be an array of objects 
-          in which an object may be empty {} or with the following structure: 
-          { 
-            weekday: number,
-            startTime: string,
-            endTime: string,
-            totalSlots: number
-          }`,
-        }
-      ),
-    }),
-  });
+    //       return true;
+    //     },
+    //     {
+    //       message: `Schedule must be an array of objects 
+    //       in which an object may be empty {} or with the following structure: 
+    //       { 
+    //         weekday: number,
+    //         startTime: string,
+    //         endTime: string,
+    //         totalSlots: number
+    //       }`,
+    //     }
+    //   ),
+    // }),
+  })
+
+});
 
   // ------------------------- Search Doctor Schema -------------------------
   Search_Doctor = object({
