@@ -151,7 +151,22 @@ export const AddSchedule: FC = () => {
       ],
     };
     console.log(values.schedule);
-    const response = await axios.post(
+    if(size===0){
+      const response = await axios.post(
+        `${import.meta.env.VITE_DB_URL}:${
+          import.meta.env.VITE_DB_PORT
+        }/api/doctor/online-visit`,
+        values,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+    else{
+    const response = await axios.put(
       `${import.meta.env.VITE_DB_URL}:${
         import.meta.env.VITE_DB_PORT
       }/api/doctor/online-visit`,
@@ -162,9 +177,9 @@ export const AddSchedule: FC = () => {
           "Content-Type": "application/json",
         },
       }
-    );
-    console.log(values);
-    console.log(response.data);
+    );}
+    // console.log(values);
+    // console.log(response.data);
   };
 
   return (
