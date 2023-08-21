@@ -146,6 +146,7 @@ export const BookAppointment: FC = () => {
           .then((response) => {
             console.log(response.data);
             setDoctorDetails(response.data);
+            // setDayIndex()
           });
         // setSize(response.data.OnlineSchedule.schedule.length);
         // setContact(response.data.doctorInfo.phone);
@@ -168,6 +169,7 @@ export const BookAppointment: FC = () => {
       endTime : singleDay?.endTime,
       totalSlots : singleDay?.totalSlots,
     }
+    console.log(val);
     const msg = axios.post(
       `${import.meta.env.VITE_DB_URL}:${
         import.meta.env.VITE_DB_PORT
@@ -214,7 +216,7 @@ export const BookAppointment: FC = () => {
         </div>
         {doctordetails && (
           <div className="flex-[60%] flex-col">
-            {doctordetails?.OnlineSchedule.schedule.map((day, index) => {
+            {doctordetails?.OnlineSchedule.schedule.map((day) => {
               return (
                 // <RadioGroup
                 //   onValueChange={() => {
@@ -222,7 +224,7 @@ export const BookAppointment: FC = () => {
                 //   }}
                 // >
                 <div>
-                  {Object.keys(day).length !== 0 && (
+                   
                     <div className="grid grid-cols-4 ml-4 mt-4 gap-4">
                       <div>
                         <input
@@ -230,12 +232,13 @@ export const BookAppointment: FC = () => {
                           className="h-6 w-6 text-green-600 border-gray-300 focus:ring-green-400"
                           name="day"
                           id={day.weekday.toString()}
+                          
                           onChange={() => {
                             setDayIndex(day.weekday);
                             setSingleDay(day);
                           }}
                         />
-                        <label htmlFor={dayIndex.toString()}>{days[dayIndex]}</label>
+                        <label htmlFor={day.weekday.toString()}>{days[day.weekday]}</label>
                       </div>
                       <div>
                         Start Time: <b>{day.startTime}</b>
@@ -247,7 +250,7 @@ export const BookAppointment: FC = () => {
                         Slot: <b>{day.totalSlots}</b>
                       </div>
                     </div>
-                  )}
+                  
                 </div>
               );
             })}
