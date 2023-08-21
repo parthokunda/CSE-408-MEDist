@@ -24,7 +24,7 @@ import {
 
 const AppRouter: FC = () => {
   const [cookies] = useCookies(["user"]);
-  const role = cookies.user.role==='doctor'?'doctor':'patient';
+  const role = cookies.user===undefined?"none":cookies.user.role==='doctor'?'doctor':'patient';
   const navList: navIcon[] = [
     { name: "Medicines", link: "/searchMedicines" },
     { name: "Prescriptions", link: "/prescriptions" },
@@ -62,7 +62,7 @@ const AppRouter: FC = () => {
           path="doctor/pendingAppointments"
           element={<PatientSearchPage />}
         />
-        <Route path="patient/bookAppointment" element={<BookAppointment />} />
+        <Route path="patient/bookAppointment/:doctorID" element={<BookAppointment />} />
         <Route path="patient/searchDoctor" element={<DoctorSearchPage />} />
       </Route>
       <Route path="/logout/" element={<Logout />} />

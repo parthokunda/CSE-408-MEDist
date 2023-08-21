@@ -2,12 +2,12 @@ import { FC, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { AiOutlineArrowRight } from "react-icons/ai";
 
-import { DoctorPendingAttributes } from "@/models/Brand";
+import { PendingAppointments } from "@/models/Brand";
 import DoctorPendingCard from "./PatientPendingAppointmentCard";
 import exp from "constants";
 
 const DoctorPendingCards: FC<{
-  doctorFetchedData: DoctorPendingAttributes[];
+  doctorFetchedData: PendingAppointments;
   currentPage: number;
   setCurrentPage: (page: number) => void;
 }> = (props) => {
@@ -15,8 +15,9 @@ const DoctorPendingCards: FC<{
   const recordsPerPage = 3;
   const lastIndex = props.currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
-  const records = props.doctorFetchedData.slice(firstIndex, lastIndex);
-  const nPages = Math.ceil(props.doctorFetchedData.length / recordsPerPage);
+  const records = props.doctorFetchedData.pendingAppointments.appointments;
+  console.log("here records",records);
+  const nPages = Math.ceil(props.doctorFetchedData.pendingAppointments.totalCount/ recordsPerPage);
   const array = [
     currentPage - 2,
     currentPage - 1,
@@ -25,7 +26,7 @@ const DoctorPendingCards: FC<{
     currentPage + 2,
   ];
   const pages = array.filter((page) => page > 0 && page <= nPages);
-  if (props.doctorFetchedData && props.doctorFetchedData.length === 0) {
+  if (props.doctorFetchedData && props.doctorFetchedData.totalCount === 0) {
     return (
       <div className="flex justify-center align-middle">No Doctor Found</div>
     );
@@ -53,9 +54,9 @@ const DoctorPendingCards: FC<{
         <div className="flex">Appointment Time</div>
       </div>
       <div className="grid lg:grid-cols-1 md:grid-cols-3 sm:grid-cols-3 mt-3 gap-5">
-        {props.doctorFetchedData &&
+        {records &&
           records.map((doctor, index) => (
-            <DoctorPendingCard doctor={doctor} key={index} />
+            <DoctorPendingCard app={doctor} key={index} />
           ))}
       </div>
       <nav className="absolute bottom-[-200px] w-full pb-3">

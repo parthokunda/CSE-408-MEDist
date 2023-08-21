@@ -28,6 +28,7 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/webp",
 ];
 export const DoctorAdditionalInfoForm = z.object({
+  name:z.string().nonempty(),
   gender: z.union([z.literal("male"), z.literal("female"), z.literal("other")]),
   dateOfBirth: z.string(),
   bmdcNumber: z
@@ -41,6 +42,7 @@ export const DoctorAdditionalInfoForm = z.object({
 });
 
 export const PatientAdditionalInfoForm = z.object({
+  name:z.string().nonempty(),
   gender: z.union([z.literal("male"), z.literal("female"), z.literal("other")]),
   dateOfBirth: z.string(),
   mobileNumber: z.string().nonempty(),

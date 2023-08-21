@@ -26,6 +26,9 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useCookies } from "react-cookie";
+
+import axios from "axios";
 
 import { initializeApp } from "firebase/app";
 import {
@@ -36,6 +39,7 @@ import {
 } from "firebase/storage";
 
 export const PatientInfo: FC = () => {
+  const [cookies] = useCookies(["user"]);
   const forms = useForm<z.infer<typeof PatientAdditionalInfoForm>>({
     defaultValues: {
       gender: "male",
@@ -47,10 +51,6 @@ export const PatientInfo: FC = () => {
     resolver: zodResolver(PatientAdditionalInfoForm),
   });
 
-  // const { register,handleSubmit,reset, control} = forms;
-  // const [show, setShow] = useState(false);
-  // const { fields, append, remove } = useFieldArray({
-  //   name: 'degrees',
   //   control
   // });
   const bloodGroups = [
@@ -74,34 +74,7 @@ export const PatientInfo: FC = () => {
     measurementId: "G-QB6RHMBMMK",
   };
   const app = initializeApp(FIREBASE_CONFIG);
-  // const file = req.file;
-  // const userID = req.user_identity.id;
 
-  //     const dateTime = new Date();
-
-  //     // create a reference to the storage bucket location
-  //     const storageRef = ref(
-  //       storage,
-  //       `profile_pictures/${userID}${file.originalname}`
-  //     );
-
-  //     // define metadata
-  //     const metadata = {
-  //       contentType: file.mimetype,
-  //     };
-
-  //     // upload the file
-  //     const uploadTask = await uploadBytesResumable(
-  //       storageRef,
-  //       file.buffer,
-  //       metadata
-  //     );
-
-  //     // get the download url
-  //     const downloadURL = await getDownloadURL(uploadTask.ref);
-
-  //     req.body.image = downloadURL;
-  //     next();
 
   //! another test
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -133,27 +106,40 @@ export const PatientInfo: FC = () => {
     console.log(selectedFile);
   };
   // force image upload before full submission
-
-  const onSubmit: SubmitHandler<z.infer<typeof PatientAdditionalInfoForm>> = (
+  const onSubmit: SubmitHandler<z.infer<typeof PatientAdditionalInfoForm>> = async (
     data
   ) => {
-    uploadFile().then((url) => {
+    uploadFile().then(async (url)=> {
       data.image = url as string;
-      console.log(data);
+      const patientData = {
+        "name": data.name,
+        "phone": data.mobileNumber,
+        "gendar": data.gender,
+        "dob": data.dateOfBirth,
+        "address": "BUET",
+        "bloodGroup": data.bloodGroup,
+        "height": Number(data.height_feet+"."+data.height_inches),
+        "weight": data.weight,
+        "image": data.image,
+      }
+      const response =await axios.put(
+        `${import.meta.env.VITE_DB_URL}:${
+          import.meta.env.VITE_DB_PORT
+        }/api/patient/additional-info`,patientData,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+      // console.log(data);
+
     });
 
     console.log("here");
-    //console.log(data);
-    // while (downloadURL === "") {
-    //   console.log("waiting");
-    // }
 
-    //console.log(data);
   };
-  // if(selectedFile){
-  //   console.log((selectedFile))
-  // };
-  // console.log(forms.getValues("image"));
   return (
     <>
       <div className="text-black text-large justify-center text-large mt-5 font-bold gap-5 ml-6">
@@ -165,6 +151,18 @@ export const PatientInfo: FC = () => {
       >
         <div className="flex">
           <div className="flex-[50%] flex flex-col gap-5">
+          <div className="flex gap-3">
+              Name:
+              <Controller
+                control={forms.control}
+                name="name"
+                render={({ field }) => (
+                  <div>
+                    <Input {...field} placeholder="Name" />
+                  </div>
+                )}
+              />
+            </div>
             <div className="flex gap-3">
               Gender:
               <Controller

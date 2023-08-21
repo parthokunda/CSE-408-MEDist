@@ -17,16 +17,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { DoctorPendingAttributes } from "@/models/Brand";
+import { PendingAppointmentOverviewInfo } from "@/models/Brand";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { DialogClose } from "@radix-ui/react-dialog";
 
-const DoctorPendingCard: FC<{ doctor: DoctorPendingAttributes }> = (props) => {
+const DoctorPendingCard: FC<{ app: PendingAppointmentOverviewInfo }> = (props) => {
   // convert Date to date and time
-  const date = props.doctor.date;
+  console.log(props.app);
+  const date = new Date(props.app.startTime);
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day = date.getDate();
@@ -40,8 +41,9 @@ const DoctorPendingCard: FC<{ doctor: DoctorPendingAttributes }> = (props) => {
   const dateStr = `${day}/${month}/${year}`;
   const timeStr = `${hr}:${min}`;
   var availability = false;
+  const end=new Date(props.app.endTime);
   function isAvailable() {
-    if (props.doctor.date < new Date()) availability = true;
+    if (date < new Date()) availability = true;
     else availability = false;
     return availability;
   }
@@ -87,9 +89,9 @@ const DoctorPendingCard: FC<{ doctor: DoctorPendingAttributes }> = (props) => {
       <Card className="flex flex-col drop-shadow-lg overflow-hidden">
         <CardContent>
           <div className="grid grid-cols-5 gap-4">
-            <div className="flex mt-3 text-xl">{props.doctor.appID}</div>
+            <div className="flex mt-3 text-xl">{props.app.id}</div>
             <div className="flex mt-3 text-c1 text-xl font-bold">
-              {props.doctor.name}
+              {props.app.doctorInfo!.name}
             </div>
             <div className="flex mt-3 text-xl">{dateStr}</div>
             <div className="flex mt-3 text-xl">{timeStr}</div>
@@ -100,7 +102,7 @@ const DoctorPendingCard: FC<{ doctor: DoctorPendingAttributes }> = (props) => {
                   disabled={!isAvailable()}
                   className="bg-c2 w-42 text-white rounded-lg hover:bg-c1 mt-5"
                   onClick={() => {
-                    navigator.clipboard.writeText(props.doctor.meetLink);
+                    navigator.clipboard.writeText(props.app.meetingLink);
                     console.log("Link Copied");
                     setModalOpen(true);
                   }}
@@ -112,7 +114,7 @@ const DoctorPendingCard: FC<{ doctor: DoctorPendingAttributes }> = (props) => {
                 <DialogHeader>
                     <DialogTitle>Link Copied to Clipboard</DialogTitle>
                     <DialogDescription>
-                        Your Link is : <b className="text-c1">{props.doctor.meetLink}</b>
+                        Your Link is : <b className="text-c1">{props.app.meetingLink}</b>
                     </DialogDescription>
                 </DialogHeader>
 

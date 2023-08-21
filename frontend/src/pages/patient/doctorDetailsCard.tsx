@@ -8,12 +8,12 @@ import {
 } from "@/components/ui/card";
 // import {FontAwesomeIcon} from "react-icons/fa"
 
-import { DoctorSearchAttributes } from "@/models/Brand";
+import { DoctorProfileInfo } from "@/models/Brand";
 import { Button } from "@/components/ui/button";
 
 import { Link } from "react-router-dom";
 
-const DoctorDetailsCard: FC<{ doctor: DoctorSearchAttributes }> = (props) => {
+const DoctorDetailsCard: FC<{ doctor: DoctorProfileInfo }> = (props) => {
   return (
     <Card className="flex flex-col drop-shadow-lg overflow-hidden">
       <CardContent>
@@ -22,31 +22,32 @@ const DoctorDetailsCard: FC<{ doctor: DoctorSearchAttributes }> = (props) => {
             <div className="flex">
               <div className="flex flex-col ml-6 ">
                 <img
-                  src={props.doctor.img}
+                  src={props.doctor.DoctorInfo.image}
+                  alt="doctor image"
                   className="mt-2 h-24 w-24"
                   placeholder="img_404"
                 />
                 <div className="text-c1  text-2xl flex justify-start font-bold gap-2">
-                  {props.doctor.name}
+                  {props.doctor.DoctorInfo.name}
                 </div>
                 <div className="text-c2 text-xl flex justify-start">
-                  {props.doctor.degree}
+                  {props.doctor.DoctorInfo.degrees.join(", ")}
                 </div>
                 <div className="text-c2 text-xl flex justify-start">
-                  {props.doctor.department}
+                  {props.doctor.Specialization.name}
                 </div>
                 <div className="text-c2 text-xl flex justify-start">
-                  BMDC : {props.doctor.bmdcNumber}
+                  BMDC : {props.doctor.DoctorInfo.bmdc}
                 </div>
               </div>
             </div>
             <div className="flex">
             <div className="flex flex-col ml-6">
               <div className="text-c1 text-xl font-bold">
-                Cost : {props.doctor.cost} Taka
+                Cost : {props.doctor.OnlineSchedule.visitFee} Taka
               </div>
               <div className="text-c1 text-xl font-bold">
-                Contact : {props.doctor.contact}
+                Contact : 01759881197
               </div>
               
             </div>

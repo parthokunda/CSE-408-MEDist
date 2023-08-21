@@ -13,7 +13,8 @@ import { FC, useEffect } from "react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import DoctorDetailsCard  from "./doctorDetailsCard";
+import DoctorDetailsCard from "./doctorDetailsCard";
+import { useParams } from "react-router-dom";
 
 import {
   Dialog,
@@ -28,7 +29,19 @@ import { DialogClose } from "@radix-ui/react-dialog";
 
 import { set } from "date-fns";
 
+import { useCookies } from "react-cookie";
+import axios from "axios";
+
+import {
+  DoctorProfileInfo,
+  OnlineScheduleAttributes,
+  SingleDaySchedule,
+} from "@/models/Brand";
+
 export const BookAppointment: FC = () => {
+  const { doctorID } = useParams();
+  console.log(doctorID);
+  const [cookies] = useCookies(["user"]);
   const [Saturday, setSaturday] = useState(false);
   const [Sunday, setSunday] = useState(false);
   const [Monday, setMonday] = useState(false);
@@ -61,13 +74,13 @@ export const BookAppointment: FC = () => {
   const [cost, setCost] = useState("");
 
   const days = [
+    "Friday",
     "Saturday",
     "Sunday",
     "Monday",
     "Tuesday",
     "Wednesday",
     "Thursday",
-    "Friday",
   ];
 
   type FormValues = {
@@ -79,7 +92,7 @@ export const BookAppointment: FC = () => {
       slot?: string;
     }[];
   };
-  const doctor={
+  const doctor = {
     img: "https://www.w3schools.com/howto/img_avatar.png",
     name: "Dr. John Doe",
     degree: "MBBS, FCPS, FRCS",
@@ -103,42 +116,72 @@ export const BookAppointment: FC = () => {
   };
   const [formValues, setFormValues] = useState<FormValues>(values);
   const [dayIndex, setDayIndex] = useState(8);
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [totalslot, setSlot] = useState(0);
   const [payed, setPayed] = useState(false);
   const onCall = (obj: FormValues) => {
     setFormValues(obj);
     console.log(obj);
   };
-  const OnSubmit: () => void = () => {
-    // <Dialog>
-    //   <DialogTrigger asChild>
-    //     <Button
-    //       className="bg-c2 w-42 text-white rounded-lg hover:bg-c1"
-    //       onClick={() => {
-    //         OnSubmit();
-    //       }}
-    //       disabled={dayIndex === 8}
-    //     >
-    //       Book Now
-    //     </Button>
-    //   </DialogTrigger>
-    //   <DialogContent className="sm:max-w-[425px] bg-c4">
-    //     <DialogHeader>
-    //       <DialogTitle>Payment Completed</DialogTitle>
-    //       <DialogDescription>
-    //         Your appointment is on : <b className="text-c1">{days[dayIndex]}</b>
-    //       </DialogDescription>
-    //     </DialogHeader>
+  const [singleDay, setSingleDay] = useState<SingleDaySchedule>();
+  console.log(cookies.user.token);
+  // const [weekdays, setWeekdays] = useState<SingleDaySchedule[]>
+  // var doctordetails: DoctorProfileInfo;
+  const [doctordetails, setDoctorDetails] = useState<DoctorProfileInfo>();
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        axios
+          .get(
+            `${import.meta.env.VITE_DB_URL}:${
+              import.meta.env.VITE_DB_PORT
+            }/api/doctor/profile-info/${doctorID}`,
+            {
+              headers: {
+                Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response.data);
+            setDoctorDetails(response.data);
+          });
+        // setSize(response.data.OnlineSchedule.schedule.length);
+        // setContact(response.data.doctorInfo.phone);
+        // setDoctorDetails(response.data);
+        console.log(doctordetails);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    fetchData();
+  }, []);
 
-    //     <DialogFooter>
-    //       <DialogClose asChild>
-    //         <Button className="bg-c2 hover:bg-c1">Ok</Button>
-    //       </DialogClose>
-    //     </DialogFooter>
-    //   </DialogContent>
-    // </Dialog>
+  const OnSubmit: () => void = () => {
     setPayed(true);
     console.log(dayIndex);
+    console.log("day is", singleDay);
+    const val={
+      weekday : singleDay?.weekday,
+      startTime : singleDay?.startTime,
+      endTime : singleDay?.endTime,
+      totalSlots : singleDay?.totalSlots,
+    }
+    const msg = axios.post(
+      `${import.meta.env.VITE_DB_URL}:${
+        import.meta.env.VITE_DB_PORT
+      }/api/appointment/book-online-appointment/${doctorID}`,
+      val,
+      {
+        headers: {
+          Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
+          "Content-Type": "application/json",
+        },
+      }
+    );
   };
+  console.log(doctordetails?.OnlineSchedule.schedule);
   // onCall(values);
   return (
     <>
@@ -167,81 +210,81 @@ export const BookAppointment: FC = () => {
               </div>
             </div>
           </div> */}
-          <DoctorDetailsCard doctor={doctor}/>
+          {doctordetails && <DoctorDetailsCard doctor={doctordetails!} />}
         </div>
-        <div className="flex-[60%] flex-col">
-          {formValues.days.map((day, index) => {
-            return (
-              // <RadioGroup
-              //   onValueChange={() => {
-              //     setDayIndex(index);
-              //   }}
-              // >
-              <div>
-                {Object.keys(day).length !== 0 && (
-                  <div className="grid grid-cols-4 ml-4 mt-4 gap-4">
-                    <div>
-                      <input
-                        type="radio"
-                        className="h-6 w-6 text-green-600 border-gray-300 focus:ring-green-400"
-                        name="day"
-                        id={index.toString()}
-                        onChange={() => {
-                          setDayIndex(index);
-                        }}
-                      />
-                      <label htmlFor={index.toString()}>{days[index]}</label>
+        {doctordetails && (
+          <div className="flex-[60%] flex-col">
+            {doctordetails?.OnlineSchedule.schedule.map((day, index) => {
+              return (
+                // <RadioGroup
+                //   onValueChange={() => {
+                //     setDayIndex(index);
+                //   }}
+                // >
+                <div>
+                  {Object.keys(day).length !== 0 && (
+                    <div className="grid grid-cols-4 ml-4 mt-4 gap-4">
+                      <div>
+                        <input
+                          type="radio"
+                          className="h-6 w-6 text-green-600 border-gray-300 focus:ring-green-400"
+                          name="day"
+                          id={day.weekday.toString()}
+                          onChange={() => {
+                            setDayIndex(day.weekday);
+                            setSingleDay(day);
+                          }}
+                        />
+                        <label htmlFor={dayIndex.toString()}>{days[day.weekday]}</label>
+                      </div>
+                      <div>
+                        Start Time: <b>{day.startTime}</b>
+                      </div>
+                      <div>
+                        End Time: <b>{day.endTime}</b>
+                      </div>
+                      <div>
+                        Slot: <b>{day.totalSlots}</b>
+                      </div>
                     </div>
-                    <div>
-                      Start Time: <b>{day.startTime}</b>
-                    </div>
-                    <div>
-                      End Time: <b>{day.endTime}</b>
-                    </div>
-                    <div>
-                      Slot: <b>{day.slot}</b>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  )}
+                </div>
+              );
+            })}
 
-<div className="flex justify-center mt-5">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              className="bg-c2 w-42 text-white rounded-lg hover:bg-c1"
-              onClick={() => {
-                OnSubmit();
-              }}
-              disabled={dayIndex === 8}
-            >
-              Book Now
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] bg-c4">
-            <DialogHeader>
-              <DialogTitle>Payment Completed</DialogTitle>
-              <DialogDescription>
-                Your appointment is on :{" "}
-                <b className="text-c1">{days[dayIndex]}</b>
-              </DialogDescription>
-            </DialogHeader>
+            <div className="flex justify-center mt-5">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    className="bg-c2 w-42 text-white rounded-lg hover:bg-c1"
+                    onClick={() => {
+                      OnSubmit();
+                    }}
+                    disabled={dayIndex === 8}
+                  >
+                    Book Now
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px] bg-c4">
+                  <DialogHeader>
+                    <DialogTitle>Payment Completed</DialogTitle>
+                    <DialogDescription>
+                      Your appointment is on :{" "}
+                      <b className="text-c1">{days[dayIndex]}</b>
+                    </DialogDescription>
+                  </DialogHeader>
 
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button className="bg-c2 hover:bg-c1">Ok</Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button className="bg-c2 hover:bg-c1">Ok</Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+        )}
       </div>
-
-        </div>
-      </div>
-
-      
     </>
   );
 };

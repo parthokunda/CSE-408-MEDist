@@ -2,10 +2,10 @@ import { FC, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { AiOutlineArrowRight } from "react-icons/ai";
 
-import { DoctorSearchAttributes } from "@/models/Brand";
+import { SearchDoctorInfo } from "@/models/Brand";
 import DoctorSearchCard from "./DoctorSearchCard";
 const DoctorSearchCards: FC<{
-  doctorFetchedData: DoctorSearchAttributes[];
+  doctorFetchedData: SearchDoctorInfo;
   currentPage: number;
   setCurrentPage: (page: number) => void;
 }> = (props) => {
@@ -13,8 +13,9 @@ const DoctorSearchCards: FC<{
   const recordsPerPage = 3;
   const lastIndex = props.currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
-  const records = props.doctorFetchedData.slice(firstIndex, lastIndex);
-  const nPages = Math.ceil(props.doctorFetchedData.length / recordsPerPage);
+  console.log(props.doctorFetchedData);
+  const records = props.doctorFetchedData.Doctors;
+  const nPages = Math.ceil(props.doctorFetchedData.totalCount / recordsPerPage);
   const array = [
     currentPage - 2,
     currentPage - 1,
@@ -23,7 +24,7 @@ const DoctorSearchCards: FC<{
     currentPage + 2,
   ];
   const pages = array.filter((page) => page > 0 && page <= nPages);
-  if (props.doctorFetchedData && props.doctorFetchedData.length === 0) {
+  if (props.doctorFetchedData && props.doctorFetchedData.totalCount=== 0) {
     return (
       <div className="flex justify-center align-middle">No Doctor Found</div>
     );
@@ -77,7 +78,7 @@ const DoctorSearchCards: FC<{
                     ? "px-4 py-2 text-xl text-white rounded-full bg-c3 font-bold "
                     : "px-4 py-2 text-xl hover:rounded-full hover:bg-c1 hover:text-white duration-300"
                 }
-                onClick={() => setPage(page)}
+                onClick={() => setCurrentPage(page)}
               >
                 {page}
               </a>

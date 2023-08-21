@@ -10,6 +10,7 @@ import {
 import { navIcon } from "../../models/navIcon";
 import { Outlet } from "react-router-dom";
 
+
 const NavBar: FC<{ navList: navIcon[] }> = (props) => {
   return (
     <>
@@ -27,9 +28,7 @@ const NavBar: FC<{ navList: navIcon[] }> = (props) => {
               >{ icon.link==="/appointments" &&icon.role==="doctor"?
               <Link to ="doctor/pendingAppointments">
               {icon.name}
-            </Link>:<NavigationMenuLink href={icon.link ? icon.link : ""}>
-                  {icon.name}
-                </NavigationMenuLink>
+            </Link>:<Link to="patient/searchDoctor">{icon.name}</Link>
 
               }
                 {/* <NavigationMenuLink href={icon.link ? icon.link : ""}>

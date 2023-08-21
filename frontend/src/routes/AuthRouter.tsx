@@ -11,8 +11,11 @@ const AuthRoute : FC = () : JSX.Element =>{
     if(cookies.user.role == 'patient'){
         return <Navigate to="/patient"/>
     }
-    if(cookies.user.role == 'doctor'){
+    if(cookies.user.role == 'doctor' && cookies.user.profile_status == 'partially_registered'){
         return <Navigate to="/doctor/info/"/>
+    }
+    if(cookies.user.role == 'doctor' && cookies.user.profile_status == 'fully_registered'){
+        return <Navigate to="/doctor/addSchedule"/>
     }
     return <>No router found</>
 }

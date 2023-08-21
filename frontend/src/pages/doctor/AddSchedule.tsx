@@ -11,9 +11,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "../../components/ui/input";
 import { FC, useEffect } from "react";
 import { useState } from "react";
-
+import axios from "axios";
 import { Button } from "@/components/ui/button";
-
+import { useCookies } from "react-cookie";
 import { DoctorOnlineScheduleForm } from "@/models/FormSchema";
 
 export const AddSchedule: FC = () => {
@@ -58,22 +58,112 @@ export const AddSchedule: FC = () => {
   const [contact, setContact] = useState("");
   const [cost, setCost] = useState("");
 
+  const [size, setSize] = useState(0);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_DB_URL}:${
+            import.meta.env.VITE_DB_PORT
+          }/api/doctor/profile-info`,
+          {
+            headers: {
+              Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
+            },
+            }
+          );
+        setSize(response.data.OnlineSchedule.schedule.length);
+        // setContact(response.data.doctorInfo.phone);
+        console.log(response.data, size, contact);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    fetchData();
+  }, []);
+  useEffect(() => {
+    console.log(size);
+  }, [size]);
+
   const values = {
-    contact: contact,
-    cost: cost,
-    days: [
-      Saturday ? { startTime: SatStart, endTime: SatEnd, slot: SatSlots } : {},
-      Sunday ? { startTime: SunStart, endTime: SunEnd, slot: SunSlots } : {},
-      Monday ? { startTime: MonStart, endTime: MonEnd, slot: MonSlots } : {},
-      Tuesday ? { startTime: TueStart, endTime: TueEnd, slot: TueSlots } : {},
-      Wednesday ? { startTime: WedStart, endTime: WedEnd, slot: WedSlots } : {},
-      Thursday ? { startTime: ThuStart, endTime: ThuEnd, slot: ThuSlots } : {},
-      Friday ? { startTime: FriStart, endTime: FriEnd, slot: FriSlots } : {},
+    visitFee: Number(cost),
+    schedule: [
+      Saturday
+        ? {
+            weekday: 0,
+            startTime: SatStart,
+            endTime: SatEnd,
+            totalSlots: Number(SatSlots),
+          }
+        : {},
+      Sunday
+        ? {
+            weekday: 1,
+            startTime: SunStart,
+            endTime: SunEnd,
+            totalSlots: Number(SunSlots),
+          }
+        : {},
+      Monday
+        ? {
+            weekday: 2,
+            startTime: MonStart,
+            endTime: MonEnd,
+            totalSlots: Number(MonSlots),
+          }
+        : {},
+      Tuesday
+        ? {
+            weekday: 3,
+            startTime: TueStart,
+            endTime: TueEnd,
+            totalSlots: Number(TueSlots),
+          }
+        : {},
+      Wednesday
+        ? {
+            weekday: 4,
+            startTime: WedStart,
+            endTime: WedEnd,
+            totalSlots: Number(WedSlots),
+          }
+        : {},
+      Thursday
+        ? {
+            weekday: 5,
+            startTime: ThuStart,
+            endTime: ThuEnd,
+            totalSlots: Number(ThuSlots),
+          }
+        : {},
+      Friday
+        ? {
+            weekday: 6,
+            startTime: FriStart,
+            endTime: FriEnd,
+            totalSlots: Number(FriSlots),
+          }
+        : {},
     ],
   };
-
-  const onSubmit: () => void = () => {
+  const [cookies] = useCookies(["user"]);
+  const onSubmit: () => void = async () => {
     console.log(values);
+    const response = await axios.post(
+      `${import.meta.env.VITE_DB_URL}:${
+        import.meta.env.VITE_DB_PORT
+      }/api/doctor/online-visit`,
+      values,
+      {
+        headers: {
+          Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log(values);
+    console.log(response.data);
   };
 
   return (
@@ -81,81 +171,14 @@ export const AddSchedule: FC = () => {
       <div className="flex text-c1 text-large font-bold justify-center mt-6">
         Edit Online Clinic
       </div>
-      {/* <form
-        onSubmit={forms.handleSubmit(onSubmit)}
-        className="flex flex-col w-screen justify-start gap-5 ml-6"
-      >
-        <div className="flex">
-          <div className="flex-[40%] flex flex-col gap-5">
-            <div className="flex gap-3">
-              Contact Number :
-              <Controller
-                name="contact"
-                control={forms.control}
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    type="text"
-                    className="flex w-42"
-                    placeholder="Enter Contact Number"
-                    value={value}
-                    onChange={onChange}
-                  />
-                )}
-              />
-            </div>
-            <div className="flex gap-3">
-              Cost :
-              <Controller
-                name="cost"
-                control={forms.control}
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    type="text"
-                    className="flex w-42"
-                    placeholder="Enter Cost"
-                    value={value}
-                    onChange={onChange}
-                  />
-                )}
-              />
-            </div>
-          </div>
-          {/* <div className="flex-[60%] flex flex-col gap-5">
-            Edit Schedule
-            <div className="flex flex-col gap-5">
-              <div className="flex gap-3">
-                Days :
-                <Controller
-                  name="days"
-                  // days is an array of objects containing day,time and slots
-                  control={forms.control}
-                  render={({ field }) => (
-                    <div className="flex flex-col gap-3">
-                      <div className="flex gap-3">
-                        <Input
-                          type="checkbox"
-                          id="Saturday"
-                          onChange={() => setSaturday(!Saturday)}
-                        >
-                          Saturday
-                        </Input>
-                      </div>
-                    </div>
-                    // <Input></>
-                  )}
-                />
-              </div>
-            </div>
-          </div> */}
-      {/* </div>
-  </form> */}
+
       <div className="flex flex-col ml-6 mt-5 gap-5">
         <div className="flex gap-3">
           Contact Number :
           <Input
             type="text"
             className="flex w-42"
-            placeholder="Enter Contact Number"
+            placeholder={contact}
             value={contact}
             onChange={(e) => setContact(e.target.value)}
           />
@@ -165,7 +188,7 @@ export const AddSchedule: FC = () => {
           <Input
             type="text"
             className="flex w-42"
-            placeholder="Enter Cost"
+            placeholder={cost}
             value={cost}
             onChange={(e) => setCost(e.target.value)}
           />
@@ -556,14 +579,14 @@ export const AddSchedule: FC = () => {
         </div>
       </div>
       {/* button */}
-        <div className="flex justify-center mt-5">
-            <Button
-                className="flex bg-c2 justify-center w-42 h-10 text-white rounded-lg hover:bg-c1"
-                onClick={() => onSubmit()}
-            >
-                Save
-            </Button>
-        </div>
+      <div className="flex justify-center mt-5">
+        <Button
+          className="flex bg-c2 justify-center w-42 h-10 text-white rounded-lg hover:bg-c1"
+          onClick={() => onSubmit()}
+        >
+          Save
+        </Button>
+      </div>
     </>
   );
 };

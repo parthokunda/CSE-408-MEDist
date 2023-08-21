@@ -3,7 +3,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import * as z from "zod";
 import { Label } from "@/components/ui/label";
 import { DoctorSearchForm } from "@/models/FormSchema";
-import { FC, useEffect } from "react";
+import { FC, useEffect,useState } from "react";
 import { Input } from "../../components/ui/input";
 import { AiOutlineSearch } from "react-icons/ai";
 import {
@@ -13,8 +13,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useCookies } from "react-cookie";
+import axios from "axios";
+import {SpecializationAttributes} from "@/models/Brand";
+import { Button } from "../../components/ui/button";
 
 export const SearchDoctor: FC<{
+
   formValues: z.infer<typeof DoctorSearchForm>;
   formSubmitHandler: (formData: z.infer<typeof DoctorSearchForm>) => void;
 }> = (props) => {
@@ -27,8 +32,10 @@ export const SearchDoctor: FC<{
   });
 
   const onSubmit: SubmitHandler<z.infer<typeof DoctorSearchForm>> = (data) => {
+    // console.log(data);
     props.formSubmitHandler(data);
   };
+  const [cookies] = useCookies(["user"]);
   const departments = [
     "ENT",
     "Cardiology",
@@ -41,14 +48,42 @@ export const SearchDoctor: FC<{
     "Pediatrics",
     "Psychiatry",
   ];
+  const [specializations, setSpecializations] = useState<
+    SpecializationAttributes[]
+  >([]);
+
   useEffect(() => {
-    const subscription = forms.watch(() => forms.handleSubmit(onSubmit)());
-    console.log(
-      "🚀 ~ file: test.tsx:32 ~ useEffect ~ subscription:",
-      subscription
-    );
-    return () => subscription.unsubscribe();
-  }, [forms.handleSubmit, forms.watch]);    
+    async function fetchSpecializations() {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_DB_URL}:${
+            import.meta.env.VITE_DB_PORT
+          }/api/doctor/specialization-list`,
+          {
+            headers: {
+              Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
+            },
+          }
+        );
+        setSpecializations(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchSpecializations();
+  }, []);
+
+
+  // useEffect(() => {
+  //   const subscription = forms.watch(() => forms.handleSubmit(onSubmit)());
+  //   console.log(
+  //     "🚀 ~ file: test.tsx:32 ~ useEffect ~ subscription:",
+  //     subscription
+  //   );
+  //   return () => subscription.unsubscribe();
+  // }, [forms.handleSubmit]);    
 
   
 
@@ -75,22 +110,26 @@ export const SearchDoctor: FC<{
             name="department"
             control={forms.control}
             render={({ field  }) => (
+              <div>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger className="flex width-2 bg-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {departments.map((department) => (
-                    <SelectItem key={department} value={department}>
-                      {department}
+                  {specializations.map((department) => (
+                    <SelectItem key={department.name} value={department.id.toString()}>
+                      {department.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              </div>
             )}
           />
         </div>
+        <Button type="submit"className="flex bg-c2 hover:bg-c1">Search</Button>
       </form>
+      
       <p className="text-red-600 ml-4">
         {forms.formState.errors.name?.message}
       </p>

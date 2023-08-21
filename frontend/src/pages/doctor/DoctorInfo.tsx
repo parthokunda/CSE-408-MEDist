@@ -11,7 +11,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "../../components/ui/input";
 import { FC, useEffect } from "react";
 import { useState } from "react";
-
+import { useQuery } from "@tanstack/react-query";
+import { useParams, Link } from "react-router-dom";
+import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
+import axios from "axios";
 import {
   Select,
   SelectContent,
@@ -36,11 +39,11 @@ import {
 } from "firebase/storage";
 
 import { useCookies } from "react-cookie";
-import {DoctorAdditionalInfo} from "@/models/Brand";
+import { DoctorAdditionalInfo, SpecializationAttributes } from "@/models/Brand";
 
 export const DoctorInfo: FC = () => {
   const [cookies] = useCookies(["user"]);
-  var doctorInfo:DoctorAdditionalInfo;
+  var doctorInfo: DoctorAdditionalInfo;
   const forms = useForm<z.infer<typeof DoctorAdditionalInfoForm>>({
     defaultValues: {
       gender: "male",
@@ -52,26 +55,34 @@ export const DoctorInfo: FC = () => {
     resolver: zodResolver(DoctorAdditionalInfoForm),
   });
 
-  // const { register,handleSubmit,reset, control} = forms;
-  // const [show, setShow] = useState(false);
-  // const { fields, append, remove } = useFieldArray({
-  //   name: 'degrees',
-  //   control
-  // });
-  const departments = [
-    { key: 1, value: "Medicine" },
-    { key: 2, value: "Surgery" },
-    { key: 3, value: "Gynae" },
-    { key: 4, value: "Orthopedic" },
-    { key: 5, value: "Cardiology" },
-    { key: 6, value: "Neurology" },
-    { key: 7, value: "ENT" },
-    { key: 8, value: "Eye" },
-    { key: 9, value: "Child" },
-    { key: 10, value: "Skin" },
-    { key: 11, value: "Psychiatry" },
-    { key: 12, value: "Physical Medicine" },
-  ];
+  type types = SpecializationAttributes[];
+  const [specializations, setSpecializations] = useState<
+    SpecializationAttributes[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    async function fetchSpecializations() {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_DB_URL}:${
+            import.meta.env.VITE_DB_PORT
+          }/api/doctor/specialization-list`,
+          {
+            headers: {
+              Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
+            },
+          }
+        );
+        setSpecializations(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchSpecializations();
+  }, []);
 
   const FIREBASE_CONFIG = {
     apiKey: "AIzaSyCHZ4fFHB6mG2e1QfU8njqeZnbhmRnO9Go",
@@ -83,34 +94,6 @@ export const DoctorInfo: FC = () => {
     measurementId: "G-QB6RHMBMMK",
   };
   const app = initializeApp(FIREBASE_CONFIG);
-  // const file = req.file;
-  // const userID = req.user_identity.id;
-
-  //     const dateTime = new Date();
-
-  //     // create a reference to the storage bucket location
-  //     const storageRef = ref(
-  //       storage,
-  //       `profile_pictures/${userID}${file.originalname}`
-  //     );
-
-  //     // define metadata
-  //     const metadata = {
-  //       contentType: file.mimetype,
-  //     };
-
-  //     // upload the file
-  //     const uploadTask = await uploadBytesResumable(
-  //       storageRef,
-  //       file.buffer,
-  //       metadata
-  //     );
-
-  //     // get the download url
-  //     const downloadURL = await getDownloadURL(uploadTask.ref);
-
-  //     req.body.image = downloadURL;
-  //     next();
 
   //! another test
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -141,16 +124,42 @@ export const DoctorInfo: FC = () => {
     event.preventDefault();
     console.log(selectedFile);
   };
-  const onSubmit: SubmitHandler<z.infer<typeof DoctorAdditionalInfoForm>> = (
-    data
-  ) => {
-    uploadFile().then((url) => {
+  const onSubmit: SubmitHandler<
+    z.infer<typeof DoctorAdditionalInfoForm>
+  > = async (data) => {
+    uploadFile().then(async (url) => {
       // console.log(url);
       data.image = url as string;
+      const val = {
+        name: data.name,
+        phone: data.mobileNumber,
+        gendar: data.gender,
+        dob: data.dateOfBirth,
+        bmdc: data.bmdcNumber,
+        issueDate: data.issueDate,
+        degrees: data.degrees,
+        specializationID: Number(data.department),
+        image: data.image,
+      };
+      const response = await axios.put(
+        `${import.meta.env.VITE_DB_URL}:${
+          import.meta.env.VITE_DB_PORT
+        }/api/doctor/additional-info`,
+        val,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(val);
       console.log(data);
+      console.log(response.data);
     });
     console.log("here");
   };
+  console.log(cookies.user);
   // if(selectedFile){
   //   console.log((selectedFile))
   // };
@@ -167,6 +176,19 @@ export const DoctorInfo: FC = () => {
         {" "}
         <div className="flex">
           <div className="flex-[50%] flex flex-col gap-5">
+            <div className="flex gap-3">
+              Name :
+              <Controller
+                name="name"
+                control={forms.control}
+                render={({ field }) => (
+                  <div>
+                    <Input {...field} placeholder="name" />
+                    <p>{forms.formState.errors.name?.message}</p>
+                  </div>
+                )}
+              />
+            </div>
             <div className="flex gap-3">
               Gender:
               <Controller
@@ -206,6 +228,39 @@ export const DoctorInfo: FC = () => {
                 )}
               />
             </div>
+
+            <div className="flex-[50%] width-10 gap-3">
+              Department:
+              <Controller
+                name="department"
+                control={forms.control}
+                render={({ field }) => (
+                  <div className="flex-[50%]  w-[200px] flex-col">
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="flex width-2 bg-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {specializations.map(
+                          (department: SpecializationAttributes) => (
+                            <SelectItem
+                              key={department.name}
+                              value={department.id.toString()}
+                            >
+                              {department.name.toString()}
+                            </SelectItem>
+                          )
+                        )}
+                      </SelectContent>
+                      <p>{forms.formState.errors.department?.message}</p>
+                    </Select>
+                  </div>
+                )}
+              />
+            </div>
             <div className="flex gap-3">
               BMDC Number :
               <Controller
@@ -240,36 +295,6 @@ export const DoctorInfo: FC = () => {
                   <div>
                     <Input {...field} placeholder="Mobile Number" />
                     <p>{forms.formState.errors.mobileNumber?.message}</p>
-                  </div>
-                )}
-              />
-            </div>
-            <div className="flex-[50%] width-10 gap-3">
-              Department:
-              <Controller
-                name="department"
-                control={forms.control}
-                render={({ field }) => (
-                  <div className="flex-[50%]  w-[200px] flex-col">
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger className="flex width-2 bg-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {departments.map((department) => (
-                          <SelectItem
-                            key={department.key}
-                            value={department.value}
-                          >
-                            {department.value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                      <p>{forms.formState.errors.department?.message}</p>
-                    </Select>
                   </div>
                 )}
               />
