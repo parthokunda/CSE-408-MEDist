@@ -235,7 +235,7 @@ export const BookAppointment: FC = () => {
                             setSingleDay(day);
                           }}
                         />
-                        <label htmlFor={dayIndex.toString()}>{days[day.weekday]}</label>
+                        <label htmlFor={dayIndex.toString()}>{days[dayIndex]}</label>
                       </div>
                       <div>
                         Start Time: <b>{day.startTime}</b>

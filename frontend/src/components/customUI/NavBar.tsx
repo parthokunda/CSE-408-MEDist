@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   NavigationMenu,
@@ -10,11 +10,10 @@ import {
 import { navIcon } from "../../models/navIcon";
 import { Outlet } from "react-router-dom";
 
-
 const NavBar: FC<{ navList: navIcon[] }> = (props) => {
   return (
     <>
-    {console.log(props.navList)}
+      {console.log(props.navList)}
       <NavigationMenu>
         <div className="flex items-center w-screen h-14 bg-c1 font-inter ">
           <div className="font-bold text-3xl text-c4 ml-4 flex-grow">
@@ -25,15 +24,16 @@ const NavBar: FC<{ navList: navIcon[] }> = (props) => {
               <NavigationMenuItem
                 key={icon.name}
                 className="text-c4 hover:text-white"
-              >{ icon.link==="/appointments" &&icon.role==="doctor"?
-              <Link to ="doctor/pendingAppointments">
-              {icon.name}
-            </Link>:<Link to="patient/searchDoctor">{icon.name}</Link>
-
-              }
-                {/* <NavigationMenuLink href={icon.link ? icon.link : ""}>
-                  {icon.name}
-                </NavigationMenuLink> */}
+              >
+                {icon.link === "/appointments" && icon.role === "doctor" ? (
+                  <Link to="doctor/pendingAppointments">{icon.name}</Link>
+                ) : icon.link === "/appointments" && icon.role === "patient" ? (
+                  <Link to="patient/searchDoctor">{icon.name}</Link>
+                ) : (
+                  <NavigationMenuLink href={icon.link ? icon.link : ""}>
+                    {icon.name}
+                  </NavigationMenuLink>
+                )}
               </NavigationMenuItem>
             ))}
           </NavigationMenuList>

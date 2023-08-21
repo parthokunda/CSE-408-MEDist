@@ -22,8 +22,8 @@ const DoctorDetailsCard: FC<{ doctor: DoctorProfileInfo }> = (props) => {
             <div className="flex">
               <div className="flex flex-col ml-6 ">
                 <img
-                  src={props.doctor.DoctorInfo.image}
-                  alt="doctor image"
+                  src={props.doctor.DoctorInfo.image||"https://www.w3schools.com/howto/img_avatar.png"}
+                  alt="https://www.w3schools.com/howto/img_avatar.png"
                   className="mt-2 h-24 w-24"
                   placeholder="img_404"
                 />

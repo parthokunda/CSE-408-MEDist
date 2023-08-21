@@ -86,70 +86,71 @@ export const AddSchedule: FC = () => {
     console.log(size);
   }, [size]);
 
-  const values = {
-    visitFee: Number(cost),
-    schedule: [
-      Saturday
-        ? {
-            weekday: 0,
-            startTime: SatStart,
-            endTime: SatEnd,
-            totalSlots: Number(SatSlots),
-          }
-        : {},
-      Sunday
-        ? {
-            weekday: 1,
-            startTime: SunStart,
-            endTime: SunEnd,
-            totalSlots: Number(SunSlots),
-          }
-        : {},
-      Monday
-        ? {
-            weekday: 2,
-            startTime: MonStart,
-            endTime: MonEnd,
-            totalSlots: Number(MonSlots),
-          }
-        : {},
-      Tuesday
-        ? {
-            weekday: 3,
-            startTime: TueStart,
-            endTime: TueEnd,
-            totalSlots: Number(TueSlots),
-          }
-        : {},
-      Wednesday
-        ? {
-            weekday: 4,
-            startTime: WedStart,
-            endTime: WedEnd,
-            totalSlots: Number(WedSlots),
-          }
-        : {},
-      Thursday
-        ? {
-            weekday: 5,
-            startTime: ThuStart,
-            endTime: ThuEnd,
-            totalSlots: Number(ThuSlots),
-          }
-        : {},
-      Friday
-        ? {
-            weekday: 6,
-            startTime: FriStart,
-            endTime: FriEnd,
-            totalSlots: Number(FriSlots),
-          }
-        : {},
-    ],
-  };
+
   const [cookies] = useCookies(["user"]);
   const onSubmit: () => void = async () => {
-    console.log(values);
+    const values = {
+      visitFee: Number(cost),
+      schedule: [
+        Saturday
+          ? {
+              weekday: 0,
+              startTime: SatStart,
+              endTime: SatEnd,
+              totalSlots: Number(SatSlots),
+            }
+          : {},
+        Sunday
+          ? {
+              weekday: 1,
+              startTime: SunStart,
+              endTime: SunEnd,
+              totalSlots: Number(SunSlots),
+            }
+          : {},
+        Monday
+          ? {
+              weekday: 2,
+              startTime: MonStart,
+              endTime: MonEnd,
+              totalSlots: Number(MonSlots),
+            }
+          : {},
+        Tuesday
+          ? {
+              weekday: 3,
+              startTime: TueStart,
+              endTime: TueEnd,
+              totalSlots: Number(TueSlots),
+            }
+          : {},
+        Wednesday
+          ? {
+              weekday: 4,
+              startTime: WedStart,
+              endTime: WedEnd,
+              totalSlots: Number(WedSlots),
+            }
+          : {},
+        Thursday
+          ? {
+              weekday: 5,
+              startTime: ThuStart,
+              endTime: ThuEnd,
+              totalSlots: Number(ThuSlots),
+            }
+          : {},
+        Friday
+          ? {
+              weekday: 6,
+              startTime: FriStart,
+              endTime: FriEnd,
+              totalSlots: Number(FriSlots),
+            }
+          : {},
+      ],
+    };
+    console.log(values.schedule);
     const response = await axios.post(
       `${import.meta.env.VITE_DB_URL}:${
         import.meta.env.VITE_DB_PORT

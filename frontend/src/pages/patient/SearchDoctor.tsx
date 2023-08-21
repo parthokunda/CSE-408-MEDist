@@ -3,7 +3,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import * as z from "zod";
 import { Label } from "@/components/ui/label";
 import { DoctorSearchForm } from "@/models/FormSchema";
-import { FC, useEffect,useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Input } from "../../components/ui/input";
 import { AiOutlineSearch } from "react-icons/ai";
 import {
@@ -15,11 +15,10 @@ import {
 } from "@/components/ui/select";
 import { useCookies } from "react-cookie";
 import axios from "axios";
-import {SpecializationAttributes} from "@/models/Brand";
+import { SpecializationAttributes } from "@/models/Brand";
 import { Button } from "../../components/ui/button";
 
 export const SearchDoctor: FC<{
-
   formValues: z.infer<typeof DoctorSearchForm>;
   formSubmitHandler: (formData: z.infer<typeof DoctorSearchForm>) => void;
 }> = (props) => {
@@ -75,7 +74,6 @@ export const SearchDoctor: FC<{
     fetchSpecializations();
   }, []);
 
-
   // useEffect(() => {
   //   const subscription = forms.watch(() => forms.handleSubmit(onSubmit)());
   //   console.log(
@@ -83,9 +81,7 @@ export const SearchDoctor: FC<{
   //     subscription
   //   );
   //   return () => subscription.unsubscribe();
-  // }, [forms.handleSubmit]);    
-
-  
+  // }, [forms.handleSubmit]);
 
   return (
     <>
@@ -104,32 +100,40 @@ export const SearchDoctor: FC<{
             </div>
           )}
         />
-        <div className="flex  w-1/3 m-3 gap-3">
+        <div className="flex w-1/3 m-3 gap-3">
           Specialization:
           <Controller
             name="department"
             control={forms.control}
-            render={({ field  }) => (
-              <div>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger className="flex width-2 bg-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {specializations.map((department) => (
-                    <SelectItem key={department.name} value={department.id.toString()}>
-                      {department.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            render={({ field }) => (
+              <div className="flex-[50%] w-200px">
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger className="flex width-full bg-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {specializations.map((department) => (
+                      <SelectItem
+                        key={department.name}
+                        value={department.id.toString()}
+                      >
+                        {department.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
           />
         </div>
-        <Button type="submit"className="flex bg-c2 hover:bg-c1">Search</Button>
+        <Button type="submit" className="flex bg-c2 hover:bg-c1">
+          Search
+        </Button>
       </form>
-      
+
       <p className="text-red-600 ml-4">
         {forms.formState.errors.name?.message}
       </p>

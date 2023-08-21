@@ -213,14 +213,14 @@ const DoctorSearchPage: FC = (props) => {
               formValues={searchFormData}
               formSubmitHandler={updateFormData}
             />
-            {searchFormData.department ||
-              (searchFormData.name && (
+            {(searchFormData.department ||
+              searchFormData.name) && (
                 <DoctorSearchCards
                   doctorFetchedData={doctors!}
                   currentPage={currentSearchPage}
                   setCurrentPage={setCurrentSearchPage}
                 />
-              ))}
+              )}
           </div>
         )}
         {!searchTab && (

@@ -21,7 +21,8 @@ const DoctorSearchCard: FC<{ doctor: DoctorOverviewInfo }> = (props) => {
           <div className="flex flex-[80%]">
             <div className="flex">
               <img
-                src={props.doctor.DoctorInfo.image}
+                src={props.doctor.DoctorInfo.image||"https://www.w3schools.com/howto/img_avatar.png"}
+                alt="https://www.w3schools.com/howto/img_avatar.png"
                 className="mt-2 h-24 w-24"
                 placeholder="img_404"
               />
