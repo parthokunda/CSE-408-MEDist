@@ -44,15 +44,15 @@ export const DoctorAdditionalInfoForm = z.object({
 export const PatientAdditionalInfoForm = z.object({
   name:z.string().nonempty(),
   gender: z.union([z.literal("male"), z.literal("female"), z.literal("other")]),
-  dateOfBirth: z.string(),
+  dateOfBirth: z.date(),
   mobileNumber: z.string().nonempty(),
   // height : z.object({
   //     feet : z.number().int().min(0).max(10),
   //     inches : z.number().min(0).max(12)
   // }),
-  height_feet: z.string().nonempty(),
-  height_inches: z.string().nonempty(),
-  weight: z.string().nonempty(),
+  height_feet: z.number(),
+  height_inches: z.number(),
+  weight: z.number(),
   bloodGroup: z.string().nonempty(),
   image: z.string(),
 });
