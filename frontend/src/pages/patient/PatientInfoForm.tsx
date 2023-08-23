@@ -28,6 +28,7 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { PatientAttributes } from "@/models/UserInfo";
+import PatientInfo from "./PatientInfo";
 
 const PatientInfoForm: FC<{ patientInfo: PatientAttributes, userToken: string }> = (props) => {
   console.log(props.patientInfo);
@@ -182,18 +183,18 @@ const PatientInfoForm: FC<{ patientInfo: PatientAttributes, userToken: string }>
                 )}
               />
             </div>
-            {/* <div className="flex gap-3">
+            <div className="flex gap-3">
               Date of Birth:
               <Controller
                 control={forms.control}
                 name="dateOfBirth"
                 render={({ field }) => (
                   <div>
-                    <Input type="date" {...field} />
+                    <Input type="date" {...field} value={field.value.toString().substring(0,10)} />
                   </div>
                 )}
               />
-            </div> */}
+            </div>
             <div className="flex gap-3">
               Mobile Number:
               <Controller

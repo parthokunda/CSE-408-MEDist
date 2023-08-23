@@ -76,6 +76,8 @@ export const PatientInfo: FC = () => {
   //   return <p>You are fully registered</p>
   // }
 
+  console.log(patientInfo.dob.toString().substring(0,10));
+
   return <PatientInfoForm patientInfo={patientInfo} userToken={cookies.user.token}/>
 };
 
