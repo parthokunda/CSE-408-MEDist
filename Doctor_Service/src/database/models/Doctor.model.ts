@@ -4,6 +4,8 @@ import {
   BelongsToGetAssociationMixin,
   BelongsToSetAssociationMixin,
   DataTypes,
+  HasManyAddAssociationMixin,
+  HasManyGetAssociationsMixin,
   Model,
   Optional,
 } from "sequelize";
@@ -17,6 +19,8 @@ import Specialization, {
 } from "./Specialization.model";
 import OnlineSchedule, {
   OnlineScheduleAttributes,
+  OnlineScheduleInfo,
+  OnlineScheduleOverviewInfo,
 } from "./Online_Schedule.model";
 
 export enum DoctorStatus {
@@ -36,7 +40,8 @@ export const DoctorAdditionalInfo_Excluded_Properties: (
   | "userID"
   | "scheduleID"
   | "specializationID"
-)[] = ["userID", "scheduleID", "specializationID"];
+  | "online_visit_fee"
+)[] = ["userID", "scheduleID", "specializationID", "online_visit_fee"];
 
 export const DoctorOverviewInfo_Excluded_Properties: (
   | "userID"
@@ -55,15 +60,25 @@ export interface SearchDoctorInfo {
 export interface DoctorAdditionalInfo {
   DoctorInfo: Omit<
     DoctorAttributes,
-    "userID" | "scheduleID" | "specializationID"
+    "userID" | "scheduleID" | "specializationID" | "online_visit_fee"
   >;
   Specialization: SpecializationAttributes | {};
+}
+
+export interface OnlineScheduleOverview {
+  visit_fee: number;
+  schedules: OnlineScheduleOverviewInfo[];
+}
+
+export interface DoctorOnlineScheduleInfo {
+  visit_fee: number;
+  schedules: OnlineScheduleInfo[];
 }
 
 export interface DoctorProfileInfo {
   DoctorInfo: DoctorAttributes;
   Specialization: SpecializationAttributes | {};
-  OnlineSchedule: OnlineScheduleAttributes | {};
+  OnlineSchedule: OnlineScheduleOverview;
 }
 
 export interface DoctorOverviewInfo {
@@ -79,6 +94,7 @@ export interface DoctorAttributes {
   id: number;
   status: string;
   userID: number;
+  specializationID: number;
 
   // additional info
   image: string;
@@ -91,8 +107,8 @@ export interface DoctorAttributes {
   issueDate: Date;
   degrees: string[];
 
-  specializationID: number;
-  scheduleID: number;
+  // online schedule visit fee
+  online_visit_fee: number;
 }
 
 class Doctor extends Model implements DoctorAttributes {
@@ -119,16 +135,13 @@ class Doctor extends Model implements DoctorAttributes {
     number
   >;
 
-  public scheduleID!: number;
-  public getOnlineSchedule!: BelongsToGetAssociationMixin<OnlineSchedule>;
-  public setOnlineSchedule!: BelongsToSetAssociationMixin<
-    OnlineSchedule,
-    number
-  >;
+  public online_visit_fee!: number;
+  public getOnlineSchedules!: HasManyGetAssociationsMixin<OnlineSchedule>;
+  public addOnlineSchedule!: HasManyAddAssociationMixin<OnlineSchedule, number>;
 
   public static associations: {
     specialization: Association<Doctor, Specialization>;
-    onlineSchedule: Association<Doctor, OnlineSchedule>;
+    online_schedules: Association<Doctor, OnlineSchedule>;
   };
 }
 
@@ -197,6 +210,11 @@ Doctor.init(
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
     },
+
+    online_visit_fee: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   },
   {
     tableName: "doctors",
@@ -217,17 +235,12 @@ Specialization.hasMany(Doctor, {
 });
 
 // relation between Doctor and OnlineSchedule
-Doctor.belongsTo(OnlineSchedule, {
-  foreignKey: {
-    name: "scheduleID",
-    allowNull: true,
-  },
+Doctor.hasMany(OnlineSchedule, {
+  foreignKey: "doctorID",
 });
 
-OnlineSchedule.hasOne(Doctor, {
-  foreignKey: {
-    name: "scheduleID",
-  },
+OnlineSchedule.belongsTo(Doctor, {
+  foreignKey: "doctorID",
 });
 
 export default Doctor;

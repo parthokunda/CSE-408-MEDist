@@ -9,47 +9,48 @@ for /f "tokens=5" %%a in ('netstat -aon ^| find ":3004" ^| find "LISTENING"') do
 for /f "tokens=5" %%a in ('netstat -aon ^| find ":3005" ^| find "LISTENING"') do taskkill /f /pid %%a
 
 
-REM ================================ Comment this section if you don't want to install dependencies ================================
+@REM REM ================================ Comment this section if you don't want to install dependencies ================================
 
-REM Check and install dependencies for each project folder
-for %%F in (Auth_Service Patient_Service Doctor_Service Medicine_Service Appointment_Service proxy) do (
+@REM REM Check and install dependencies for each project folder
+@REM for %%F in (Auth_Service Patient_Service Doctor_Service Medicine_Service Appointment_Service proxy) do (
 
-    REM open a new cmd window in each folder
-    start cmd /k "cd %%~F\"
+@REM     REM open a new cmd window in each folder
+@REM     start cmd /k "cd %%~F\"
 
-    REM check if package.json is present in the folder
-    if exist %%~F\package.json (
-        REM check if node_modules is present in the folder
-        if not exist %%~F\node_modules (
+@REM     REM check if package.json is present in the folder
+@REM     if exist %%~F\package.json (
+@REM         REM check if node_modules is present in the folder
+@REM         if not exist %%~F\node_modules (
             
-            REM run pnpm i if node_modules is not present and wait for it to finish
-            echo node_modules not found in %%~F, running pnpm i...
-            pushd %%~F
-            pnpm i
-            popd
+@REM             REM run pnpm i if node_modules is not present and wait for it to finish
+@REM             echo node_modules not found in %%~F, running pnpm i...
+@REM             pushd %%~F
+@REM             pnpm i
+@REM             popd
 
-        ) else (
-            echo node_modules found in %%~F
-        )
+@REM         ) else (
+@REM             echo node_modules found in %%~F
+@REM         )
         
-    ) else (
-        echo package.json not found in %%~F
-    ) 
+@REM     ) else (
+@REM         echo package.json not found in %%~F
+@REM     ) 
     
-)
+@REM )
 
-REM close the current cmd window
-taskkill /f /im cmd.exe
+@REM REM close the current cmd window
+@REM taskkill /f /im cmd.exe
 
 
-REM ================================ to this portion  ================================
+@REM REM ================================ to this portion  ================================
 
 
 REM run the project
 for %%F in (Auth_Service Patient_Service Doctor_Service Medicine_Service Appointment_Service proxy) do (
 
     REM open a new cmd window in each folder and run the project
-    start cmd /k "cd %%~F\ && pnpm dev"
+    REM name the cmd window with the folder name
+    start cmd /k "cd %%~F\ && pnpm dev" /title %%~F
 )
 
 

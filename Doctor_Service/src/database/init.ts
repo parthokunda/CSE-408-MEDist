@@ -12,9 +12,9 @@ const isDev = config.ENVIRONMENT === "development";
 const dbInit = async () =>
   Promise.all([
     // sync all models with database
+    Doctor.sync({ alter: isDev }),
     OnlineSchedule.sync({ alter: isDev }),
     Specialization.sync({ alter: isDev }),
-    Doctor.sync({ alter: isDev }),
   ])
     .then(() => {
       log.info("Database synced.");
