@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "../../components/ui/input";
 import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import {
   Select,
@@ -28,111 +29,118 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { PatientAttributes } from "@/models/UserInfo";
-import PatientInfo from "./PatientInfo";
 
-const PatientInfoForm: FC<{ patientInfo: PatientAttributes, userToken: string }> = (props) => {
-  console.log(props.patientInfo);
+const bloodGroups = [
+  { key: 1, value: "A+" },
+  { key: 2, value: "A-" },
+  { key: 3, value: "B+" },
+  { key: 4, value: "B-" },
+  { key: 5, value: "O+" },
+  { key: 6, value: "o-" },
+  { key: 7, value: "AB+" },
+  { key: 8, value: "AB-" },
+];
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCHZ4fFHB6mG2e1QfU8njqeZnbhmRnO9Go",
+  authDomain: "medist-photos-8c6bf.firebaseapp.com",
+  projectId: "medist-photos-8c6bf",
+  storageBucket: "medist-photos-8c6bf.appspot.com",
+  messagingSenderId: "488575338890",
+  appId: "1:488575338890:web:af4e96b6e455fcf9296073",
+  measurementId: "G-QB6RHMBMMK",
+};
+
+const uploadImage = async (selectedFile: File | null) => {
+  if (selectedFile) {
+    const storage = getStorage();
+    const storageRef = ref(storage, "profile_pictures/" + selectedFile.name);
+    const metadata = {
+      contentType: selectedFile.type,
+    };
+    const uploadTask = await uploadBytesResumable(
+      storageRef,
+      selectedFile,
+      metadata
+    );
+    const downloadURL = await getDownloadURL(uploadTask.ref);
+    console.log(downloadURL);
+    return downloadURL;
+  }
+};
+
+const infoSubmitHandler = async (
+  data: z.infer<typeof PatientAdditionalInfoForm>,
+  userToken: string,
+  imageFile: File | null
+) : Promise<string> => {
+  data.image = (await uploadImage(imageFile)) as string;
+
+  const patientData = {
+    name: data.name,
+    phone: data.mobileNumber,
+    gendar: data.gender,
+    dob: data.dateOfBirth,
+    address: "BUET",
+    bloodGroup: data.bloodGroup,
+    height: Number(data.height_feet + "." + data.height_inches),
+    weight: data.weight,
+    image: data.image,
+  };
+
+  await axios.put(
+    `${import.meta.env.VITE_DB_URL}:${
+      import.meta.env.VITE_DB_PORT
+    }/api/patient/additional-info`,
+    patientData,
+    {
+      headers: {
+        Authorization: `Bearer ${userToken}`, // Replace with your actual token
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return data.image;
+};
+
+const PatientInfoForm: FC<{
+  patientInfo: PatientAttributes;
+  userToken: string;
+}> = (props) => {
+  initializeApp(FIREBASE_CONFIG);
+
   const forms = useForm<z.infer<typeof PatientAdditionalInfoForm>>({
     defaultValues: {
       name: props.patientInfo.name ? props.patientInfo.name : "",
       gender: props.patientInfo.gendar ? props.patientInfo.gendar : undefined,
       dateOfBirth: props.patientInfo.dob ? props.patientInfo.dob : undefined,
-      mobileNumber: props.patientInfo.phone ? props.patientInfo.phone : undefined,
+      mobileNumber: props.patientInfo.phone
+        ? props.patientInfo.phone
+        : undefined,
       height_feet: 5,
       height_inches: 3,
       weight: props.patientInfo.weight ? props.patientInfo.weight : undefined,
-      bloodGroup: props.patientInfo.bloodGroup ? props.patientInfo.bloodGroup : undefined,
+      bloodGroup: props.patientInfo.bloodGroup
+        ? props.patientInfo.bloodGroup
+        : undefined,
+      image: props.patientInfo.image ? props.patientInfo.image : undefined,
     },
-    resolver: zodResolver(PatientAdditionalInfoForm),
+    // resolver: zodResolver(PatientAdditionalInfoForm),
   });
 
-  //   control
-  // });
-  const bloodGroups = [
-    { key: 1, value: "A+" },
-    { key: 2, value: "A-" },
-    { key: 3, value: "B+" },
-    { key: 4, value: "B-" },
-    { key: 5, value: "O+" },
-    { key: 6, value: "o-" },
-    { key: 7, value: "AB+" },
-    { key: 8, value: "AB-" },
-  ];
-
-  const FIREBASE_CONFIG = {
-    apiKey: "AIzaSyCHZ4fFHB6mG2e1QfU8njqeZnbhmRnO9Go",
-    authDomain: "medist-photos-8c6bf.firebaseapp.com",
-    projectId: "medist-photos-8c6bf",
-    storageBucket: "medist-photos-8c6bf.appspot.com",
-    messagingSenderId: "488575338890",
-    appId: "1:488575338890:web:af4e96b6e455fcf9296073",
-    measurementId: "G-QB6RHMBMMK",
-  };
-  const app = initializeApp(FIREBASE_CONFIG);
-
-  //! another test
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [downloadURL, setDownloadURL] = useState<string>(props.patientInfo.image ? props.patientInfo.image : "");
 
   const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     setSelectedFile(file);
   };
-  var downloadURL = "";
-  const uploadFile = async () => {
-    if (selectedFile) {
-      const storage = getStorage();
-      const storageRef = ref(storage, "profile_pictures/" + selectedFile.name);
-      const metadata = {
-        contentType: selectedFile.type,
-      };
-      const uploadTask = await uploadBytesResumable(
-        storageRef,
-        selectedFile,
-        metadata
-      );
-      downloadURL = await getDownloadURL(uploadTask.ref);
-      console.log(downloadURL);
-      return downloadURL;
-    }
-  };
-  const handleImage = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log(selectedFile);
-  };
-  // force image upload before full submission
-  const onSubmit: SubmitHandler<
-    z.infer<typeof PatientAdditionalInfoForm>
-  > = async (data) => {
-    uploadFile().then(async (url) => {
-      data.image = url as string;
-      const patientData = {
-        name: data.name,
-        phone: data.mobileNumber,
-        gendar: data.gender,
-        dob: data.dateOfBirth,
-        address: "BUET",
-        bloodGroup: data.bloodGroup,
-        height: Number(data.height_feet + "." + data.height_inches),
-        weight: data.weight,
-        image: data.image,
-      };
-      const response = await axios.put(
-        `${import.meta.env.VITE_DB_URL}:${
-          import.meta.env.VITE_DB_PORT
-        }/api/patient/additional-info`,
-        patientData,
-        {
-          headers: {
-            Authorization: `Bearer ${props.userToken}`, // Replace with your actual token
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      // console.log(data);
-    });
 
-    console.log("here");
+  const onSubmit = async (data: z.infer<typeof PatientAdditionalInfoForm>) => {
+    const imageURL = await infoSubmitHandler(data, props.userToken, selectedFile);
+    setDownloadURL(imageURL);
   };
+
   return (
     <>
       <div className="text-black text-large justify-center text-large mt-5 font-bold gap-5 ml-6">
@@ -151,7 +159,7 @@ const PatientInfoForm: FC<{ patientInfo: PatientAttributes, userToken: string }>
                 name="name"
                 render={({ field }) => (
                   <div>
-                    <Input {...field}  />
+                    <Input {...field} />
                   </div>
                 )}
               />
@@ -190,7 +198,11 @@ const PatientInfoForm: FC<{ patientInfo: PatientAttributes, userToken: string }>
                 name="dateOfBirth"
                 render={({ field }) => (
                   <div>
-                    <Input type="date" {...field} value={field.value.toString().substring(0,10)} />
+                    <Input
+                      type="date"
+                      {...field}
+                      value={field.value.toString().substring(0, 10)}
+                    />
                   </div>
                 )}
               />
@@ -279,28 +291,31 @@ const PatientInfoForm: FC<{ patientInfo: PatientAttributes, userToken: string }>
             <Controller
               name="image"
               control={forms.control}
-              render={({ field: { ref, name, onBlur, onChange } }) => (
+              render={({ field }) => (
                 <div className="flex flex-col">
                   <Label htmlFor="profilePicture">Profile Picture</Label>
                   <Input
                     type="file"
-                    ref={ref}
-                    name={name}
-                    onBlur={onBlur}
+                    ref={field.ref}
+                    name={field.name}
+                    onBlur={field.onBlur}
                     onChange={(e) => {
-                      const file = e.target.files?.[0];
-
                       handleFileInput(e);
-                      onChange(downloadURL);
+                      // console.log(downloadURL);
+                      // field.onChange(downloadURL);
                     }}
                   />
                   {selectedFile && (
-                    // src={URL.createObjectURL(selectedFile)};
-                    <img
-                      className="w-[250px] h-[250px]"
-                      src={URL.createObjectURL(selectedFile)}
-                      alt="img"
-                    />
+                    <Avatar className="w-[250px] h-[250px]">
+                      <AvatarImage src={URL.createObjectURL(selectedFile)} />
+                      <AvatarFallback>Loading</AvatarFallback>
+                    </Avatar>
+                  )}
+                  {!selectedFile && props.patientInfo.image && (
+                    <Avatar className="w-[250px] h-[250px]">
+                      <AvatarImage src={props.patientInfo.image} />
+                      <AvatarFallback>Loading</AvatarFallback>
+                    </Avatar>
                   )}
                 </div>
               )}
