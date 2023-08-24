@@ -48,8 +48,7 @@ for /f "tokens=5" %%a in ('netstat -aon ^| find ":3005" ^| find "LISTENING"') do
 REM run the project
 for %%F in (Auth_Service Patient_Service Doctor_Service Medicine_Service Appointment_Service proxy) do (
 
-    REM open a new cmd window in each folder and run the project
-    REM name the cmd window with the folder name
+    REM open a new cmd window in each folder and run the server and name the window with the folder name
     start cmd /k "cd %%~F\ && pnpm dev" /title %%~F
 )
 

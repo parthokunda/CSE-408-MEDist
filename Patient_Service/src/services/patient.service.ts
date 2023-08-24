@@ -15,6 +15,7 @@ import Patient, {
   PatientAdditionalInfo_Excluded_Properties,
   PatientOverviewInfo,
   PatientOverviewInfo_Excluded_Properties,
+  UpdatedPatientAdditionalInfo,
 } from "../database/models/Patient.model";
 import log from "../utils/logger";
 import { excludeProperties } from "../utils/necessary_functions";
@@ -29,7 +30,9 @@ export interface PatientServiceInterface {
   getPatientInfo(patientID: number): Promise<Patient>;
 
   //get patient additional info
-  getPatientAdditionalInfo(patientID: number): Promise<PatientAdditionalInfo>;
+  getPatientAdditionalInfo(
+    patientID: number
+  ): Promise<UpdatedPatientAdditionalInfo>;
 
   //get patient overview info
   getPatientOverviewInfo(patientID: number): Promise<PatientOverviewInfo>;
@@ -38,7 +41,7 @@ export interface PatientServiceInterface {
   updatePatientAdditionalInfo(
     patientID: number,
     newPatientInfo: Partial<Patient>
-  ): Promise<Patient>;
+  ): Promise<UpdatedPatientAdditionalInfo>;
 }
 
 class PatientService implements PatientServiceInterface {
@@ -176,7 +179,7 @@ class PatientService implements PatientServiceInterface {
   // ----------------------------------------- Get Patient Additional Info ------------------------------------------ //
   async getPatientAdditionalInfo(
     patientID: number
-  ): Promise<PatientAdditionalInfo> {
+  ): Promise<UpdatedPatientAdditionalInfo> {
     try {
       const patient = await patientRepository.getPatientInfo(patientID);
 
@@ -185,8 +188,24 @@ class PatientService implements PatientServiceInterface {
         PatientAdditionalInfo_Excluded_Properties
       );
 
+      const height = patientAdditionalInfo.height;
+      // feet is simply the integer part of height
+      const feet = Math.floor(height);
+      // inches is the decimal part of height
+      let inches = height - feet;
+      // convert inches to integer
+      inches = Math.floor(inches * 100);
+
+      const updatedPatientAdditionalInfo = {
+        ...patientAdditionalInfo,
+        height: {
+          feet,
+          inches,
+        },
+      };
+
       return {
-        PatientInfo: patientAdditionalInfo,
+        PatientInfo: updatedPatientAdditionalInfo,
       };
     } catch (error) {
       throw error;
@@ -197,7 +216,7 @@ class PatientService implements PatientServiceInterface {
   async updatePatientAdditionalInfo(
     patientID: number,
     newPatientInfo: Partial<Patient>
-  ): Promise<Patient> {
+  ): Promise<UpdatedPatientAdditionalInfo> {
     try {
       // if newPatientInfo contains id, userID, status remove them
       if (newPatientInfo.id) delete newPatientInfo.id;
@@ -209,7 +228,7 @@ class PatientService implements PatientServiceInterface {
         newPatientInfo
       );
 
-      return patient;
+      return await this.getPatientAdditionalInfo(patientID);
     } catch (error) {
       throw error;
     }

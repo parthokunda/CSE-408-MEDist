@@ -116,6 +116,11 @@ class OnlineScheduleService implements OnlineScheduleServiceInterface {
         );
       });
 
+      //sort ascending order by weekday
+      onlineSchedulesInfo.sort((a, b) => {
+        return a.weekday - b.weekday;
+      });
+
       return {
         visit_fee: doctor.online_visit_fee,
         schedules: onlineSchedulesInfo,

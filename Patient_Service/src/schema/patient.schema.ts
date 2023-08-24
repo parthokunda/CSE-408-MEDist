@@ -67,8 +67,24 @@ class PatientSchema implements Patient_Schema_Interface {
       ),
 
       // can be number or string (number in string), can be empty
-      height: union([number(), string()])
-        .transform((val) => Number(val))
+      height: any()
+        .refine((val) => {
+          // check if it is object
+          if (typeof val === "object") {
+            // check if it has feet and inches
+            if (val.hasOwnProperty("feet") && val.hasOwnProperty("inches")) {
+              // check if feet is number and inches is number
+              if (
+                typeof val.feet === "number" &&
+                typeof val.inches === "number"
+              ) {
+                return true;
+              }
+            }
+          }
+
+          return false;
+        })
         .optional(),
 
       weight: union([number(), string()])

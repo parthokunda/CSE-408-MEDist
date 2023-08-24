@@ -257,6 +257,11 @@ class DoctorService implements DoctorServiceInterface {
         );
       });
 
+      //sort ascending order by weekday
+      onlineSchedulesInfo.sort((a, b) => {
+        return a.weekday - b.weekday;
+      });
+
       return {
         DoctorInfo: doctor.dataValues,
         Specialization: specialization?.dataValues || {},

@@ -34,6 +34,15 @@ export interface PatientAdditionalInfo {
   PatientInfo: Omit<PatientAttributes, "userID">;
 }
 
+export interface UpdatedPatientAdditionalInfo {
+  PatientInfo: Omit<PatientAttributes, "userID" | "height"> & {
+    height: {
+      feet: number;
+      inches: number;
+    };
+  };
+}
+
 export const PatientAdditionalInfo_Excluded_Properties: "userID"[] = ["userID"];
 
 export const PatientOverviewInfo_Excluded_Properties: (

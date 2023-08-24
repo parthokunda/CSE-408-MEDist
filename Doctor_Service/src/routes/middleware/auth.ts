@@ -51,11 +51,7 @@ const authorize =
           return next();
         }
         // error in auth service
-        else if (auth_response_payload.status === "error")
-          return next(createError.InternalServerError());
-
-        // invalid token
-        return next(createError.Unauthorized());
+        else return next(createError.Unauthorized());
       }
       // error in message broker
       next(createError.InternalServerError("Error in message broker"));
