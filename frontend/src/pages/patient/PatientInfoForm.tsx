@@ -1,13 +1,21 @@
-import { FC } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { FC, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
+import { initializeApp } from "firebase/app";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import axios from "axios";
+import { PatientAdditionalInfoForm } from "@/models/FormSchema";
+import { PatientAttributes } from "@/models/UserInfo";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "../../components/ui/input";
-import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import {
   Select,
   SelectContent,
@@ -15,20 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-import { PatientAdditionalInfoForm } from "@/models/FormSchema";
 import { Button } from "@/components/ui/button";
-
-import axios from "axios";
-
-import { initializeApp } from "firebase/app";
-import {
-  getStorage,
-  ref,
-  getDownloadURL,
-  uploadBytesResumable,
-} from "firebase/storage";
-import { PatientAttributes } from "@/models/UserInfo";
 
 const bloodGroups = [
   { key: 1, value: "A+" },
@@ -36,7 +31,7 @@ const bloodGroups = [
   { key: 3, value: "B+" },
   { key: 4, value: "B-" },
   { key: 5, value: "O+" },
-  { key: 6, value: "o-" },
+  { key: 6, value: "O-" },
   { key: 7, value: "AB+" },
   { key: 8, value: "AB-" },
 ];
@@ -64,7 +59,6 @@ const uploadImage = async (selectedFile: File | null) => {
       metadata
     );
     const downloadURL = await getDownloadURL(uploadTask.ref);
-    console.log(downloadURL);
     return downloadURL;
   }
 };
@@ -73,7 +67,7 @@ const infoSubmitHandler = async (
   data: z.infer<typeof PatientAdditionalInfoForm>,
   userToken: string,
   imageFile: File | null
-) : Promise<string> => {
+): Promise<string> => {
   data.image = (await uploadImage(imageFile)) as string;
 
   const patientData = {
@@ -129,7 +123,9 @@ const PatientInfoForm: FC<{
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [downloadURL, setDownloadURL] = useState<string>(props.patientInfo.image ? props.patientInfo.image : "");
+  const [downloadURL, setDownloadURL] = useState<string>(
+    props.patientInfo.image ? props.patientInfo.image : ""
+  );
 
   const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
@@ -137,22 +133,26 @@ const PatientInfoForm: FC<{
   };
 
   const onSubmit = async (data: z.infer<typeof PatientAdditionalInfoForm>) => {
-    const imageURL = await infoSubmitHandler(data, props.userToken, selectedFile);
+    const imageURL = await infoSubmitHandler(
+      data,
+      props.userToken,
+      selectedFile
+    );
     setDownloadURL(imageURL);
   };
 
   return (
     <>
-      <div className="text-black text-large justify-center text-large mt-5 font-bold gap-5 ml-6">
+      <div className="text-black text-3xl text-large text-center font-bold my-5">
         Additional Info
       </div>
       <form
         onSubmit={forms.handleSubmit(onSubmit)}
-        className="flex flex-col w-screen justify-start gap-5 ml-6"
+        className="flex flex-col w-screen justify-start mx-5"
       >
-        <div className="flex">
+        <div className="grid grid-cols-2">
           <div className="flex-[50%] flex flex-col gap-5">
-            <div className="flex gap-3">
+            <div className="grid grid-cols-2 w-[50%]">
               Name:
               <Controller
                 control={forms.control}
@@ -164,7 +164,7 @@ const PatientInfoForm: FC<{
                 )}
               />
             </div>
-            <div className="flex gap-3">
+            <div className="grid grid-cols-2 w-[50%]">
               Gender:
               <Controller
                 name="gender"
@@ -191,7 +191,7 @@ const PatientInfoForm: FC<{
                 )}
               />
             </div>
-            <div className="flex gap-3">
+            <div className="grid grid-cols-2 w-[50%]">
               Date of Birth:
               <Controller
                 control={forms.control}
@@ -207,7 +207,7 @@ const PatientInfoForm: FC<{
                 )}
               />
             </div>
-            <div className="flex gap-3">
+            <div className="grid grid-cols-2 w-[50%]">
               Mobile Number:
               <Controller
                 control={forms.control}
@@ -219,32 +219,33 @@ const PatientInfoForm: FC<{
                 )}
               />
             </div>
-            <div className="flex gap-3">
+            <div className="grid grid-cols-3 w-[75%]">
               Height:
               <Controller
                 name="height_feet"
                 control={forms.control}
                 render={({ field }) => (
-                  <div>
+                  <div className="flex items-center gap-3">
                     <Input {...field} placeholder="Height in feet" />
-                    Ft
+                    <p>Ft</p>
                     <p>{forms.formState.errors.height_feet?.message}</p>
                   </div>
                 )}
               />
+              {/* <div></div> */}
               <Controller
                 name="height_inches"
                 control={forms.control}
                 render={({ field }) => (
-                  <div>
+                  <div className="flex items-center gap-3">
                     <Input {...field} placeholder="Height in inches" />
-                    Inches
+                    <p>Inches</p>
                     <p>{forms.formState.errors.height_inches?.message}</p>
                   </div>
                 )}
               />
             </div>
-            <div className="flex gap-3">
+            <div className="grid grid-cols-2 w-[50%]">
               Weight:
               <Controller
                 control={forms.control}
@@ -256,44 +257,54 @@ const PatientInfoForm: FC<{
                 )}
               />
             </div>
-            <div className="flex-[50%] width-10 gap-3">
+            <div className="grid grid-cols-2 w-[50%]">
               Blood Group:
               <Controller
                 name="bloodGroup"
                 control={forms.control}
                 render={({ field }) => (
-                  <div className="flex-[50%]  w-[200px] flex-col">
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger className="flex width-2 bg-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {bloodGroups.map((department) => (
-                          <SelectItem
-                            key={department.key}
-                            value={department.value}
-                          >
-                            {department.value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                      <p>{forms.formState.errors.bloodGroup?.message}</p>
-                    </Select>
-                  </div>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {bloodGroups.map((department) => (
+                        <SelectItem
+                          key={department.key}
+                          value={department.value}
+                        >
+                          {department.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                    <p>{forms.formState.errors.bloodGroup?.message}</p>
+                  </Select>
                 )}
               />
             </div>
           </div>
-          <div className="flex-[30%] flex flex-col ml- gap-5">
+          <div className="flex flex-col justify-center items-center gap-3 ">
+            <p className="text-lg font-bold">Profile Picture</p>
+            {selectedFile && (
+              <Avatar className="w-[250px] h-[250px]">
+                <AvatarImage src={URL.createObjectURL(selectedFile)} />
+                <AvatarFallback>Loading</AvatarFallback>
+              </Avatar>
+            )}
+            {!selectedFile && props.patientInfo.image && (
+              <Avatar className="w-[250px] h-[250px]">
+                <AvatarImage src={props.patientInfo.image} />
+                <AvatarFallback>Loading</AvatarFallback>
+              </Avatar>
+            )}
             <Controller
               name="image"
               control={forms.control}
               render={({ field }) => (
                 <div className="flex flex-col">
-                  <Label htmlFor="profilePicture">Profile Picture</Label>
                   <Input
                     type="file"
                     ref={field.ref}
@@ -301,22 +312,9 @@ const PatientInfoForm: FC<{
                     onBlur={field.onBlur}
                     onChange={(e) => {
                       handleFileInput(e);
-                      // console.log(downloadURL);
                       // field.onChange(downloadURL);
                     }}
                   />
-                  {selectedFile && (
-                    <Avatar className="w-[250px] h-[250px]">
-                      <AvatarImage src={URL.createObjectURL(selectedFile)} />
-                      <AvatarFallback>Loading</AvatarFallback>
-                    </Avatar>
-                  )}
-                  {!selectedFile && props.patientInfo.image && (
-                    <Avatar className="w-[250px] h-[250px]">
-                      <AvatarImage src={props.patientInfo.image} />
-                      <AvatarFallback>Loading</AvatarFallback>
-                    </Avatar>
-                  )}
                 </div>
               )}
             />

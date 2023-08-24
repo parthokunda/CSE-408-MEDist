@@ -1,42 +1,12 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Controller,
-  SubmitHandler,
-  useForm,
-  useFieldArray,
-} from "react-hook-form";
-import * as z from "zod";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Input } from "../../components/ui/input";
-import { FC, useEffect } from "react";
-import { useState } from "react";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-import { PatientAdditionalInfoForm } from "@/models/FormSchema";
-import { Button } from "@/components/ui/button";
+import { FC } from "react";
+import axios from "axios";
 import { useCookies } from "react-cookie";
 
-import axios from "axios";
-
-import { initializeApp } from "firebase/app";
-import {
-  getStorage,
-  ref,
-  getDownloadURL,
-  uploadBytesResumable,
-} from "firebase/storage";
 import { useQuery } from "@tanstack/react-query";
-import { PatientAttributes, UserStatus } from "@/models/UserInfo";
-import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 import PatientInfoForm from "./PatientInfoForm";
+
+import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
+import { PatientAttributes } from "@/models/UserInfo";
 
 const getPatientInfo = async (
   bearerToken: string
@@ -70,13 +40,12 @@ export const PatientInfo: FC = () => {
     return <LoadingSpinner/>
   }
 
-
   //we will probably navigate to a default page from here
   // if(patientInfo.status && patientInfo.status.startsWith(UserStatus.FULLY_REGISTERED)){
   //   return <p>You are fully registered</p>
   // }
 
-  console.log(patientInfo.dob.toString().substring(0,10));
+  console.log(patientInfo);
 
   return <PatientInfoForm patientInfo={patientInfo} userToken={cookies.user.token}/>
 };
