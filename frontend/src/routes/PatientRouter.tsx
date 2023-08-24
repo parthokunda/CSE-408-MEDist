@@ -1,13 +1,38 @@
-import {FC} from 'react';
-import {useCookies} from 'react-cookie'
-import { Navigate } from 'react-router-dom';
+import NavBar from "@/components/customUI/NavBar";
+import { ProfileStatus } from "@/models/LoginSignUpSchema";
+import { navIcon } from "@/models/navIcon";
+import DoctorSearchPage from "@/pages/patient/DoctorSearchPage";
+import PatientInfo from "@/pages/patient/PatientInfo";
+import { FC } from "react";
+import { useCookies } from "react-cookie";
+import { Navigate, Route, Routes } from "react-router-dom";
 
-const PatientRoute : FC<{element:JSX.Element}> = (props) : JSX.Element => {
-    const [cookies] = useCookies(["user"]);
-    if(cookies.user && cookies.user.role && cookies.user.role == 'patient'){
-        return props.element;
+const navList: navIcon[] = [
+  { name: "Medicines", link: "/searchMedicines" },
+  { name: "Prescriptions", link: "/prescriptions" },
+  { name: "Appointments", link: "/appointments", role: "patient" },
+  { name: "Account", link: "/patient/account" },
+  { name: "Logout", link: "/logout/" }, //! careful with the first /. cookies path problem otherwise
+  // TODO: add a logout icon insted of this
+];
+
+const PatientRouter: FC = () => {
+  const [cookies] = useCookies(["user"]);
+  if (cookies.user && cookies.user.role && cookies.user.role == "patient") {
+    if (cookies.user.profile_status === ProfileStatus.PARTIALLY_REGISTERED) {
+      <Navigate to="/patient/account" />;
     }
-    return <Navigate to="/" />
+    return (
+      <Routes>
+        <Route >
+          <Route path="/" element={<PatientInfo />} />
+          <Route path="/account" element={<PatientInfo />} />
+          <Route path="/searchDoctor" element={<DoctorSearchPage />} />
+        </Route>
+      </Routes>
+    );
+  }
+  return <Navigate to="/" />;
 };
 
-export default PatientRoute;
+export default PatientRouter;
