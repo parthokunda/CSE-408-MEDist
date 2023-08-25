@@ -20,10 +20,18 @@ export interface AppointmentBookingInput {
   patientName: string;
   patientEmail: string;
 
-  patientCredentials: JSON;
-
   appointmentStartTime: Date;
   appointmentEndTime: Date;
+}
+
+export interface AppointmentConfirmingInput {
+  doctorName: string;
+  doctorEmail: string;
+
+  patientName: string;
+  patientEmail: string;
+
+  patientCredentials: JSON;
 }
 
 export interface Appointment_List {
@@ -45,16 +53,39 @@ export interface Search_Appointment_Input {
   filterByEndTime: Date | null;
 }
 
+export interface TimeSlot {
+  startTime: Date;
+  endTime: Date;
+}
+
 export interface Appointment_Repository_Interface {
+  // book temporary appointment
+  Book_Temporary_Appointment(
+    req: AppointmentBookingInput
+  ): Promise<Appointment>;
   // book online appointment
-  Book_Online_Appointment(req: AppointmentBookingInput): Promise<Appointment>;
+  Confirm_Online_Appointment(
+    appointmentID: number,
+    req: AppointmentConfirmingInput
+  ): Promise<Appointment>;
+
+  // delete appointment
+  Delete_Appointment(appointmentID: number, patientID: number): Promise<void>;
 
   // lastest booking appointment time
-  Lastest_Booking_Appointment_Time_In_That_Day(
+  Find_Booking_Appointment_Time_In_That_Day(
+    doctorID: number,
+    day_startTime: Date,
+    day_endTime: Date,
+    timeInterval_of_eachSlot: number
+  ): Promise<Date>;
+
+  // check if there is any temporary appointment in that day
+  Is_There_Any_Temporary_Appointment_In_That_Day(
     doctorID: number,
     day_startTime: Date,
     day_endTime: Date
-  ): Promise<Date>;
+  ): Promise<boolean>;
 
   // total slot booked
   Total_Slot_Booked_In_That_Day(
@@ -76,6 +107,9 @@ export interface Appointment_Repository_Interface {
     pagination: number,
     currentPage: number
   ): Promise<Appointment_List>;
+
+  // get appointment by id
+  Get_AppointmentInfo(appointmentID: number): Promise<Appointment>;
 }
 
 class AppointmentRepository implements Appointment_Repository_Interface {
@@ -154,11 +188,49 @@ class AppointmentRepository implements Appointment_Repository_Interface {
     return searchQuery;
   }
 
+  // ----------------- Get Appointment Info ----------------- //
+  async Get_AppointmentInfo(appointmentID: number): Promise<Appointment> {
+    try {
+      const appointment = await Appointment.findByPk(appointmentID);
+      if (!appointment) throw createHttpError(404, "Appointment not found");
+      return appointment;
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Internal Server Error");
+    }
+  }
+
+  // ----------------- Delete Appointment ----------------- //
+  async Delete_Appointment(
+    appointmentID: number,
+    patientID: number
+  ): Promise<void> {
+    try {
+      const appointment = await Appointment.findByPk(appointmentID);
+      if (!appointment) throw createHttpError(404, "Appointment not found");
+      if (appointment.patientID !== patientID)
+        throw createHttpError(
+          403,
+          "You are not authorized to delete this appointment"
+        );
+      // delete appointment
+      await appointment.destroy();
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Internal Server Error");
+    }
+  }
+
   // ----------------- Book Online Appointment ----------------- //
-  async Book_Online_Appointment(
-    req: AppointmentBookingInput
+  async Confirm_Online_Appointment(
+    appointmentID: number,
+    req: AppointmentConfirmingInput
   ): Promise<Appointment> {
     try {
+      // find appointment
+      const appointment = await Appointment.findByPk(appointmentID);
+      if (!appointment) throw createHttpError(404, "Appointment not found");
+
       // have to generate meet link
       const authClient = await googleCalendarApi.createClient(
         req.patientCredentials
@@ -174,15 +246,95 @@ class AppointmentRepository implements Appointment_Repository_Interface {
         description: `Appointment with Dr. ${req.doctorName}	
         Patient Name: ${req.patientName}`,
 
-        startTime: req.appointmentStartTime,
-        endTime: req.appointmentEndTime,
+        startTime: appointment.startTime,
+        endTime: appointment.endTime,
 
         otherAttendees: [req.doctorEmail, req.patientEmail],
       };
 
       const meetLink = await googleCalendarApi.createEvent(event, authClient);
 
-      // create appointment
+      // update meet link
+      appointment.meetingLink = meetLink;
+      await appointment.save();
+
+      return appointment;
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Internal Server Error");
+    }
+  }
+
+  // ----------------- Lastest Booking Appointment Time ----------------- //
+  async Find_Booking_Appointment_Time_In_That_Day(
+    doctorID: number,
+    day_startTime: Date,
+    day_endTime: Date,
+    timeInterval_of_eachSlot: number
+  ): Promise<Date> {
+    try {
+      // find a time gap between day_startTime and day_endTime where no appointment is booked that is there is no entry in database
+      // for that time gap
+
+      // find all appointments in that day
+      const appointments = await Appointment.findAll({
+        where: {
+          doctorID: doctorID,
+          startTime: {
+            [Op.between]: [day_startTime, day_endTime],
+          },
+        },
+        order: [["startTime", "ASC"]],
+      });
+
+      for (let i = 0; i < appointments.length - 1; i++) {
+        if (
+          appointments[i + 1].startTime.getTime() -
+            appointments[i].endTime.getTime() >=
+          timeInterval_of_eachSlot
+        ) {
+          return appointments[i].endTime;
+        }
+      }
+
+      // if no time gap found
+      // then return the last appointment end time
+      return appointments[appointments.length - 1].endTime;
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Internal Server Error");
+    }
+  }
+
+  async Is_There_Any_Temporary_Appointment_In_That_Day(
+    doctorID: number,
+    day_startTime: Date,
+    day_endTime: Date
+  ): Promise<boolean> {
+    try {
+      const appointment = await Appointment.findOne({
+        where: {
+          doctorID: doctorID,
+          startTime: {
+            [Op.between]: [day_startTime, day_endTime],
+          },
+          status: AppointmentStatus.TEMPORARY,
+        },
+      });
+
+      if (appointment) return true;
+      else return false;
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Internal Server Error");
+    }
+  }
+
+  async Book_Temporary_Appointment(
+    req: AppointmentBookingInput
+  ): Promise<Appointment> {
+    try {
+      // create temporary appointment
       const appointment = await Appointment.create({
         doctorID: req.doctorID,
         doctorEmail: req.doctorEmail,
@@ -196,41 +348,10 @@ class AppointmentRepository implements Appointment_Repository_Interface {
         endTime: req.appointmentEndTime,
 
         type: AppointmentType.ONLINE,
-        meetingLink: meetLink,
+        status: AppointmentStatus.TEMPORARY,
       });
 
       return appointment;
-    } catch (error) {
-      log.error(error);
-      throw createHttpError(500, "Internal Server Error");
-    }
-  }
-
-  // ----------------- Lastest Booking Appointment Time ----------------- //
-  async Lastest_Booking_Appointment_Time_In_That_Day(
-    doctorID: number,
-    day_startTime: Date,
-    day_endTime: Date
-  ): Promise<Date> {
-    try {
-      // get lastest appointment time
-      // which is in range [startTime, endTime]
-
-      const lastestAppointment = await Appointment.findOne({
-        where: {
-          doctorID: doctorID,
-          startTime: {
-            [Op.between]: [day_startTime, day_endTime],
-          },
-        },
-        order: [["startTime", "DESC"]],
-      });
-
-      if (lastestAppointment) {
-        return lastestAppointment.startTime;
-      } else {
-        return day_startTime;
-      }
     } catch (error) {
       log.error(error);
       throw createHttpError(500, "Internal Server Error");

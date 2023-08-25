@@ -13,12 +13,22 @@ import sequelizeConnection from "../config";
 import Prescription from "./Prescription.model";
 import Prescription_Medicines from "./Prescription_Medicines.model";
 
+export const WeekName = [
+  "Friday",
+  "Saturday",
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+];
+
 export enum AppointmentStatus {
   PENDING = "pending",
   PRESCRIBED = "prescribed",
   RATED = "rated",
   COMPLETED = "completed",
-  CANCELLED = "cancelled",
+  TEMPORARY = "temporary",
 }
 
 export enum AppointmentType {
@@ -45,7 +55,7 @@ export interface PendingAppointmentOverviewInfo {
 
   status: AppointmentStatus;
 
-  meetingLink: string;
+  meetingLink: string | null;
 }
 
 export interface PendingAppointments {
@@ -176,7 +186,7 @@ Appointment.init(
 
     meetingLink: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
 
     rating: {
