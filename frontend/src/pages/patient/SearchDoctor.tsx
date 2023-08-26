@@ -31,22 +31,9 @@ export const SearchDoctor: FC<{
   });
 
   const onSubmit: SubmitHandler<z.infer<typeof DoctorSearchForm>> = (data) => {
-    // console.log(data);
     props.formSubmitHandler(data);
   };
   const [cookies] = useCookies(["user"]);
-  const departments = [
-    "ENT",
-    "Cardiology",
-    "Dermatology",
-    "Gastroenterology",
-    "Gynecology",
-    "Neurology",
-    "Oncology",
-    "Orthopedics",
-    "Pediatrics",
-    "Psychiatry",
-  ];
   const [specializations, setSpecializations] = useState<
     SpecializationAttributes[]
   >([]);
@@ -74,27 +61,17 @@ export const SearchDoctor: FC<{
     fetchSpecializations();
   }, []);
 
-  // useEffect(() => {
-  //   const subscription = forms.watch(() => forms.handleSubmit(onSubmit)());
-  //   console.log(
-  //     "🚀 ~ file: test.tsx:32 ~ useEffect ~ subscription:",
-  //     subscription
-  //   );
-  //   return () => subscription.unsubscribe();
-  // }, [forms.handleSubmit]);
-
   return (
     <>
       <form
         onSubmit={forms.handleSubmit(onSubmit)}
-        // onChange={forms.handleSubmit(onSubmit)}
         className="flex w-screen justify-start gap-5 items-center"
       >
         <Controller
           name="name"
           control={forms.control}
           render={({ field }) => (
-            <div className=" relative w-1/3 ">
+            <div className="relative w-1/3 ">
               <AiOutlineSearch className="h-8 w-8 absolute p-1 box-border right-3 top-1/2 transform -translate-y-1/2" />
               <Input {...field} placeholder="Search By Name" />
             </div>

@@ -1,99 +1,23 @@
-import { FC, useEffect, useState } from "react";
-import SearchDoctor from "./SearchDoctor";
-import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
-import { MedSearchForm } from "@/models/FormSchema";
-import { DoctorSearchForm } from "@/models/FormSchema";
-import { DoctorPendingAttributes } from "@/models/Brand";
-import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
-import DoctorSearchCards from "./DoctorSearchCards";
-import DoctorPendingCards from "./PatientPendingAppointmentsCards";
-import { useCookies } from "react-cookie";
-import axios from "axios";
 import {
-  SpecializationAttributes,
   PendingAppointments,
-  SearchDoctorInfo,
+  SearchDoctorInfo
 } from "@/models/Brand";
-import { set } from "date-fns";
-
-// import { useMutation } from "@tanstack/react-query";
+import { DoctorSearchForm } from "@/models/FormSchema";
+import axios from "axios";
+import { FC, useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
+import { z } from "zod";
+import DoctorSearchCards from "./Appointment/DoctorSearchCards";
+import DoctorPendingCards from "./PatientPendingAppointmentsCards";
+import SearchDoctor from "./SearchDoctor";
 
 const DoctorSearchPage: FC = (props) => {
   const [doctors, setDoctors] = useState<SearchDoctorInfo>();
-  // const fetchDoctorList =  async(searchFormData:z.infer<typeof DoctorSearchForm>):Promise<SearchDoctorInfo> => {
-
-  //     const str :SearchDoctorInfo= await axios.get(
-  //       `${import.meta.env.VITE_DB_URL}:${
-  //         import.meta.env.VITE_DB_PORT
-  //       }api/doctor/search/${currentSearchPage}?name=${
-  //         searchFormData.name
-  //       }&specializationID=${searchFormData.department}&pagination=5`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
-  //         },
-  //       }
-  //     );
-  //     console.log(str);
-  //     return str;
-  //     // setDoctors(response.data);
-  //     // return response.data;
-
-  // };
-
-  // useEffect(() => {
-  //   async function fetchDoctors(){
-  //     try{
-  //       const response = await axios.get(
-  //         `${import.meta.env.VITE_DB_URL}:${
-  //           import.meta.env.VITE_DB_PORT
-  //         }api/doctor/search/${currentSearchPage}?name=${
-  //           searchFormData.name
-  //         }&specializationID=${searchFormData.department}&pagination=5`,
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
-  //           },
-  //         }
-  //       );
-  //       console.log(response.data);
-  //       setDoctors(response.data);
-  //   }
-  //   catch(error){
-  //     console.error(error);
-  //   }
-  // }
-  // fetchDoctors();
-  // } ,[]);
-
-  // const [Specializations, setSpecializations] = useState<
 
   const [searchFormData, setSearchFormData] = useState<
     z.infer<typeof DoctorSearchForm>
   >({ name: "", department: "" });
   const updateFormData = (formData: z.infer<typeof DoctorSearchForm>): void => {
-    // console.log(formData);
-    // async function fetchDoctors(){
-    //       try{
-    //         const response = await axios.get(
-    //           `${import.meta.env.VITE_DB_URL}:${
-    //             import.meta.env.VITE_DB_PORT
-    //           }/api/doctor/search/1?name=Dh&specializationID=2&pagination=5`,
-    //           {
-    //             headers: {
-    //               Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
-    //             },
-    //           }
-    //         );
-    //         console.log("here", response.data);
-    //         setDoctors(response.data);
-    //     }
-    //     catch(error){
-    //       console.error(error);
-    //     }
-    //   }
-    //   fetchDoctors();
     var str = `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
     }/api/doctor/search/${currentSearchPage}?name=${
@@ -114,20 +38,13 @@ const DoctorSearchPage: FC = (props) => {
         }
       )
       .then((response) => {
-        // console.log("here", response.data);
         setDoctors(response.data);
         setSearchFormData(formData);
-        // resetCurrentPendingPage();
-        // resetCurrentSearchPage();
         console.log("here", searchFormData);
-        // console.log("here", doctors);
       })
       .catch((error) => {
         console.error(error);
       });
-
-    // setSearchFormData(formData);
-    // console.log("here", searchFormData);
   };
   const [searchTab, setSearchTab] = useState(true);
   const [cookies] = useCookies(["user"]);
@@ -141,20 +58,12 @@ const DoctorSearchPage: FC = (props) => {
   function resetCurrentPendingPage(): void {
     setCurrentPendingPage(1);
   }
-  // const { data, isError, isLoading, mutate } = useMutation({
-  //   mutationKey: ["doctorList"],
-  //   mutationFn: fetchDoctorList,
-  // });
-
   useEffect(() => {
     resetCurrentSearchPage();
   }, [searchFormData.name, searchFormData.department]);
   useEffect(() => {
     resetCurrentPendingPage();
   }, [searchFormData]);
-  // useEffect(() => {
-  //   mutate(searchFormData);
-  // }, [searchFormData, currentSearchPage]);
   useEffect(() => {
     updateFormData(searchFormData);
   }, [currentSearchPage, searchFormData]);

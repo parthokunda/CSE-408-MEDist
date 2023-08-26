@@ -1,26 +1,18 @@
-import { FC } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
 import NavBar from "@/components/customUI/NavBar";
 import { navIcon } from "@/models/navIcon";
+import Logout from "@/pages/LoginPage/Logout";
 import GenericDescriptionPage from "@/pages/Medicines/Generic/GenericDescriptionPage";
 import ManufacturerDescriptionPage from "@/pages/Medicines/Manufacturer/ManufacturerPage";
 import MedicineDescriptionPage from "@/pages/Medicines/Medicine/MedicineDescriptionPage";
 import MedicineSearchPage from "@/pages/Medicines/SearchMedicines/MedicineSearchPage";
-import PatientRoute from "./PatientRoute";
-import AuthRoute from "./AuthRouter";
-import Logout from "@/pages/LoginPage/Logout";
-import DoctorInfo from "@/pages/doctor/DoctorInfo";
-import PatientInfo from "@/pages/patient/PatientInfo";
 import AddSchedule from "@/pages/doctor/AddSchedule";
-import BookAppointment from "@/pages/patient/PatientBookAppointment";
-import DoctorSearchPage from "@/pages/patient/DoctorSearchPage";
+import DoctorInfo from "@/pages/doctor/DoctorInfo";
 import PatientSearchPage from "@/pages/doctor/DoctorPendingAppointments";
+import BookAppointment from "@/pages/patient/PatientBookAppointment";
+import { FC } from "react";
 import { useCookies } from "react-cookie";
-import {
-  UserRoles,
-  ProfileStatus,
-  LoginSignupToken,
-} from "@/models/LoginSignUpSchema";
+import { Navigate, Route, Routes } from "react-router-dom";
+import AuthRoute from "./AuthRouter";
 import PatientRouter from "./PatientRouter";
 
 const AppRouter: FC = () => {

@@ -1,6 +1,7 @@
 import NavBar from "@/components/customUI/NavBar";
 import { ProfileStatus } from "@/models/LoginSignUpSchema";
 import { navIcon } from "@/models/navIcon";
+import AppointmentPage from "@/pages/patient/Appointment/AppointmentPage";
 import DoctorSearchPage from "@/pages/patient/DoctorSearchPage";
 import PatientInfo from "@/pages/patient/PatientInfo";
 import { FC } from "react";
@@ -27,7 +28,7 @@ const PatientRouter: FC = () => {
         <Route >
           <Route path="/" element={<PatientInfo />} />
           <Route path="/account" element={<PatientInfo />} />
-          <Route path="/searchDoctor" element={<DoctorSearchPage />} />
+          <Route path="/searchDoctor" element={<AppointmentPage/>} />
         </Route>
       </Routes>
     );

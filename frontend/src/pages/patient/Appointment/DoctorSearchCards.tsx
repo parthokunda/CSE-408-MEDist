@@ -1,9 +1,8 @@
-import { FC, useState } from "react";
-import { AiOutlineArrowLeft } from "react-icons/ai";
-import { AiOutlineArrowRight } from "react-icons/ai";
-
+import { FC } from "react";
+import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import { SearchDoctorInfo } from "@/models/Brand";
 import DoctorSearchCard from "./DoctorSearchCard";
+
 const DoctorSearchCards: FC<{
   doctorFetchedData: SearchDoctorInfo;
   currentPage: number;

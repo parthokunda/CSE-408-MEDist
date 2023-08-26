@@ -2,11 +2,7 @@ import { FC } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-// import {FontAwesomeIcon} from "react-icons/fa"
 
 import { DoctorOverviewInfo } from "@/models/Brand";
 import { Button } from "@/components/ui/button";
@@ -44,12 +40,6 @@ const DoctorSearchCard: FC<{ doctor: DoctorOverviewInfo }> = (props) => {
           </div>
           <div className="flex flex-[20%]">
             <div className="flex flex-col">
-              {/* <div className="text-c1 text-xl font-bold">
-                Cost : {props.doctor.cost} Taka
-              </div>
-              <div className="text-c1 text-xl font-bold">
-                Contact : {props.doctor.contact}
-              </div> */}
               <Button className="bg-c2 w-42 text-white rounded-lg hover:bg-c1 mt-5">
                 <Link to={`/patient/bookAppointment/${props.doctor.DoctorInfo.id}`}>
                   Book An Appointment

@@ -93,6 +93,8 @@ export const DoctorSearchForm = z.object({
   department: z.string(),
 });
 
+export type DoctorSearchFormType = z.infer<typeof DoctorSearchForm>
+
 export const PatientSearchForm = z.object({
   name: z.string(),
 });
