@@ -31,14 +31,14 @@ appointmentRouter.get("/", authorize(false), (req: Request, res: Response) => {
 
 // create appointment - only accessible to patient
 appointmentRouter.post(
-  "/book-online-appointment/:doctorID",
+  "/book-online-appointment/:scheduleID",
   authorize(true),
   validateRequest(appointmentSchema.Booking_Online_Appointment),
   appointmentController.Book_Online_Appointment
 );
 
 // confirm appointment - only accessible to patient
-appointmentRouter.get(
+appointmentRouter.put(
   "/book-online-appointment/confirm/:appointmentID",
   authorize(true),
   validateRequest(appointmentSchema.Confirm_Online_Appointment),
@@ -46,7 +46,7 @@ appointmentRouter.get(
 );
 
 // cancel appointment - only accessible to patient
-appointmentRouter.get(
+appointmentRouter.delete(
   "/book-online-appointment/cancel/:appointmentID",
   authorize(true),
   validateRequest(appointmentSchema.Confirm_Online_Appointment),

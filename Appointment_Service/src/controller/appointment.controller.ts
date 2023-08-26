@@ -9,7 +9,6 @@ import {
   prescription_medicineService,
 } from "../services";
 import {
-  Booking_Online_Appointment_Body_Input,
   Booking_Online_Appointment_Params_Input,
   Confirm_Online_Appointment_Params_Input,
 } from "../schema/appointment.schema";
@@ -18,6 +17,7 @@ import log from "../utils/logger";
 import { Search_Appointment_Input } from "../database/repository";
 import {
   AppointmentStatus,
+  AppointmentTimeSlot,
   AppointmentType,
   WeekName,
 } from "../database/models";
@@ -29,16 +29,13 @@ export interface SlotRequest {
   totalSlots: number;
   timeInterval_forEachSlot: number;
   patientEmail: string;
+  timeSlotID: number;
 }
 
 export interface Appointment_Controller_Interface {
   //book online appointment - access by patient
   Book_Online_Appointment(
-    req: Request<
-      Booking_Online_Appointment_Params_Input,
-      {},
-      Booking_Online_Appointment_Body_Input
-    >,
+    req: Request<Booking_Online_Appointment_Params_Input>,
     res: Response,
     next: NextFunction
   );
@@ -144,34 +141,32 @@ class Appointment_Controller implements Appointment_Controller_Interface {
 
   // ----------------- Book Online Appointment ----------------- //
   async Book_Online_Appointment(
-    req: Request<
-      Booking_Online_Appointment_Params_Input,
-      {},
-      Booking_Online_Appointment_Body_Input
-    >,
+    req: Request<Booking_Online_Appointment_Params_Input>,
     res: Response,
     next: NextFunction
   ) {
-    if (!req.body.weekday && !req.body.weekname)
-      throw createHttpError(
-        400,
-        "weekday or weekname field in request body is required"
-      );
-
-    if (req.body.weekname)
-      req.body.weekday = WeekName.indexOf(req.body.weekname);
-
-    //convert doctorID(string type) to number type
-    const doctorID = Number(req.params.doctorID);
+    const scheduleID = Number(req.params.scheduleID);
     const patientID = Number(req.user_identity?.id);
     const patientEmail = req.user_identity?.email as string;
-    const weekday = req.body.weekday as number;
-    const startTime = req.body.startTime as string;
-    const endTime = req.body.endTime as string;
-    const totalSlots = req.body.totalSlots as number;
-
     try {
       // check if week day is less than today
+      const timeSlotInfo: AppointmentTimeSlot =
+        await appointmentService.Get_Schedule_Info_From_Doctor_Server(
+          scheduleID
+        );
+
+      if (!timeSlotInfo) throw createHttpError(404, "Schedule not found");
+
+      if (timeSlotInfo.remainingSlots === 0)
+        throw createHttpError(400, "No slot available");
+
+      const doctorID = timeSlotInfo.doctorID;
+      const timeSlotID = timeSlotInfo.id;
+      const weekday = timeSlotInfo.weekday;
+      const startTime = timeSlotInfo.startTime;
+      const endTime = timeSlotInfo.endTime;
+      const totalSlots = timeSlotInfo.totalSlots;
+
       const today = new Date().getDay();
 
       let appointmentDay: Date;
@@ -219,6 +214,7 @@ class Appointment_Controller implements Appointment_Controller_Interface {
         totalSlots,
         timeInterval_forEachSlot,
         patientEmail,
+        timeSlotID,
       };
 
       // book temporary online appointment

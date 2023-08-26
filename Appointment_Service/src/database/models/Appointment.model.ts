@@ -36,6 +36,19 @@ export enum AppointmentType {
   PHYSICAL = "physical",
 }
 
+export interface AppointmentTimeSlot {
+  id: number;
+  doctorID: number;
+
+  weekday: number;
+
+  startTime: string;
+  endTime: string;
+
+  totalSlots: number;
+  remainingSlots: number;
+}
+
 export interface Patient_or_Doctor_Info {
   id: number;
   name: string;
@@ -85,6 +98,10 @@ export interface AppointmentAttributes {
   meetingLink: string;
   rating: number;
 
+  timeSlotID: number;
+
+  expires_at: Date;
+
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -108,6 +125,9 @@ class Appointment extends Model implements AppointmentAttributes {
 
   public meetingLink!: string;
   public rating!: number;
+
+  public timeSlotID!: number;
+  public expires_at!: Date;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -180,7 +200,7 @@ Appointment.init(
     status: {
       type: DataTypes.ENUM,
       values: Object.values(AppointmentStatus),
-      defaultValue: AppointmentStatus.PENDING,
+      defaultValue: AppointmentStatus.TEMPORARY,
       allowNull: false,
     },
 
@@ -192,6 +212,16 @@ Appointment.init(
     rating: {
       type: DataTypes.INTEGER,
       allowNull: true,
+    },
+
+    timeSlotID: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+
+    expires_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
     },
   },
   {

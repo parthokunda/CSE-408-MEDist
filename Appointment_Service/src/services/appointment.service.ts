@@ -4,6 +4,7 @@ import createHttpError from "http-errors";
 // internal imports
 import log from "../utils/logger";
 import broker, {
+  BrokerServiceInterface,
   RPC_Request_Payload,
   RPC_Response_Payload,
 } from "../utils/broker";
@@ -11,6 +12,7 @@ import broker, {
 // import models
 import {
   Appointment,
+  AppointmentTimeSlot,
   AppointmentType,
   Patient_or_Doctor_Info,
   PendingAppointmentOverviewInfo,
@@ -27,6 +29,7 @@ import {
 } from "../database/repository";
 import { SlotRequest } from "../controller/appointment.controller";
 import { config } from "../config";
+import brokerService from "../utils/broker";
 
 export interface AppointmentServiceInterface {
   // check if patient has already booked an appointment
@@ -35,6 +38,11 @@ export interface AppointmentServiceInterface {
     day_startTime: Date,
     day_endTime: Date
   ): Promise<boolean>;
+
+  // get shedule info from doctor_server
+  Get_Schedule_Info_From_Doctor_Server(
+    scheduleID: number
+  ): Promise<AppointmentTimeSlot>;
 
   // book online appointment
   Book_Temporary_Online_Appointment(
@@ -207,13 +215,73 @@ class AppointmentService implements AppointmentServiceInterface {
     };
   }
 
+  // ----------------- Get Schedule Info From Doctor Server ----------------- //
+  async Get_Schedule_Info_From_Doctor_Server(
+    scheduleID: number
+  ): Promise<AppointmentTimeSlot> {
+    try {
+      const payload = {
+        type: "GET_SCHEDULE_INFO_FROM_ID",
+        data: {
+          scheduleID,
+        },
+      };
+
+      log.debug(payload, "payload - for 'GET_SCHEDULE_INFO_FROM_ID'");
+
+      const doctor_response_payload: RPC_Response_Payload =
+        await broker.RPC_Request(config.DOCTOR_RPC_QUEUE, payload);
+
+      log.debug(
+        doctor_response_payload,
+        "response payload - from doctor - for 'GET_SCHEDULE_INFO_FROM_ID'"
+      );
+
+      if (doctor_response_payload.status !== "success")
+        throw createHttpError(500, "Error in message broker - from doctor");
+
+      return {
+        id: doctor_response_payload.data["id"],
+        doctorID: doctor_response_payload.data["doctorID"],
+        weekday: doctor_response_payload.data["weekday"],
+        startTime: doctor_response_payload.data["startTime"],
+        endTime: doctor_response_payload.data["endTime"],
+        totalSlots: doctor_response_payload.data["totalSlots"],
+        remainingSlots: doctor_response_payload.data["remainingSlots"],
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // ----------------- Delete Appointment ----------------- //
   async Delete_Appointment(
     appointmentID: number,
     patientID: number
   ): Promise<void> {
     try {
+      const appointment = await appointmentRepository.Get_AppointmentInfo(
+        appointmentID
+      );
+
+      const timeSlotID = appointment.timeSlotID;
+
       await appointmentRepository.Delete_Appointment(appointmentID, patientID);
+
+      // publish to doctor server
+      const payload: RPC_Request_Payload = {
+        type: "DELETED_TEMP_APPOINTMENT",
+        data: {
+          appointmentID,
+          timeSlotID,
+        },
+      };
+
+      log.debug(payload, "payload - for 'DELETED_APPOINTMENT'");
+      await brokerService.PUBLISH_TO_EXCHANGE(
+        config.TEMPORARAY_APPOINTMENT_DELETION_EXCHANGE,
+        payload
+      );
     } catch (error) {
       throw error;
     }
@@ -297,12 +365,32 @@ class AppointmentService implements AppointmentServiceInterface {
 
         appointmentStartTime: startTime,
         appointmentEndTime: endTime,
+
+        timeSlotID: slotRequest.timeSlotID,
       };
 
       const newAppointment =
         await appointmentRepository.Book_Temporary_Appointment(
           appointmentInput
         );
+
+      if (!newAppointment)
+        throw createHttpError(500, "Error in booking temporary appointment");
+
+      // publish to doctor server
+      const payload: RPC_Request_Payload = {
+        type: "BOOKED_TEMP_APPOINTMENT",
+        data: {
+          appointmentID: newAppointment.id,
+          timeSlotID: newAppointment.timeSlotID,
+        },
+      };
+
+      log.debug(payload, "payload - for 'BOOKED_TEMP_APPOINTMENT'");
+      await brokerService.PUBLISH_TO_EXCHANGE(
+        config.APPOINTMENT_CREATION_EXCHANGE,
+        payload
+      );
 
       return {
         id: newAppointment.id,

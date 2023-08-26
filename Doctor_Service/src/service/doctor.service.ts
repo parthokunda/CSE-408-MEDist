@@ -26,6 +26,7 @@ import { doctorRepository } from "../database/repository";
 import { searchQuery_and_Params } from "../database/repository/doctor.repository";
 import log from "../utils/logger";
 import { OnlineSchedule_Excluded_Properties } from "../database/models";
+import online_scheduleService from "./online_schedule.service";
 
 export interface DoctorServiceInterface {
   // during registration and login
@@ -140,6 +141,11 @@ class DoctorService implements DoctorServiceInterface {
 
       case "GET_EMAIL_AND_NAME_FROM_ID":
         return await this.getEmailandName_givenID(
+          Number(payload.data["doctorID"])
+        );
+
+      case "GET_SCHEDULE_INFO_FROM_ID":
+        return await online_scheduleService.giveScheduleInfo(
           Number(payload.data["doctorID"])
         );
 

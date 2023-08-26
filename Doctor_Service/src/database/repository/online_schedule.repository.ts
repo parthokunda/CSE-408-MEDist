@@ -6,6 +6,7 @@ import { OnlineScheduleAttributes } from "../models/Online_Schedule.model";
 
 //import model
 import { Doctor, OnlineSchedule } from "../models";
+import log from "../../utils/logger";
 
 export interface Online_Schedule_Repository_Interface {
   // create online schedule
@@ -19,11 +20,28 @@ export interface Online_Schedule_Repository_Interface {
     doctorID: number,
     schedules: Partial<OnlineSchedule>[]
   ): Promise<OnlineSchedule[]>;
+
+  // get online schedule info
+  getOnlineScheduleInfo(scheduleID: number): Promise<OnlineSchedule>;
 }
 
 class Online_Schedule_Repository
   implements Online_Schedule_Repository_Interface
 {
+  // ----------------------- Get Online Schedule Info ----------------------- //
+  async getOnlineScheduleInfo(scheduleID: number): Promise<OnlineSchedule> {
+    try {
+      const schedule = await OnlineSchedule.findByPk(scheduleID);
+      if (!schedule)
+        throw new createHttpError.NotFound("Online schedule not found");
+
+      return schedule;
+    } catch (error) {
+      log.error(error, "Error in getting online schedule info");
+      throw createHttpError.InternalServerError(error.message);
+    }
+  }
+
   // ----------------------- Create Online Schedule ----------------------- //
   async createOnlineSchedules(
     doctorID: number,

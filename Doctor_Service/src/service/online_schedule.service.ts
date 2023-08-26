@@ -18,6 +18,13 @@ import {
 import { DoctorProfileInfo, OnlineScheduleOverview } from "../database/models";
 import doctorService from "./doctor.service";
 import { excludeProperties } from "../utils/necessary_functions";
+import brokerService, {
+  BrokerServiceInterface,
+  RPC_Request_Payload,
+  RPC_Response_Payload,
+} from "../utils/broker";
+import log from "../utils/logger";
+import { config } from "../config";
 
 export interface OnlineScheduleServiceInterface {
   //create online schedule
@@ -34,9 +41,116 @@ export interface OnlineScheduleServiceInterface {
 
   // get online schedule
   getOnlineSchedule(doctorID: number): Promise<DoctorOnlineScheduleInfo>;
+
+  // give schedule info to other services
+  giveScheduleInfo(scheduleID: number): Promise<RPC_Response_Payload>;
 }
 
 class OnlineScheduleService implements OnlineScheduleServiceInterface {
+  // broker service will be insatnced once and will be used throughout the application
+  // even if we create multiple instances of this class
+
+  private static brokerService: BrokerServiceInterface;
+
+  constructor() {
+    if (!OnlineScheduleService.brokerService) {
+      OnlineScheduleService.brokerService = brokerService;
+
+      brokerService.SUBSCRIBE_TO_EXCHANGE(
+        config.TEMPORARAY_APPOINTMENT_DELETION_EXCHANGE,
+        this.temporaryAppointmentDeletionObserver
+      );
+
+      brokerService.SUBSCRIBE_TO_EXCHANGE(
+        config.APPOINTMENT_CREATION_EXCHANGE,
+        this.AppointmentCreationObserver
+      );
+    }
+  }
+
+  private temporaryAppointmentDeletionObserver = async (
+    payload: RPC_Request_Payload
+  ): Promise<void> => {
+    try {
+      log.info(payload, "received info that an appointment has been deleted");
+      const timeSlotID = payload.data["timeSlotID"];
+
+      const schedule = await online_scheduleRepository.getOnlineScheduleInfo(
+        timeSlotID
+      );
+
+      if (!schedule) {
+        log.error("No schedule found with the given time slot id");
+        return;
+      }
+
+      if (schedule.remainingSlots < schedule.totalSlots) {
+        schedule.remainingSlots++;
+        await schedule.save();
+      }
+    } catch (error) {
+      log.error(error, "Error in temporary appointment deletion observer");
+      return;
+    }
+  };
+
+  private AppointmentCreationObserver = async (
+    payload: RPC_Request_Payload
+  ): Promise<void> => {
+    try {
+      log.info(payload, "received info that an appointment has been created");
+      const timeSlotID = payload.data["timeSlotID"];
+
+      const schedule = await online_scheduleRepository.getOnlineScheduleInfo(
+        timeSlotID
+      );
+
+      if (!schedule) {
+        log.error("No schedule found with the given time slot id");
+        return;
+      }
+
+      if (schedule.remainingSlots > 0) {
+        schedule.remainingSlots--;
+        await schedule.save();
+      }
+    } catch (error) {
+      log.error(error, "Error in appointment creation observer");
+      return;
+    }
+  };
+
+  // ----------------------- Give Schedule Info ----------------------- //
+  async giveScheduleInfo(scheduleID: number): Promise<RPC_Response_Payload> {
+    try {
+      const schedule = await online_scheduleRepository.getOnlineScheduleInfo(
+        scheduleID
+      );
+
+      return {
+        status: "success",
+        data: {
+          id: schedule.id,
+          doctorID: schedule.doctorID,
+
+          weekday: schedule.weekday,
+          startTime: schedule.startTime,
+          endTime: schedule.endTime,
+
+          totalSlots: schedule.totalSlots,
+          remainingSlots: schedule.remainingSlots,
+        },
+      };
+    } catch (error) {
+      log.error(error, "Error in giving schedule info");
+
+      return {
+        status: "error",
+        data: {},
+      };
+    }
+  }
+
   // ----------------------- Create Online Schedule ----------------------- //
   async createOnlineSchedule(
     doctorID: number,

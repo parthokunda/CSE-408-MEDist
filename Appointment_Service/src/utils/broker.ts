@@ -29,6 +29,16 @@ export interface BrokerServiceInterface {
   ): Promise<RPC_Response_Payload>;
 
   RPC_Observer(userService: AppointmentServiceInterface): Promise<void>;
+
+  PUBLISH_TO_EXCHANGE(
+    RPC_EXCHANGE_NAME: string,
+    requestPayload: RPC_Request_Payload
+  ): Promise<void>;
+
+  SUBSCRIBE_TO_EXCHANGE(
+    RPC_EXCHANGE_NAME: string,
+    callback: (requestPayload: RPC_Request_Payload) => void
+  ): Promise<void>;
 }
 
 class BrokerService implements BrokerServiceInterface {
@@ -45,6 +55,58 @@ class BrokerService implements BrokerServiceInterface {
     return await this.amqlibConnection.createChannel();
   }
 
+  async SUBSCRIBE_TO_EXCHANGE(
+    RPC_EXCHANGE_NAME: string,
+    callback: (requestPayload: RPC_Request_Payload) => void
+  ): Promise<void> {
+    const channel = await this.getChannel();
+
+    const queue = await channel.assertQueue("", { exclusive: true });
+
+    await channel.bindQueue(queue.queue, RPC_EXCHANGE_NAME, "");
+
+    log.info(`Subscribed to exchange ${RPC_EXCHANGE_NAME}`);
+
+    channel.consume(
+      queue.queue,
+      (msg: Message | null) => {
+        if (msg && msg.content) {
+          const requestPayload: RPC_Request_Payload = JSON.parse(
+            msg.content.toString()
+          ) as RPC_Request_Payload;
+
+          callback(requestPayload);
+        }
+      },
+      {
+        noAck: true,
+      }
+    );
+  }
+
+  async PUBLISH_TO_EXCHANGE(
+    RPC_EXCHANGE_NAME: string,
+    requestPayload: RPC_Request_Payload
+  ): Promise<void> {
+    const channel = await this.getChannel();
+
+    await channel.assertExchange(RPC_EXCHANGE_NAME, "fanout", {
+      durable: false,
+    });
+
+    await channel.publish(
+      RPC_EXCHANGE_NAME,
+      "",
+      Buffer.from(JSON.stringify(requestPayload))
+    );
+
+    log.info(
+      `Published to exchange ${RPC_EXCHANGE_NAME}: ${JSON.stringify(
+        requestPayload
+      )}`
+    );
+  }
+
   async RPC_Request(
     RPC_QUEUE_NAME: string,
     requestPayload: RPC_Request_Payload
@@ -52,7 +114,10 @@ class BrokerService implements BrokerServiceInterface {
     const uuid = uuidv4(); // correlation id
 
     const channel = await this.getChannel();
+
+    // create a temporary queue which will be deleted once the message is consumed
     const queue = await channel.assertQueue("", { exclusive: true });
+    //exclusive: true means that the queue will be deleted once the connection is closed
 
     log.info(
       `Sending RPC request: ${JSON.stringify(

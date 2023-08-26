@@ -22,6 +22,8 @@ export interface AppointmentBookingInput {
 
   appointmentStartTime: Date;
   appointmentEndTime: Date;
+
+  timeSlotID: number;
 }
 
 export interface AppointmentConfirmingInput {
@@ -256,6 +258,7 @@ class AppointmentRepository implements Appointment_Repository_Interface {
 
       // update meet link
       appointment.meetingLink = meetLink;
+      appointment.status = AppointmentStatus.PENDING;
       await appointment.save();
 
       return appointment;
@@ -346,6 +349,11 @@ class AppointmentRepository implements Appointment_Repository_Interface {
 
         startTime: req.appointmentStartTime,
         endTime: req.appointmentEndTime,
+
+        //expiry time after 10 minutes
+        expires_at: new Date(Date.now() + 10 * 60 * 1000),
+
+        timeSlotID: req.timeSlotID,
 
         type: AppointmentType.ONLINE,
         status: AppointmentStatus.TEMPORARY,
