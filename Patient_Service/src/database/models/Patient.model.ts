@@ -43,6 +43,23 @@ export interface UpdatedPatientAdditionalInfo {
   };
 }
 
+export interface Patient_Info_For_Prescription {
+  id: number;
+  name: string;
+  email: string;
+  image: string;
+
+  phone: string;
+  gendar: string;
+  age: number;
+  bloodGroup: string;
+  height: {
+    feet: number;
+    inches: number;
+  };
+  weight: number;
+}
+
 export const PatientAdditionalInfo_Excluded_Properties: "userID"[] = ["userID"];
 
 export const PatientOverviewInfo_Excluded_Properties: (

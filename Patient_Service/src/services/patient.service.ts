@@ -15,6 +15,7 @@ import Patient, {
   PatientAdditionalInfo_Excluded_Properties,
   PatientOverviewInfo,
   PatientOverviewInfo_Excluded_Properties,
+  Patient_Info_For_Prescription,
   UpdatedPatientAdditionalInfo,
 } from "../database/models/Patient.model";
 import log from "../utils/logger";
@@ -121,6 +122,42 @@ class PatientService implements PatientServiceInterface {
     }
   }
 
+  // ----------------------------------------- Get Patient Info for Prescription ------------------------------------------ //
+  async getPatientInfo_forPrescription(
+    patientID: number
+  ): Promise<RPC_Response_Payload> {
+    try {
+      const patient = await this.repository.getPatientInfo(patientID);
+
+      const patientInfo = (await this.getPatientAdditionalInfo(patientID))
+        .PatientInfo;
+
+      // remove status from patientInfo
+      const { status, address, dob, ...rest } = patientInfo;
+
+      // calculate age from dob
+      const oneYear = 365.25 * 24 * 60 * 60 * 1000;
+      const age = Math.floor((Date.now() - dob.getTime()) / oneYear);
+
+      const resultData: Patient_Info_For_Prescription = {
+        ...rest,
+        age,
+      };
+
+      return {
+        status: "success",
+        data: {
+          resultData,
+        },
+      };
+    } catch (error) {
+      return {
+        status: "error",
+        data: {},
+      };
+    }
+  }
+
   // ----------------- server side RPC request handler ----------------
   async serveRPCRequest(payload: RPC_Request_Payload) {
     log.debug(payload, "Rpc request payload");
@@ -138,6 +175,8 @@ class PatientService implements PatientServiceInterface {
 
       case "GET_NAME_FROM_ID":
         return await this.getName_givenID(payload.data["patientID"]);
+
+      case "GET_PATIENT_INFO_FOR_PRESCRIPTION":
 
       default:
         break;

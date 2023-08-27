@@ -90,6 +90,44 @@ export interface DoctorOverviewInfo {
   Specialization: SpecializationAttributes | {};
 }
 
+export interface PrescriptionDoctorInfo {
+  DoctorInfo: Omit<
+    DoctorAttributes,
+    | "userId"
+    | "scheduleId"
+    | "specializationId"
+    | "status"
+    | "dob"
+    | "online_visit_fee"
+    | "gender"
+    | "bmdc"
+    | "issueDate"
+  >;
+  Specialization: SpecializationAttributes;
+}
+
+export const PrescriptionDoctorInfo_Excluded_Properties: (
+  | "userID"
+  | "scheduleID"
+  | "specializationID"
+  | "status"
+  | "dob"
+  | "online_visit_fee"
+  | "gender"
+  | "bmdc"
+  | "issueDate"
+)[] = [
+  "userID",
+  "scheduleID",
+  "specializationID",
+  "status",
+  "dob",
+  "gender",
+  "bmdc",
+  "issueDate",
+  "online_visit_fee",
+];
+
 export interface DoctorAttributes {
   id: number;
   status: string;

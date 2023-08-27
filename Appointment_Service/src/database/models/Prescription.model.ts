@@ -17,6 +17,51 @@ import sequelizeConnection from "../config";
 import Appointment from "./Appointment.model";
 import Prescription_Medicines from "./Prescription_Medicines.model";
 
+export interface DoctorPortion {
+  DoctorInfo: {
+    id: number;
+    name: string;
+    email: string;
+    image: string;
+
+    phone: string;
+    degrees: string[];
+  };
+  Specialization: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface PatientPortion {
+  id: number;
+  name: string;
+  email: string;
+  image: string;
+
+  phone: string;
+  gendar: string;
+  age: number;
+  bloodGroup: string;
+  height: {
+    feet: number;
+    inches: number;
+  };
+  weight: number;
+}
+
+export interface AppointmentPortion {
+  id: number;
+  type: string;
+  time: Date;
+}
+
+export interface PrescriptionHeader {
+  DoctorPortionInfo: DoctorPortion;
+  PatientPortionInfo: PatientPortion;
+  AppointmentPortionInfo: AppointmentPortion;
+}
+
 export interface PrescriptionAttributes {
   id: number;
 
