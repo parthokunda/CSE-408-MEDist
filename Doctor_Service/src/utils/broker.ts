@@ -43,16 +43,32 @@ export interface BrokerServiceInterface {
 
 class BrokerService implements BrokerServiceInterface {
   private amqlibConnection: Connection | null;
+  private channel: Channel | null;
 
   constructor() {
     this.amqlibConnection = null;
+    this.channel = null;
   }
 
   async getChannel(): Promise<Channel> {
     if (this.amqlibConnection === null) {
       this.amqlibConnection = await amqplib.connect(config.MSG_QUEUE_URL);
     }
-    return await this.amqlibConnection.createChannel();
+    if (this.channel === null) {
+      this.channel = await this.amqlibConnection.createChannel();
+    }
+    return this.channel;
+  }
+
+  async closeConnectionAndChannel() {
+    if (this.channel) {
+      await this.channel.close();
+      this.channel = null;
+    }
+    if (this.amqlibConnection) {
+      await this.amqlibConnection.close();
+      this.amqlibConnection = null;
+    }
   }
 
   async SUBSCRIBE_TO_EXCHANGE(
@@ -60,6 +76,11 @@ class BrokerService implements BrokerServiceInterface {
     callback: (requestPayload: RPC_Request_Payload) => void
   ): Promise<void> {
     const channel = await this.getChannel();
+
+    // Ensure the exchange is declared before binding the queue
+    await channel.assertExchange(RPC_EXCHANGE_NAME, "fanout", {
+      durable: false,
+    });
 
     const queue = await channel.assertQueue("", { exclusive: true });
 

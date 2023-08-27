@@ -59,7 +59,10 @@ export interface AppointmentServiceInterface {
   ): Promise<PendingAppointmentOverviewInfo>;
 
   // delete appointment
-  Delete_Appointment(appointmentID: number, patientID: number): Promise<void>;
+  Delete_Temporary_Appointment(
+    appointmentID: number,
+    patientID: number
+  ): Promise<void>;
 
   //search appointment
   Search_Pending_Appointment(
@@ -255,7 +258,7 @@ class AppointmentService implements AppointmentServiceInterface {
   }
 
   // ----------------- Delete Appointment ----------------- //
-  async Delete_Appointment(
+  async Delete_Temporary_Appointment(
     appointmentID: number,
     patientID: number
   ): Promise<void> {

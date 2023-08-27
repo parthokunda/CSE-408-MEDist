@@ -59,6 +59,14 @@ export interface Appointment_Controller_Interface {
 }
 
 class Appointment_Controller implements Appointment_Controller_Interface {
+  constructor() {
+    this.Book_Online_Appointment = this.Book_Online_Appointment.bind(this);
+    this.Confirm_Online_Appointment =
+      this.Confirm_Online_Appointment.bind(this);
+    this.Cancel_Online_Appointment = this.Cancel_Online_Appointment.bind(this);
+    this.View_Pending_Appointments = this.View_Pending_Appointments.bind(this);
+  }
+
   private setAppointmentDay(weekday: number, thisweek: boolean): Date {
     let today: number, appointmentDay: Date;
 
@@ -77,7 +85,10 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     );
     appointmentDay.setHours(0, 0, 0, 0);
 
-    log.debug(appointmentDay, "appointmentDay in setAppointmentDay");
+    log.info(
+      appointmentDay.toDateString(),
+      "appointmentDay in setAppointmentDay"
+    );
     return appointmentDay;
   }
 
@@ -89,6 +100,7 @@ class Appointment_Controller implements Appointment_Controller_Interface {
       0,
       0
     );
+
     return appointmentDayTime;
   }
   // ----------------- Cancel Online Appointment ----------------- //
@@ -101,7 +113,10 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     const patientID = req.user_identity?.id as number;
 
     try {
-      await appointmentService.Delete_Appointment(appointmentID, patientID);
+      await appointmentService.Delete_Temporary_Appointment(
+        appointmentID,
+        patientID
+      );
 
       res.status(200).json({
         message: "Appointment cancelled successfully",
@@ -146,6 +161,9 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     next: NextFunction
   ) {
     const scheduleID = Number(req.params.scheduleID);
+    log.debug(scheduleID, "scheduleID in Book_Online_Appointment");
+    log.debug(typeof scheduleID, "scheduleID type in Book_Online_Appointment");
+
     const patientID = Number(req.user_identity?.id);
     const patientEmail = req.user_identity?.email as string;
     try {
@@ -181,9 +199,18 @@ class Appointment_Controller implements Appointment_Controller_Interface {
         this.setAppointmentDayTime(appointmentDay, startTime)
       );
 
-      const appointment_day_end_time = this.setAppointmentDayTime(
-        appointmentDay,
-        endTime
+      log.info(
+        appointment_day_start_time.toTimeString(),
+        "appointment_day_start_time"
+      );
+
+      const appointment_day_end_time = new Date(
+        this.setAppointmentDayTime(appointmentDay, endTime)
+      );
+
+      log.info(
+        appointment_day_end_time.toTimeString(),
+        "appointment_day_end_time"
       );
 
       // check patient has already booked appointment with the doctor on that day

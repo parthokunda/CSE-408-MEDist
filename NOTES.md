@@ -11,6 +11,17 @@ const payload: RPC_Request_Payload = {
 > get patient id from patient service if patient exists ( signed up already )
 
 
+## kill port if already in use
+```bash
+npx kill-port 3000
+npx kill-port 3001
+npx kill-port 3002
+npx kill-port 3003
+npx kill-port 3004
+npx kill-port 3005
+```
+
+
 #### CREATE_NEW_ENTITY 
 ```typescript
   const payload: RPC_Request_Payload = {
@@ -55,60 +66,5 @@ return dateTimeRegex.test(val)
 - `HH:MM` or `HH:MM:SS`
 - `YYYY-MM-DD HH:MM` or `YYYY-MM-DD HH:MM:SS`
 - `YYYY-MM-DDTHH:MM` or `YYYY-MM-DDTHH:MM:SS`
-
-## message broker installation
-```bash
-npm i jsonwebtoken bcrypt
-npm i -D @types/jsonwebtoken @types/bcrypt
-
-npm i amqplib
-npm i -D @types/amqplib
-
 ```
 
-## message broker configuration for future use
-```typescript
-async createChannel(): Promise<Channel> {
-    const channel: Channel = await this.getChannel();
-    await channel.assertExchange(config.EXCHANGE_NAME, "direct", {
-      durable: true,
-    });
-    return channel;
-  }
-
-  // to notify other services that some event has occured
-  async publishMessage(
-    channel: Channel,
-    toService: string,
-    message: string
-  ): Promise<void> {
-    await channel.publish(
-      config.EXCHANGE_NAME,
-      toService,
-      Buffer.from(message)
-    );
-
-    log.info(`Message sent to ${toService} : ${message}`);
-  }
-
-  async subscribeMessage(channel: Channel, fromService: string): Promise<void> {
-    await channel.assertExchange(config.EXCHANGE_NAME, "direct", {
-      durable: true,
-    });
-
-    const q = await channel.assertQueue("", { exclusive: true });
-    log.info(`Waiting for messages in ${q.queue}`);
-
-    channel.bindQueue(q.queue, config.EXCHANGE_NAME, config.AUTH_SERVICE);
-
-    channel.consume(q.queue, (msg: Message | null) => {
-      if (msg.content) {
-        log.info(
-          `Received message from ${fromService} : ${msg.content.toString()}`
-        );
-      }
-    });
-  }
-
-
-```

@@ -1,9 +1,6 @@
 //import model
 import createHttpError from "http-errors";
 
-// internal import
-import { OnlineScheduleAttributes } from "../models/Online_Schedule.model";
-
 //import model
 import { Doctor, OnlineSchedule } from "../models";
 import log from "../../utils/logger";
@@ -31,6 +28,15 @@ class Online_Schedule_Repository
   // ----------------------- Get Online Schedule Info ----------------------- //
   async getOnlineScheduleInfo(scheduleID: number): Promise<OnlineSchedule> {
     try {
+      log.debug(
+        scheduleID,
+        "In Getting online schedule info - repository - scheduleID"
+      );
+      log.debug(
+        typeof scheduleID,
+        "In Getting online schedule info - repository - typeof scheduleID"
+      );
+
       const schedule = await OnlineSchedule.findByPk(scheduleID);
       if (!schedule)
         throw new createHttpError.NotFound("Online schedule not found");
