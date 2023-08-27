@@ -107,13 +107,14 @@ class DoctorSchema implements Doctor_Schema_Interface {
             // check schedule is an empty object or not
             if (Object.keys(schedule).length === 0) continue;
 
-            // check schedule has the following structure or not
-            if (
+            // check schedule has the following structure or not 
+            
+           if (
               !(
-                schedule.weekname &&
-                schedule.startTime &&
-                schedule.endTime &&
-                schedule.totalSlots
+                (schedule.weekname !== undefined  || schedule.weekday !== undefined  ) &&
+                (schedule.startTime !== undefined)  &&
+                (schedule.endTime !== undefined)  &&
+                (schedule.totalSlots !== undefined )
               )
             )
               return false;
