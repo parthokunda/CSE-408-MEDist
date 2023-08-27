@@ -6,7 +6,12 @@ import { Op } from "sequelize";
 import log from "../../utils/logger";
 
 // import models
-import { Appointment, AppointmentStatus, AppointmentType } from "../models";
+import {
+  Appointment,
+  AppointmentAttributes,
+  AppointmentStatus,
+  AppointmentType,
+} from "../models";
 
 // googleCalendarApi
 import googleCalendarApi, { calendarEvent } from "../../utils/google.auth";
@@ -215,6 +220,12 @@ class AppointmentRepository implements Appointment_Repository_Interface {
           403,
           "You are not authorized to delete this appointment"
         );
+
+      if (appointment.status === AppointmentStatus.PENDING)
+        throw createHttpError(
+          403,
+          "You can not delete this appointment as it is scheduled"
+        );
       // delete appointment
       await appointment.destroy();
     } catch (error) {
@@ -280,7 +291,7 @@ class AppointmentRepository implements Appointment_Repository_Interface {
       // for that time gap
 
       // find all appointments in that day
-      const appointments = await Appointment.findAll({
+      const appointments: AppointmentAttributes[] = await Appointment.findAll({
         where: {
           doctorID: doctorID,
           startTime: {
@@ -289,6 +300,8 @@ class AppointmentRepository implements Appointment_Repository_Interface {
         },
         order: [["startTime", "ASC"]],
       });
+
+      if (appointments.length === 0) return day_startTime;
 
       for (let i = 0; i < appointments.length - 1; i++) {
         if (

@@ -24,7 +24,7 @@ export const WeekName = [
 export interface OnlineScheduleOverviewInfo
   extends Omit<
     OnlineScheduleAttributes,
-    "id" | "doctorID" | "createdAt" | "updatedAt"
+    "doctorID" | "createdAt" | "updatedAt"
   > {}
 
 export interface OnlineScheduleInfo
@@ -46,8 +46,7 @@ export const OnlineSchedule_Excluded_Properties: (
   | "doctorID"
   | "createdAt"
   | "updatedAt"
-  | "id"
-)[] = ["doctorID", "createdAt", "updatedAt", "id"];
+)[] = ["doctorID", "createdAt", "updatedAt"];
 
 export interface OnlineScheduleAttributes {
   id: number;

@@ -146,7 +146,7 @@ class DoctorService implements DoctorServiceInterface {
 
       case "GET_SCHEDULE_INFO_FROM_ID":
         return await online_scheduleService.giveScheduleInfo(
-          Number(payload.data["doctorID"])
+          Number(payload.data["scheduleID"])
         );
 
       default:

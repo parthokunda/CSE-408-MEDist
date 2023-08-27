@@ -122,6 +122,9 @@ class OnlineScheduleService implements OnlineScheduleServiceInterface {
 
   // ----------------------- Give Schedule Info ----------------------- //
   async giveScheduleInfo(scheduleID: number): Promise<RPC_Response_Payload> {
+    log.debug(scheduleID, "received schedule id");
+    log.debug(typeof scheduleID, "received schedule id type");
+
     try {
       const schedule = await online_scheduleRepository.getOnlineScheduleInfo(
         scheduleID
