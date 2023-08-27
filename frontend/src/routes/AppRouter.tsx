@@ -8,7 +8,7 @@ import MedicineSearchPage from "@/pages/Medicines/SearchMedicines/MedicineSearch
 import AddSchedule from "@/pages/doctor/AddSchedule";
 import DoctorInfo from "@/pages/doctor/DoctorInfo";
 import PatientSearchPage from "@/pages/doctor/DoctorPendingAppointments";
-import BookAppointment from "@/pages/patient/PatientBookAppointment";
+import BookAppointment from "@/pages/patient/BookAppointment/PatientBookAppointment";
 import { FC } from "react";
 import { useCookies } from "react-cookie";
 import { Navigate, Route, Routes } from "react-router-dom";

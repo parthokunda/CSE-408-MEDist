@@ -1,20 +1,8 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Controller,
-  SubmitHandler,
-  useForm,
-  useFieldArray,
-} from "react-hook-form";
-import * as z from "zod";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Input } from "../../components/ui/input";
-import { FC, useEffect } from "react";
-import { useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import DoctorDetailsCard from "./doctorDetailsCard";
 import { useParams } from "react-router-dom";
+import DoctorDetailsCard from "./DoctorDetailsCard";
 
 import {
   Dialog,
@@ -27,15 +15,13 @@ import {
 } from "@/components/ui/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
 
-import { set } from "date-fns";
 
-import { useCookies } from "react-cookie";
 import axios from "axios";
+import { useCookies } from "react-cookie";
 
 import {
   DoctorProfileInfo,
-  OnlineScheduleAttributes,
-  SingleDaySchedule,
+  SingleDaySchedule
 } from "@/models/Brand";
 
 export const BookAppointment: FC = () => {
@@ -125,7 +111,7 @@ export const BookAppointment: FC = () => {
     console.log(obj);
   };
   const [singleDay, setSingleDay] = useState<SingleDaySchedule>();
-  console.log(cookies.user.token);
+  // console.log(cookies.user.token);
   // const [weekdays, setWeekdays] = useState<SingleDaySchedule[]>
   // var doctordetails: DoctorProfileInfo;
   const [doctordetails, setDoctorDetails] = useState<DoctorProfileInfo>();
@@ -144,14 +130,14 @@ export const BookAppointment: FC = () => {
             }
           )
           .then((response) => {
-            console.log(response.data);
+            console.log("🚀 ~ file: PatientBookAppointment.tsx:133 ~ .then ~ response:", response.data)
             setDoctorDetails(response.data);
             // setDayIndex()
           });
         // setSize(response.data.OnlineSchedule.schedule.length);
         // setContact(response.data.doctorInfo.phone);
         // setDoctorDetails(response.data);
-        console.log(doctordetails);
+        // console.log(doctordetails);
       } catch (err) {
         console.log(err);
       }
@@ -183,7 +169,7 @@ export const BookAppointment: FC = () => {
       }
     );
   };
-  console.log(doctordetails?.OnlineSchedule.schedule);
+  // console.log(doctordetails?.OnlineSchedule.schedule);
   // onCall(values);
   return (
     <>
@@ -191,32 +177,12 @@ export const BookAppointment: FC = () => {
         Book Appointment
       </div>
       <div className="flex">
-        <div className="flex-[10%] flex-col">
-          {/* <div className="flex flex-col ml-6 mt-5 gap-5">
-            <div className="flex gap-3">
-              <div className="flex gap-3">
-                Contact Number :
-                <div className="flex font-bold text-black">
-                  {formValues.contact}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col ml-6 mt-5 gap-5">
-            <div className="flex gap-3">
-              <div className="flex gap-3">
-                Cost :
-                <div className="flex font-bold text-black">
-                  {formValues.cost}
-                </div>
-              </div>
-            </div>
-          </div> */}
+        <div className="w-1/4">
           {doctordetails && <DoctorDetailsCard doctor={doctordetails!} />}
         </div>
-        {doctordetails && (
+        {doctordetails && doctordetails.OnlineSchedule.schedule && (
           <div className="flex-[60%] flex-col">
-            {doctordetails?.OnlineSchedule.schedule.map((day) => {
+            {/* {doctordetails?.OnlineSchedule.schedule.map((day) => {
               return (
                 // <RadioGroup
                 //   onValueChange={() => {
@@ -253,7 +219,7 @@ export const BookAppointment: FC = () => {
                   
                 </div>
               );
-            })}
+            })} */}
 
             <div className="flex justify-center mt-5">
               <Dialog>

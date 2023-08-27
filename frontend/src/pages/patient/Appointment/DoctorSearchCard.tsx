@@ -3,13 +3,13 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { FC } from "react";
+import { Link } from "react-router-dom";
 
-import { Button } from "@/components/ui/button";
 import { DoctorOverviewInfo } from "@/models/Brand";
 
 import avatar from '@/assets/img_avatar.png';
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Link } from "react-router-dom";
 
 const DoctorSearchCard: FC<{ doctor: DoctorOverviewInfo }> = (props) => {
   return (
