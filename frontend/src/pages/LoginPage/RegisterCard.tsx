@@ -38,7 +38,6 @@ const RegisterCard: FC = () => {
   const navigate = useNavigate();
   const registerForms = useForm<RegisterCardFormType>({
     defaultValues: {
-      name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -76,15 +75,7 @@ const RegisterCard: FC = () => {
   return (
     <Card>
       <CardContent className="space-y-1 mt-2">
-        <form onSubmit={registerForms.handleSubmit(onRegisterSubmit)}>
-          <div className="space-y-1">
-            <Label htmlFor="name">Name</Label>
-            <Controller
-              control={registerForms.control}
-              name="name"
-              render={({ field }) => <Input placeholder="Name" {...field} />}
-            />
-          </div>
+        <form onSubmit={registerForms.handleSubmit(onRegisterSubmit)} className="space-y-1">
           <div className="space-y-1">
             <Label htmlFor="email">Email</Label>
             <Controller

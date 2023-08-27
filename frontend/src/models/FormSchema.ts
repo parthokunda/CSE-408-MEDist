@@ -55,10 +55,6 @@ export const PatientAdditionalInfoForm = z.object({
 
 export const RegisterCardForm = z
   .object({
-    name: z
-      .string()
-      .min(3, { message: "Minimum Name Length is 3" })
-      .max(20, { message: "Maximum Name Length is 20" }),
     email: z.string().email({ message: "Invalid Email" }),
     password: z.string().min(4, { message: "Minimum Password Length is 4" }),
     confirmPassword: z.string().min(4),
