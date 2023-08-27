@@ -136,8 +136,8 @@ class DoctorRepository implements Doctor_Repository_Interface {
         if (!updatedDoctor)
           throw createHttpError.InternalServerError("Doctor update failed.");
 
-        updatedDoctor.status = DoctorStatus.FULLY_REGISTERED;
-        await updatedDoctor.save();
+        //updatedDoctor.status = DoctorStatus.FULLY_REGISTERED;
+        //await updatedDoctor.save();
 
         return updatedDoctor;
       } else throw new Error("Doctor not found.");
@@ -197,12 +197,21 @@ class DoctorRepository implements Doctor_Repository_Interface {
       let totalCount: number;
 
       if (searchInfo.doctorName === "" && searchInfo.specializationID === -1) {
+        //where status is FULLY_REGISTERED
+
         doctors = await Doctor.findAll({
+          where: {
+            status: DoctorStatus.FULLY_REGISTERED,
+          },
           offset,
           limit: itemsPerPage,
         });
 
-        totalCount = await Doctor.count();
+        totalCount = await Doctor.count({
+          where: {
+            status: DoctorStatus.FULLY_REGISTERED,
+          },
+        });
       } else if (
         searchInfo.doctorName === "" &&
         searchInfo.specializationID !== -1
@@ -210,6 +219,7 @@ class DoctorRepository implements Doctor_Repository_Interface {
         doctors = await Doctor.findAll({
           where: {
             specializationID: searchInfo.specializationID,
+            status: DoctorStatus.FULLY_REGISTERED,
           },
           offset,
           limit: itemsPerPage,
@@ -218,6 +228,7 @@ class DoctorRepository implements Doctor_Repository_Interface {
         totalCount = await Doctor.count({
           where: {
             specializationID: searchInfo.specializationID,
+            status: DoctorStatus.FULLY_REGISTERED,
           },
         });
       } else if (
@@ -231,11 +242,13 @@ class DoctorRepository implements Doctor_Repository_Interface {
                 name: {
                   [Op.iLike]: `${searchInfo.doctorName}%`, // case insensitive starts with search
                 },
+                status: DoctorStatus.FULLY_REGISTERED,
               },
               {
                 name: {
                   [Op.iLike]: `%${searchInfo.doctorName}%`, // case insensitive contains search
                 },
+                status: DoctorStatus.FULLY_REGISTERED,
               },
             ],
           },
@@ -250,11 +263,13 @@ class DoctorRepository implements Doctor_Repository_Interface {
                 name: {
                   [Op.iLike]: `${searchInfo.doctorName}%`, // case insensitive starts with search
                 },
+                status: DoctorStatus.FULLY_REGISTERED,
               },
               {
                 name: {
                   [Op.iLike]: `%${searchInfo.doctorName}%`, // case insensitive contains search
                 },
+                status: DoctorStatus.FULLY_REGISTERED,
               },
             ],
           },
@@ -268,11 +283,13 @@ class DoctorRepository implements Doctor_Repository_Interface {
                 name: {
                   [Op.iLike]: `${searchInfo.doctorName}%`, // case insensitive starts with search
                 },
+                status: DoctorStatus.FULLY_REGISTERED,
               },
               {
                 name: {
                   [Op.iLike]: `%${searchInfo.doctorName}%`, // case insensitive contains search
                 },
+                status: DoctorStatus.FULLY_REGISTERED,
               },
             ],
           },
@@ -288,11 +305,13 @@ class DoctorRepository implements Doctor_Repository_Interface {
                 name: {
                   [Op.iLike]: `${searchInfo.doctorName}%`, // case insensitive starts with search
                 },
+                status: DoctorStatus.FULLY_REGISTERED,
               },
               {
                 name: {
                   [Op.iLike]: `%${searchInfo.doctorName}%`, // case insensitive contains search
                 },
+                status: DoctorStatus.FULLY_REGISTERED,
               },
             ],
           },
