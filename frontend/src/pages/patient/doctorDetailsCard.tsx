@@ -1,17 +1,12 @@
-import { FC } from "react";
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  CardContent
 } from "@/components/ui/card";
+import { FC } from "react";
 // import {FontAwesomeIcon} from "react-icons/fa"
 
 import { DoctorProfileInfo } from "@/models/Brand";
-import { Button } from "@/components/ui/button";
 
-import { Link } from "react-router-dom";
 
 const DoctorDetailsCard: FC<{ doctor: DoctorProfileInfo }> = (props) => {
   return (
@@ -26,7 +21,7 @@ const DoctorDetailsCard: FC<{ doctor: DoctorProfileInfo }> = (props) => {
                   alt="https://www.w3schools.com/howto/img_avatar.png"
                   className="mt-2 h-24 w-24"
                   placeholder="img_404"
-                />
+           z     />
                 <div className="text-c1  text-2xl flex justify-start font-bold gap-2">
                   {props.doctor.DoctorInfo.name}
                 </div>
