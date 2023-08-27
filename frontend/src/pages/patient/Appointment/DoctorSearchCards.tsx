@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
-import { SearchDoctorInfo } from "@/models/Brand";
+import { SearchDoctorInfo } from "@/models/DoctorSchema";
 import DoctorSearchCard from "./DoctorSearchCard";
 
 const DoctorSearchCards: FC<{

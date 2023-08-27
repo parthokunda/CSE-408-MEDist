@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useDebounce } from "@/lib/useDebounce";
-import { SpecializationAttributes } from "@/models/Brand";
+import { SpecializationAttributes } from "@/models/DoctorSchema";
 import { DoctorSearchForm, DoctorSearchFormType } from "@/models/FormSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";

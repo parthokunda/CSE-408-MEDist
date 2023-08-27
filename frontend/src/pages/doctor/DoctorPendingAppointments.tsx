@@ -1,11 +1,7 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 // import SearchDoctor from "./SearchDoctor";
-import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
-import { MedSearchForm } from "@/models/FormSchema";
 import { PatientSearchForm } from "@/models/FormSchema";
-import { DoctorPendingAttributes } from "@/models/Brand";
-import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
+import { z } from "zod";
 // import DoctorSearchCards from "./DoctorSearchCards";
 import DoctorPendingCards from "./DoctorPendingCards";
 

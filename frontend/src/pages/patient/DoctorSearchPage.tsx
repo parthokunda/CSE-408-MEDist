@@ -1,7 +1,7 @@
 import {
   PendingAppointments,
-  SearchDoctorInfo
 } from "@/models/Brand";
+import { SearchDoctorInfo } from "@/models/DoctorSchema";
 import { DoctorSearchForm } from "@/models/FormSchema";
 import axios from "axios";
 import { FC, useEffect, useState } from "react";

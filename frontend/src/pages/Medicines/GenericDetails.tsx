@@ -1,15 +1,14 @@
 import { BrandDescription } from "@/models/Brand";
 import { Generic } from "@/models/generic";
-import { availableParallelism, type } from "os";
 import { FC } from "react";
 
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-  } from "@/components/ui/card";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 //TODO: available brands er list
 const MedCard: FC<{ medicine: BrandDescription }> = (props) => {

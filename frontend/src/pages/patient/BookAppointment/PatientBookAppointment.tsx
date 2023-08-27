@@ -22,7 +22,7 @@ import { useCookies } from "react-cookie";
 import {
   DoctorProfileInfo,
   SingleDaySchedule
-} from "@/models/Brand";
+} from "@/models/DoctorSchema";
 
 export const BookAppointment: FC = () => {
   const { doctorID } = useParams();

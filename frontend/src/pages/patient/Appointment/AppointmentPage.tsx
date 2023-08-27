@@ -1,6 +1,6 @@
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SearchDoctorInfo } from "@/models/Brand";
+import { SearchDoctorInfo } from "@/models/DoctorSchema";
 import { DoctorSearchFormType } from "@/models/FormSchema";
 import axios from "axios";
 import { FC, useEffect, useState } from "react";

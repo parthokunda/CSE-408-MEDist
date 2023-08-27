@@ -1,20 +1,5 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Controller,
-  SubmitHandler,
-  useForm,
-  useFieldArray,
-} from "react-hook-form";
-import * as z from "zod";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Input } from "../../components/ui/input";
-import { FC, useEffect } from "react";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useParams, Link } from "react-router-dom";
-import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
-import axios from "axios";
 import {
   Select,
   SelectContent,
@@ -22,24 +7,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { FC, useEffect, useState } from "react";
+import {
+  Controller,
+  SubmitHandler,
+  useForm
+} from "react-hook-form";
+import * as z from "zod";
+import { Input } from "../../components/ui/input";
 
-import { DoctorAdditionalInfoForm } from "@/models/FormSchema";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { DoctorAdditionalInfoForm } from "@/models/FormSchema";
 
 import { initializeApp } from "firebase/app";
 import {
+  getDownloadURL,
   getStorage,
   ref,
-  getDownloadURL,
   uploadBytesResumable,
 } from "firebase/storage";
 
+import { DoctorAdditionalInfo, SpecializationAttributes } from "@/models/DoctorSchema";
 import { useCookies } from "react-cookie";
-import { DoctorAdditionalInfo, SpecializationAttributes } from "@/models/Brand";
 
 export const DoctorInfo: FC = () => {
   const [cookies] = useCookies(["user"]);

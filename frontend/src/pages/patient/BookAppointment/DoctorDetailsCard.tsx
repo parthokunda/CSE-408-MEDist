@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { FC } from "react";
 // import {FontAwesomeIcon} from "react-icons/fa"
 
-import { DoctorProfileInfo } from "@/models/Brand";
+import { DoctorProfileInfo } from "@/models/DoctorSchema";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import avatar from "@/assets/img_avatar.png";
 

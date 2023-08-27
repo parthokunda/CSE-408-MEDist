@@ -5,7 +5,7 @@ import {
 import { FC } from "react";
 import { Link } from "react-router-dom";
 
-import { DoctorOverviewInfo } from "@/models/Brand";
+import { DoctorOverviewInfo } from "@/models/DoctorSchema";
 
 import avatar from '@/assets/img_avatar.png';
 import { Button } from "@/components/ui/button";

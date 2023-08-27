@@ -1,6 +1,6 @@
-import { FC, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import * as z from "zod";
+import { PatientAdditionalInfoForm } from "@/models/FormSchema";
+import { PatientAttributes } from "@/models/UserInfo";
+import axios from "axios";
 import { initializeApp } from "firebase/app";
 import {
   getDownloadURL,
@@ -8,14 +8,13 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import axios from "axios";
-import { PatientAdditionalInfoForm } from "@/models/FormSchema";
-import { PatientAttributes } from "@/models/UserInfo";
+import { FC, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Input } from "../../components/ui/input";
 import {
   Select,
   SelectContent,
@@ -23,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { Input } from "../../components/ui/input";
 
 const bloodGroups = [
   { key: 1, value: "A+" },

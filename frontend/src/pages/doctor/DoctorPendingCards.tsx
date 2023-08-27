@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { AiOutlineArrowRight } from "react-icons/ai";
 
-import { DoctorPendingAttributes } from "@/models/Brand";
+import { DoctorPendingAttributes } from "@/models/DoctorSchema";
 import DoctorPendingCard from "./DoctorPendingCard";
 import exp from "constants";
 

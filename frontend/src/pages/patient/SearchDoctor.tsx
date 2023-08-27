@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { useCookies } from "react-cookie";
 import axios from "axios";
-import { SpecializationAttributes } from "@/models/Brand";
+import { SpecializationAttributes } from "@/models/DoctorSchema";
 import { Button } from "../../components/ui/button";
 
 export const SearchDoctor: FC<{
