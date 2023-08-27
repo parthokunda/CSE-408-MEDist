@@ -13,17 +13,40 @@ import sequelizeConnection from "../config";
 import Prescription from "./Prescription.model";
 import Prescription_Medicines from "./Prescription_Medicines.model";
 
+export const WeekName = [
+  "Friday",
+  "Saturday",
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+];
+
 export enum AppointmentStatus {
   PENDING = "pending",
   PRESCRIBED = "prescribed",
   RATED = "rated",
   COMPLETED = "completed",
-  CANCELLED = "cancelled",
+  TEMPORARY = "temporary",
 }
 
 export enum AppointmentType {
   ONLINE = "online",
   PHYSICAL = "physical",
+}
+
+export interface AppointmentTimeSlot {
+  id: number;
+  doctorID: number;
+
+  weekday: number;
+
+  startTime: string;
+  endTime: string;
+
+  totalSlots: number;
+  remainingSlots: number;
 }
 
 export interface Patient_or_Doctor_Info {
@@ -45,7 +68,7 @@ export interface PendingAppointmentOverviewInfo {
 
   status: AppointmentStatus;
 
-  meetingLink: string;
+  meetingLink: string | null;
 }
 
 export interface PendingAppointments {
@@ -75,6 +98,10 @@ export interface AppointmentAttributes {
   meetingLink: string;
   rating: number;
 
+  timeSlotID: number;
+
+  expires_at: Date;
+
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -98,6 +125,9 @@ class Appointment extends Model implements AppointmentAttributes {
 
   public meetingLink!: string;
   public rating!: number;
+
+  public timeSlotID!: number;
+  public expires_at!: Date;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -170,18 +200,28 @@ Appointment.init(
     status: {
       type: DataTypes.ENUM,
       values: Object.values(AppointmentStatus),
-      defaultValue: AppointmentStatus.PENDING,
+      defaultValue: AppointmentStatus.TEMPORARY,
       allowNull: false,
     },
 
     meetingLink: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
 
     rating: {
       type: DataTypes.INTEGER,
       allowNull: true,
+    },
+
+    timeSlotID: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+
+    expires_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
     },
   },
   {

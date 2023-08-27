@@ -50,6 +50,13 @@ doctorRouter.put(
   doctorController.updateDoctorAdditionalInfo
 );
 
+// get doctor's schedule - accessible to all
+doctorRouter.get(
+  "/online-visit",
+  authorize(false),
+  doctorController.getOnlineSchedule
+);
+
 // create online schedule - only accessible to doctor
 doctorRouter.post(
   "/online-visit",

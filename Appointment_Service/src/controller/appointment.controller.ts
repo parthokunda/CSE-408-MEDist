@@ -9,13 +9,18 @@ import {
   prescription_medicineService,
 } from "../services";
 import {
-  Booking_Online_Appointment_Body_Input,
   Booking_Online_Appointment_Params_Input,
+  Confirm_Online_Appointment_Params_Input,
 } from "../schema/appointment.schema";
 import createHttpError from "http-errors";
 import log from "../utils/logger";
 import { Search_Appointment_Input } from "../database/repository";
-import { AppointmentStatus, AppointmentType } from "../database/models";
+import {
+  AppointmentStatus,
+  AppointmentTimeSlot,
+  AppointmentType,
+  WeekName,
+} from "../database/models";
 
 export interface SlotRequest {
   appointmentDay: Date;
@@ -24,16 +29,27 @@ export interface SlotRequest {
   totalSlots: number;
   timeInterval_forEachSlot: number;
   patientEmail: string;
+  timeSlotID: number;
 }
 
 export interface Appointment_Controller_Interface {
   //book online appointment - access by patient
   Book_Online_Appointment(
-    req: Request /* <
-      Booking_Online_Appointment_Params_Input,
-      {},
-      Booking_Online_Appointment_Body_Input
-    > */,
+    req: Request<Booking_Online_Appointment_Params_Input>,
+    res: Response,
+    next: NextFunction
+  );
+
+  //confirm online appointment - access by patient
+  Confirm_Online_Appointment(
+    req: Request<Confirm_Online_Appointment_Params_Input>,
+    res: Response,
+    next: NextFunction
+  );
+
+  //cancel online appointment - access by patient
+  Cancel_Online_Appointment(
+    req: Request<Confirm_Online_Appointment_Params_Input>,
     res: Response,
     next: NextFunction
   );
@@ -43,16 +59,36 @@ export interface Appointment_Controller_Interface {
 }
 
 class Appointment_Controller implements Appointment_Controller_Interface {
-  private setAppointmentDay(weekday: number): Date {
-    log.debug(weekday, "weekday received in setAppointmentDay");
-    const today = new Date().getDay();
-    const appointmentDay = new Date();
+  constructor() {
+    this.Book_Online_Appointment = this.Book_Online_Appointment.bind(this);
+    this.Confirm_Online_Appointment =
+      this.Confirm_Online_Appointment.bind(this);
+    this.Cancel_Online_Appointment = this.Cancel_Online_Appointment.bind(this);
+    this.View_Pending_Appointments = this.View_Pending_Appointments.bind(this);
+  }
+
+  private setAppointmentDay(weekday: number, thisweek: boolean): Date {
+    let today: number, appointmentDay: Date;
+
+    today = new Date().getDay();
+
+    if (thisweek) {
+      appointmentDay = new Date();
+    } else {
+      // appointmentDay is next week
+      appointmentDay = new Date();
+      appointmentDay.setDate(appointmentDay.getDate() + 7);
+    }
+
     appointmentDay.setDate(
       appointmentDay.getDate() + (weekday - 2 - today) // -2 because weekday starts from 2
     );
     appointmentDay.setHours(0, 0, 0, 0);
 
-    log.debug(appointmentDay, "appointmentDay in setAppointmentDay");
+    log.info(
+      appointmentDay.toDateString(),
+      "appointmentDay in setAppointmentDay"
+    );
     return appointmentDay;
   }
 
@@ -64,46 +100,131 @@ class Appointment_Controller implements Appointment_Controller_Interface {
       0,
       0
     );
+
     return appointmentDayTime;
   }
+  // ----------------- Cancel Online Appointment ----------------- //
+  async Cancel_Online_Appointment(
+    req: Request<Confirm_Online_Appointment_Params_Input>,
+    res: Response,
+    next: NextFunction
+  ) {
+    const appointmentID = Number(req.params.appointmentID);
+    const patientID = req.user_identity?.id as number;
 
-  constructor() {
-    this.Book_Online_Appointment = this.Book_Online_Appointment.bind(this);
-    this.View_Pending_Appointments = this.View_Pending_Appointments.bind(this);
+    try {
+      await appointmentService.Delete_Temporary_Appointment(
+        appointmentID,
+        patientID
+      );
+
+      res.status(200).json({
+        message: "Appointment cancelled successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // ----------------- Confirm Online Appointment ----------------- //
+
+  async Confirm_Online_Appointment(
+    req: Request<Confirm_Online_Appointment_Params_Input>,
+    res: Response,
+    next: NextFunction
+  ) {
+    const appointmentID = Number(req.params.appointmentID);
+    const patientID = req.user_identity?.id as number;
+    const patientEmail = req.user_identity?.email as string;
+
+    try {
+      const appointment =
+        await appointmentService.Confirm_Temporary_Online_Appointment(
+          appointmentID,
+          patientID,
+          patientEmail
+        );
+
+      res.status(200).json({
+        message: "Appointment confirmed successfully",
+        appointment,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
   // ----------------- Book Online Appointment ----------------- //
   async Book_Online_Appointment(
-    req: Request,
+    req: Request<Booking_Online_Appointment_Params_Input>,
     res: Response,
     next: NextFunction
   ) {
-    const doctorID = Number(req.params.doctorID);
+    const scheduleID = Number(req.params.scheduleID);
+    log.debug(scheduleID, "scheduleID in Book_Online_Appointment");
+    log.debug(typeof scheduleID, "scheduleID type in Book_Online_Appointment");
+
     const patientID = Number(req.user_identity?.id);
     const patientEmail = req.user_identity?.email as string;
-    const weekday = req.body.weekday as number;
-    const startTime = req.body.startTime as string;
-    const endTime = req.body.endTime as string;
-    const totalSlots = req.body.totalSlots as number;
-
     try {
       // check if week day is less than today
+      const timeSlotInfo: AppointmentTimeSlot =
+        await appointmentService.Get_Schedule_Info_From_Doctor_Server(
+          scheduleID
+        );
+
+      if (!timeSlotInfo) throw createHttpError(404, "Schedule not found");
+
+      if (timeSlotInfo.remainingSlots === 0)
+        throw createHttpError(400, "No slot available");
+
+      const doctorID = timeSlotInfo.doctorID;
+      const timeSlotID = timeSlotInfo.id;
+      const weekday = timeSlotInfo.weekday;
+      const startTime = timeSlotInfo.startTime;
+      const endTime = timeSlotInfo.endTime;
+      const totalSlots = timeSlotInfo.totalSlots;
+
       const today = new Date().getDay();
-      if (weekday < today)
-        throw createHttpError(400, "You can't book appointment for past days");
+
+      let appointmentDay: Date;
 
       // construct appointmentDay from weekday
-      const appointmentDay = this.setAppointmentDay(weekday);
+      if (weekday < today)
+        appointmentDay = this.setAppointmentDay(weekday, false);
+      else appointmentDay = this.setAppointmentDay(weekday, true);
 
       // construct appointment_day_start_time and appointment_day_end_time
       const appointment_day_start_time = new Date(
         this.setAppointmentDayTime(appointmentDay, startTime)
       );
 
-      const appointment_day_end_time = this.setAppointmentDayTime(
-        appointmentDay,
-        endTime
+      log.info(
+        appointment_day_start_time.toTimeString(),
+        "appointment_day_start_time"
       );
+
+      const appointment_day_end_time = new Date(
+        this.setAppointmentDayTime(appointmentDay, endTime)
+      );
+
+      log.info(
+        appointment_day_end_time.toTimeString(),
+        "appointment_day_end_time"
+      );
+
+      // check patient has already booked appointment with the doctor on that day
+      const isAlreadyBooked =
+        await appointmentService.Patient_Booked_Appointment_In_That_Day(
+          patientID,
+          appointment_day_start_time,
+          appointment_day_end_time
+        );
+      if (isAlreadyBooked)
+        throw createHttpError(
+          400,
+          "You have already booked appointment in that time slot"
+        );
 
       // construct time interval for each slot according to totalSlots and startTime & endTime
       const timeInterval_forEachSlot = Math.floor(
@@ -120,18 +241,20 @@ class Appointment_Controller implements Appointment_Controller_Interface {
         totalSlots,
         timeInterval_forEachSlot,
         patientEmail,
+        timeSlotID,
       };
 
-      // book online appointment
-      const appointment = await appointmentService.Book_Online_Appointment(
-        doctorID,
-        patientID,
-        slotRequest
-      );
+      // book temporary online appointment
+      const appointment =
+        await appointmentService.Book_Temporary_Online_Appointment(
+          doctorID,
+          patientID,
+          slotRequest
+        );
 
       // send response
       res.status(200).json({
-        message: "Appointment booked successfully",
+        message: "Confirm the appointment within 5 minutes",
         appointment,
       });
     } catch (error) {

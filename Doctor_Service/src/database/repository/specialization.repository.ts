@@ -3,12 +3,6 @@ import createHttpError from "http-errors";
 import { Specialization } from "../models";
 
 export interface Specialization_Repository_Interface {
-  addNewSpecialization(specializationName: string): Promise<Specialization>;
-  updateSpecialization(
-    specializationID: number,
-    specializationName: string
-  ): Promise<Specialization>;
-  deleteSpecialization(specializationID: number): Promise<void>;
   getAllSpecializations(): Promise<Specialization[]>;
   getSpecialization(specializationID: number): Promise<Specialization>;
 
@@ -16,51 +10,6 @@ export interface Specialization_Repository_Interface {
 }
 
 class SpecializationRepository implements Specialization_Repository_Interface {
-  // ---------------- add new specialization ----------------
-  async addNewSpecialization(
-    specializationName: string
-  ): Promise<Specialization> {
-    const exist = await Specialization.findOne({
-      where: {
-        name: specializationName,
-      },
-    });
-
-    if (exist) {
-      throw new Error("Specialization already exists");
-    }
-    const newSpecialization = await Specialization.create({
-      name: specializationName,
-    });
-
-    return newSpecialization;
-  }
-
-  // ---------------- update specialization ----------------
-  async updateSpecialization(
-    specializationID: number,
-    specializationName: string
-  ): Promise<Specialization> {
-    const specialization = await Specialization.findByPk(specializationID);
-    if (!specialization) {
-      throw new Error("Specialization not found");
-    }
-
-    specialization.name = specializationName;
-    await specialization.save();
-
-    return specialization;
-  }
-
-  // ----------------- delete specialization -----------------
-  async deleteSpecialization(specializationID: number): Promise<void> {
-    const specialization = await Specialization.findByPk(specializationID);
-    if (!specialization)
-      throw createHttpError.NotFound("Specialization not found");
-
-    await specialization.destroy();
-  }
-
   // ----------------- get all specializations -----------------
   async getAllSpecializations(): Promise<Specialization[]> {
     const specializations = await Specialization.findAll();

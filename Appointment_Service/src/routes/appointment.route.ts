@@ -8,7 +8,8 @@ import validateRequest from "./middleware/validateRequest";
 import authorize from "./middleware/auth";
 
 // schema instance
-import appointmentSchema from "../schema/appointment.schema";
+import AppointmentSchema from "../schema/appointment.schema";
+const appointmentSchema = new AppointmentSchema();
 
 // controller instance
 import appointmentController from "../controller/appointment.controller";
@@ -30,10 +31,26 @@ appointmentRouter.get("/", authorize(false), (req: Request, res: Response) => {
 
 // create appointment - only accessible to patient
 appointmentRouter.post(
-  "/book-online-appointment/:doctorID",
+  "/book-online-appointment/:scheduleID",
   authorize(true),
   validateRequest(appointmentSchema.Booking_Online_Appointment),
   appointmentController.Book_Online_Appointment
+);
+
+// confirm appointment - only accessible to patient
+appointmentRouter.put(
+  "/book-online-appointment/confirm/:appointmentID",
+  authorize(true),
+  validateRequest(appointmentSchema.Confirm_Online_Appointment),
+  appointmentController.Confirm_Online_Appointment
+);
+
+// cancel appointment - only accessible to patient
+appointmentRouter.delete(
+  "/book-online-appointment/cancel/:appointmentID",
+  authorize(true),
+  validateRequest(appointmentSchema.Confirm_Online_Appointment),
+  appointmentController.Cancel_Online_Appointment
 );
 
 // search pending appointments - accessible to both patient and doctor

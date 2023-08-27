@@ -25,6 +25,8 @@ import { Doctor } from "../database/models";
 import { doctorRepository } from "../database/repository";
 import { searchQuery_and_Params } from "../database/repository/doctor.repository";
 import log from "../utils/logger";
+import { OnlineSchedule_Excluded_Properties } from "../database/models";
+import online_scheduleService from "./online_schedule.service";
 
 export interface DoctorServiceInterface {
   // during registration and login
@@ -39,6 +41,9 @@ export interface DoctorServiceInterface {
     doctorID: number,
     newDoctorInfo: Partial<Doctor>
   ): Promise<DoctorAdditionalInfo>;
+
+  addDoctorOnlineFee(doctorId, newFee): Promise<boolean>;
+  updateDoctorOnlineFee(doctorId, newFee): Promise<boolean>;
 
   // after full registration
   getDoctorOverviewInfo(doctorID: number): Promise<DoctorOverviewInfo>;
@@ -139,6 +144,11 @@ class DoctorService implements DoctorServiceInterface {
           Number(payload.data["doctorID"])
         );
 
+      case "GET_SCHEDULE_INFO_FROM_ID":
+        return await online_scheduleService.giveScheduleInfo(
+          Number(payload.data["scheduleID"])
+        );
+
       default:
         return response;
     }
@@ -175,7 +185,6 @@ class DoctorService implements DoctorServiceInterface {
       if (newDoctorInfo.id) delete newDoctorInfo.id;
       if (newDoctorInfo.userID) delete newDoctorInfo.userID;
       if (newDoctorInfo.status) delete newDoctorInfo.status;
-      if (newDoctorInfo.scheduleID) delete newDoctorInfo.scheduleID;
 
       const doctor = await doctorRepository.updateDoctorAdditionalInfo(
         doctorID,
@@ -193,6 +202,24 @@ class DoctorService implements DoctorServiceInterface {
         DoctorInfo: doctorInfo,
         Specialization: specialization?.dataValues || {},
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // ----------------- add doctor online fee -----------------
+  async addDoctorOnlineFee(doctorId, newFee): Promise<boolean> {
+    try {
+      return await doctorRepository.addDoctorOnlineFee(doctorId, newFee);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // ----------------- update doctor online fee -----------------
+  async updateDoctorOnlineFee(doctorId, newFee): Promise<boolean> {
+    try {
+      return await doctorRepository.updateDoctorOnlineFee(doctorId, newFee);
     } catch (error) {
       throw error;
     }
@@ -225,13 +252,29 @@ class DoctorService implements DoctorServiceInterface {
   async getDoctorProfileInfo(doctorID: number): Promise<DoctorProfileInfo> {
     try {
       const doctor = await doctorRepository.getDoctorInfo(doctorID);
+
       const specialization = await doctor.getSpecialization();
-      const onlineSchedule = await doctor.getOnlineSchedule();
+      const onlineSchedules = await doctor.getOnlineSchedules();
+
+      const onlineSchedulesInfo = onlineSchedules.map((schedule) => {
+        return excludeProperties(
+          schedule.dataValues,
+          OnlineSchedule_Excluded_Properties
+        );
+      });
+
+      //sort ascending order by weekday
+      onlineSchedulesInfo.sort((a, b) => {
+        return a.weekday - b.weekday;
+      });
 
       return {
         DoctorInfo: doctor.dataValues,
         Specialization: specialization?.dataValues || {},
-        OnlineSchedule: onlineSchedule?.dataValues || {},
+        OnlineSchedule: {
+          visit_fee: doctor.online_visit_fee,
+          schedules: onlineSchedulesInfo,
+        },
       };
     } catch (error) {
       throw error;

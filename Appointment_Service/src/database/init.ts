@@ -6,6 +6,7 @@ import { config } from "../config";
 import Appointment from "./models/Appointment.model";
 import Prescription from "./models/Prescription.model";
 import Prescription_Medicines from "./models/Prescription_Medicines.model";
+import deleteTempApp from "./models/deleteTempApp";
 
 const isDev = config.ENVIRONMENT === "development";
 
@@ -23,5 +24,7 @@ const dbInit = async () =>
       console.log(err);
       process.exit(1);
     });
+
+deleteTempApp.start();
 
 export default dbInit;

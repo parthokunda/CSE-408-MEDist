@@ -35,6 +35,9 @@ export interface Doctor_Repository_Interface {
     newDoctorInfo: Partial<Doctor>
   ): Promise<Doctor>;
 
+  addDoctorOnlineFee(doctorId: number, newFee: number): Promise<boolean>;
+  updateDoctorOnlineFee(doctorId: number, newFee: number): Promise<boolean>;
+
   // search doctor
   searchDoctor(
     searchInfo: searchQuery_and_Params
@@ -138,6 +141,44 @@ class DoctorRepository implements Doctor_Repository_Interface {
 
         return updatedDoctor;
       } else throw new Error("Doctor not found.");
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // ----------------- add doctor online fee ----------------
+  async addDoctorOnlineFee(doctorId: number, newFee: number): Promise<boolean> {
+    try {
+      const doctor = await Doctor.findByPk(doctorId);
+
+      if (doctor) {
+        if (doctor.online_visit_fee) return false;
+
+        doctor.online_visit_fee = newFee;
+        await doctor.save();
+
+        return true;
+      } else throw createHttpError.NotFound("Doctor not found.");
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // ---------------- update doctor online fee ----------------
+  async updateDoctorOnlineFee(
+    doctorId: number,
+    newFee: number
+  ): Promise<boolean> {
+    try {
+      const doctor = await Doctor.findByPk(doctorId);
+
+      if (doctor) {
+        if (!doctor.online_visit_fee) return false;
+
+        doctor.online_visit_fee = newFee;
+        await doctor.save();
+        return true;
+      } else throw createHttpError.NotFound("Doctor not found.");
     } catch (error) {
       throw error;
     }

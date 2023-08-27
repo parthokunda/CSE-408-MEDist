@@ -8,3 +8,7 @@ export {
   specializationRepository,
   online_scheduleRepository,
 };
+
+export * from "./doctor.repository";
+export * from "./specialization.repository";
+export * from "./online_schedule.repository";

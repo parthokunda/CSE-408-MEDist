@@ -14,9 +14,15 @@ import {
   Search_Doctor_Query_Input,
   Update_Doctor_Info_Body_Input,
 } from "../schema/doctor.schema";
-import { searchQuery_and_Params } from "../database/repository/doctor.repository";
+
+import { searchQuery_and_Params } from "../database/repository";
 import log from "../utils/logger";
-import { SingleDaySchedule } from "../database/models/Online_Schedule.model";
+import {
+  OnlineScheduleInfo,
+  OnlineScheduleInput,
+  WeekName,
+} from "../database/models";
+import createHttpError from "http-errors";
 
 export interface Doctor_Controller_Interface {
   //get Specialization list
@@ -35,12 +41,13 @@ export interface Doctor_Controller_Interface {
     next: NextFunction
   );
 
-  //update online schedule
   updateOnlineSchedule(
     req: Request<{}, {}, Create_Schedule_Body_Input>,
     res: Response,
     next: NextFunction
   );
+
+  getOnlineSchedule(req: Request, res: Response, next: NextFunction);
 
   // get doctor's profile info
   getDoctorProfileInfo(req: Request, res: Response, next: NextFunction);
@@ -118,30 +125,43 @@ class Doctor_Controller implements Doctor_Controller_Interface {
     try {
       const doctorID = req.user_identity?.id as number;
 
-      const schedule: SingleDaySchedule[] = [];
+      if (
+        (await doctorService.addDoctorOnlineFee(
+          doctorID,
+          req.body.visitFee as number
+        )) === false
+      )
+        throw createHttpError.BadRequest("Online Schedule already exists");
+
+      const schedule: OnlineScheduleInput[] = [];
 
       for (let singleSchedule of req.body.schedule) {
         if (Object.keys(singleSchedule).length === 0) continue;
 
+        let weekname = singleSchedule.weekname as string;
+        // convert string of form first letter capital and rest small
+        weekname =
+          weekname.charAt(0).toUpperCase() + weekname.slice(1).toLowerCase();
+
+        if (WeekName.indexOf(weekname) === -1)
+          throw createHttpError.BadRequest("Invalid weekname");
+
         schedule.push({
-          weekday: singleSchedule.weekday,
-          startTime: singleSchedule.startTime,
-          endTime: singleSchedule.endTime,
-          totalSlots: singleSchedule.totalSlots,
+          weekname,
+          weekday: WeekName.indexOf(weekname) as number,
+          startTime: singleSchedule.startTime as string,
+          endTime: singleSchedule.endTime as string,
+          totalSlots: singleSchedule.totalSlots as number,
+          remainingSlots: singleSchedule.totalSlots as number,
         });
       }
 
-      const scheduleInfo = {
-        visitFee: req.body.visitFee,
-        schedule,
-      };
-
-      const onlineSchedule = await onlineScheduleService.createOnlineSchedule(
+      const updatedProfile = await onlineScheduleService.createOnlineSchedule(
         doctorID,
-        scheduleInfo
+        schedule
       );
 
-      res.status(200).json(onlineSchedule);
+      res.status(200).json(updatedProfile);
     } catch (error) {
       next(error);
     }
@@ -156,27 +176,55 @@ class Doctor_Controller implements Doctor_Controller_Interface {
     try {
       const doctorID = req.user_identity?.id as number;
 
-      const schedule: SingleDaySchedule[] = [];
+      if (
+        (await doctorService.updateDoctorOnlineFee(
+          doctorID,
+          req.body.visitFee as number
+        )) === false
+      )
+        throw createHttpError.BadRequest("Online Schedule doesn't exists");
+
+      const schedule: OnlineScheduleInput[] = [];
 
       for (let singleSchedule of req.body.schedule) {
         if (Object.keys(singleSchedule).length === 0) continue;
 
+        let weekname = singleSchedule.weekname as string;
+        // convert string of form first letter capital and rest small
+        weekname =
+          weekname.charAt(0).toUpperCase() + weekname.slice(1).toLowerCase();
+
+        if (WeekName.indexOf(weekname) === -1)
+          throw createHttpError.BadRequest("Invalid weekname");
+
         schedule.push({
-          weekday: singleSchedule.weekday,
-          startTime: singleSchedule.startTime,
-          endTime: singleSchedule.endTime,
-          totalSlots: singleSchedule.totalSlots,
+          weekname,
+          weekday: WeekName.indexOf(weekname) as number,
+          startTime: singleSchedule.startTime as string,
+          endTime: singleSchedule.endTime as string,
+          totalSlots: singleSchedule.totalSlots as number,
+          remainingSlots: singleSchedule.totalSlots as number,
         });
       }
 
-      const scheduleInfo = {
-        visitFee: req.body.visitFee,
-        schedule,
-      };
-
-      const onlineSchedule = await onlineScheduleService.updateOnlineSchedule(
+      const updatedProfile = await onlineScheduleService.updateOnlineSchedule(
         doctorID,
-        scheduleInfo
+        schedule
+      );
+
+      res.status(200).json(updatedProfile);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // ----------------------- Get Online Schedule ----------------------- //
+  async getOnlineSchedule(req: Request, res: Response, next: NextFunction) {
+    try {
+      const doctorID = req.user_identity?.id as number;
+
+      const onlineSchedule = await onlineScheduleService.getOnlineSchedule(
+        doctorID
       );
 
       res.status(200).json(onlineSchedule);
