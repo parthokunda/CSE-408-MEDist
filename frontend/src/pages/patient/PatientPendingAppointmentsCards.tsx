@@ -1,10 +1,8 @@
-import { FC, useState } from "react";
-import { AiOutlineArrowLeft } from "react-icons/ai";
-import { AiOutlineArrowRight } from "react-icons/ai";
+import { FC } from "react";
+import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 
 import { PendingAppointments } from "@/models/Brand";
 import DoctorPendingCard from "./PatientPendingAppointmentCard";
-import exp from "constants";
 
 const DoctorPendingCards: FC<{
   doctorFetchedData: PendingAppointments;

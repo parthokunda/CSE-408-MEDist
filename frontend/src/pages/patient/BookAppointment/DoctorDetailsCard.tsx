@@ -8,7 +8,7 @@ import avatar from "@/assets/img_avatar.png";
 
 const DoctorDetailsCard: FC<{ doctor: DoctorProfileInfo }> = (props) => {
   return (
-    <Card className="flex flex-col drop-shadow-lg overflow-hidden justify-center items-center pt-6">
+    <Card className="flex flex-col drop-shadow-lg overflow-hidden justify-center items-center pt-6 mx-3">
       <CardContent className="flex flex-col items-center">
         <div className="flex flex-col m-3 items-center">
           <Avatar className="h-24 w-24 mb-3">
@@ -23,15 +23,15 @@ const DoctorDetailsCard: FC<{ doctor: DoctorProfileInfo }> = (props) => {
           <div className="text-c2 text-xl flex justify-start">
             {props.doctor.DoctorInfo.degrees.join(", ")}
           </div>
-          <div className="text-c2 text-xl flex justify-start">
+          {props.doctor.Specialization && props.doctor.Specialization.name ? <div className="text-c2 text-xl flex justify-start">
             {props.doctor.Specialization.name}
-          </div>
+          </div> : <></>}
           <div className="text-c2 text-xl flex justify-start">
             BMDC : {props.doctor.DoctorInfo.bmdc}
           </div>
         </div>
         <div className="text-c1 text-xl font-bold mt-6">
-          Cost : {props.doctor.OnlineSchedule.visitFee} Taka
+          Cost : {props.doctor.OnlineSchedule.visit_fee} ৳
         </div>
         <div className="text-c1 text-xl font-bold">Contact : 01759881197</div>
       </CardContent>

@@ -24,7 +24,7 @@ export interface DoctorAttributes {
 export interface DoctorProfileInfo {
   DoctorInfo: DoctorAttributes;
   Specialization: SpecializationAttributes;
-  OnlineSchedule: OnlineScheduleAttributes;
+  OnlineSchedule: OnlineScheduleOverview;
 }
 
 export interface DoctorAdditionalInfo {
@@ -58,9 +58,25 @@ export interface SingleDaySchedule {
 
 export interface OnlineScheduleAttributes {
   id: number;
-  visitFee: number;
-  schedule: SingleDaySchedule[];
+  weekday: number;
+  weekname: string;
+  startTime: string;
+  endTime: string;
+  totalSlots: number;
+  remainingSlots: number;
+  doctorID: number;
 }
+
+export interface OnlineScheduleOverview {
+  visit_fee: number;
+  schedules: OnlineScheduleOverviewInfo[];
+}
+
+export interface OnlineScheduleOverviewInfo
+  extends Omit<
+    OnlineScheduleAttributes,
+    "doctorID" | "createdAt" | "updatedAt"
+  > {}
 
 export interface DoctorSearchAttributes {
   img: string;

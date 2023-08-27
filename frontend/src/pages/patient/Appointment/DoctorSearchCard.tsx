@@ -24,7 +24,7 @@ const DoctorSearchCard: FC<{ doctor: DoctorOverviewInfo }> = (props) => {
                   {props.doctor.DoctorInfo.name}
                 </div>
                 <div className="text-c2 text-md flex justify-start">
-                  {props.doctor.DoctorInfo.degrees.join(", ")}
+                  {props.doctor.DoctorInfo.degrees?.join(", ")}
                 </div>
                 <div className="text-c2 text-md flex justify-start">
                   {props.doctor.Specialization.name}

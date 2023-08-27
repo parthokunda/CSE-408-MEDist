@@ -1,8 +1,18 @@
-import { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { useParams } from "react-router-dom";
 import DoctorDetailsCard from "./DoctorDetailsCard";
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 import {
   Dialog,
@@ -15,106 +25,61 @@ import {
 } from "@/components/ui/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
 
-
 import axios from "axios";
 import { useCookies } from "react-cookie";
 
-import {
-  DoctorProfileInfo,
-  SingleDaySchedule
-} from "@/models/DoctorSchema";
+import { DoctorProfileInfo, SingleDaySchedule } from "@/models/DoctorSchema";
+import { useMutation } from "@tanstack/react-query";
+import { RequestAppointmentInfo } from "@/models/Appointment";
+import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
+
+type inputObject = {
+  authToken: string;
+  scheduleId: number;
+};
+
+const getDate = (date: Date | undefined): string => {
+  if (date === undefined) return "";
+  date.getHours;
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const seconds = date.getSeconds().toString().padStart(2, "0");
+  console.log(`${hours}:${minutes}:${seconds}`);
+  return `${hours}:${minutes}:${seconds}`;
+};
+
+const onSubmit = async (
+  authToken: string,
+  scheduleId: number
+): Promise<RequestAppointmentInfo> => {
+  console.log(`sending request for scheduleid ${scheduleId}`);
+  const response = await axios.post(
+    `${import.meta.env.VITE_DB_URL}:${
+      import.meta.env.VITE_DB_PORT
+    }/api/appointment/book-online-appointment/${scheduleId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Replace with your actual token
+      },
+    }
+  );
+  console.log(
+    "🚀 ~ file: PatientBookAppointment.tsx:38 ~ onSubmit ~ response:",
+    response.data
+  );
+  return response.data;
+};
 
 export const BookAppointment: FC = () => {
   const { doctorID } = useParams();
   console.log(doctorID);
   const [cookies] = useCookies(["user"]);
-  const [Saturday, setSaturday] = useState(false);
-  const [Sunday, setSunday] = useState(false);
-  const [Monday, setMonday] = useState(false);
-  const [Tuesday, setTuesday] = useState(false);
-  const [Wednesday, setWednesday] = useState(false);
-  const [Thursday, setThursday] = useState(false);
-  const [Friday, setFriday] = useState(false);
-  const [SatStart, setSatStart] = useState("00:00:00");
-  const [SatEnd, setSatEnd] = useState("");
-  const [SunStart, setSunStart] = useState("00:00");
-  const [SunEnd, setSunEnd] = useState("");
-  const [MonStart, setMonStart] = useState("");
-  const [MonEnd, setMonEnd] = useState("");
-  const [TueStart, setTueStart] = useState("");
-  const [TueEnd, setTueEnd] = useState("");
-  const [WedStart, setWedStart] = useState("");
-  const [WedEnd, setWedEnd] = useState("");
-  const [ThuStart, setThuStart] = useState("");
-  const [ThuEnd, setThuEnd] = useState("");
-  const [FriStart, setFriStart] = useState("");
-  const [FriEnd, setFriEnd] = useState("");
-  const [SatSlots, setSatSlots] = useState("");
-  const [SunSlots, setSunSlots] = useState("");
-  const [MonSlots, setMonSlots] = useState("");
-  const [TueSlots, setTueSlots] = useState("");
-  const [WedSlots, setWedSlots] = useState("");
-  const [ThuSlots, setThuSlots] = useState("");
-  const [FriSlots, setFriSlots] = useState("");
-  const [contact, setContact] = useState("");
-  const [cost, setCost] = useState("");
-
-  const days = [
-    "Friday",
-    "Saturday",
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-  ];
-
-  type FormValues = {
-    contact: string;
-    cost: string;
-    days: {
-      startTime?: string;
-      endTime?: string;
-      slot?: string;
-    }[];
-  };
-  const doctor = {
-    img: "https://www.w3schools.com/howto/img_avatar.png",
-    name: "Dr. John Doe",
-    degree: "MBBS, FCPS, FRCS",
-    department: "ENT",
-    bmdcNumber: "123456",
-    cost: 500,
-    contact: "01712345678",
-  };
-  const values = {
-    contact: "01759881197",
-    cost: "500",
-    days: [
-      { startTime: "12:00", endTime: "14:30", slot: "5" },
-      {},
-      { startTime: "11:00", endTime: "13:30", slot: "6" },
-      {},
-      {},
-      {},
-      {},
-    ],
-  };
-  const [formValues, setFormValues] = useState<FormValues>(values);
-  const [dayIndex, setDayIndex] = useState(8);
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [totalslot, setSlot] = useState(0);
-  const [payed, setPayed] = useState(false);
-  const onCall = (obj: FormValues) => {
-    setFormValues(obj);
-    console.log(obj);
-  };
+  const [weekName, setWeekName] = useState<string>("");
   const [singleDay, setSingleDay] = useState<SingleDaySchedule>();
-  // console.log(cookies.user.token);
-  // const [weekdays, setWeekdays] = useState<SingleDaySchedule[]>
-  // var doctordetails: DoctorProfileInfo;
   const [doctordetails, setDoctorDetails] = useState<DoctorProfileInfo>();
+  const [scheduleId, setScheduleId] = useState<number>();
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -130,14 +95,12 @@ export const BookAppointment: FC = () => {
             }
           )
           .then((response) => {
-            console.log("🚀 ~ file: PatientBookAppointment.tsx:133 ~ .then ~ response:", response.data)
+            console.log(
+              "🚀 ~ file: PatientBookAppointment.tsx:133 ~ .then ~ response:",
+              response.data
+            );
             setDoctorDetails(response.data);
-            // setDayIndex()
           });
-        // setSize(response.data.OnlineSchedule.schedule.length);
-        // setContact(response.data.doctorInfo.phone);
-        // setDoctorDetails(response.data);
-        // console.log(doctordetails);
       } catch (err) {
         console.log(err);
       }
@@ -145,81 +108,71 @@ export const BookAppointment: FC = () => {
     fetchData();
   }, []);
 
-  const OnSubmit: () => void = () => {
-    setPayed(true);
-    console.log(dayIndex);
-    console.log("day is", singleDay);
-    const val={
-      weekday : singleDay?.weekday,
-      startTime : singleDay?.startTime,
-      endTime : singleDay?.endTime,
-      totalSlots : singleDay?.totalSlots,
-    }
-    console.log(val);
-    const msg = axios.post(
-      `${import.meta.env.VITE_DB_URL}:${
-        import.meta.env.VITE_DB_PORT
-      }/api/appointment/book-online-appointment/${doctorID}`,
-      val,
-      {
-        headers: {
-          Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  };
-  // console.log(doctordetails?.OnlineSchedule.schedule);
-  // onCall(values);
+  const {
+    mutate,
+    isLoading,
+    isError,
+    data: requestAppointmentData,
+  } = useMutation({
+    mutationFn: (input: inputObject) =>
+      onSubmit(input.authToken, input.scheduleId),
+  });
+
   return (
     <>
-      <div className="flex text-c1 text-large font-bold justify-center mt-6">
+      <div className="flex text-c1 text-3xl font-bold justify-center m-6">
         Book Appointment
       </div>
       <div className="flex">
         <div className="w-1/4">
           {doctordetails && <DoctorDetailsCard doctor={doctordetails!} />}
         </div>
-        {doctordetails && doctordetails.OnlineSchedule.schedule && (
+        {doctordetails && doctordetails.OnlineSchedule.schedules && (
           <div className="flex-[60%] flex-col">
-            {/* {doctordetails?.OnlineSchedule.schedule.map((day) => {
-              return (
-                // <RadioGroup
-                //   onValueChange={() => {
-                //     setDayIndex(index);
-                //   }}
-                // >
-                <div>
-                   
-                    <div className="grid grid-cols-4 ml-4 mt-4 gap-4">
-                      <div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-4"></TableHead>
+                  <TableHead>Weekday</TableHead>
+                  <TableHead>Start Time</TableHead>
+                  <TableHead>End Time</TableHead>
+                  <TableHead>Total Slot</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {doctordetails.OnlineSchedule.schedules.map((day) => {
+                  return (
+                    <TableRow key={day.id} className="items-center">
+                      <TableCell>
                         <input
                           type="radio"
-                          className="h-6 w-6 text-green-600 border-gray-300 focus:ring-green-400"
+                          className="h-4 w-4 mx-3"
                           name="day"
-                          id={day.weekday.toString()}
-                          
+                          id={day.id.toString()}
                           onChange={() => {
-                            setDayIndex(day.weekday);
+                            setWeekName(day.weekname);
                             setSingleDay(day);
+                            setScheduleId(day.id);
                           }}
                         />
-                        <label htmlFor={day.weekday.toString()}>{days[day.weekday]}</label>
-                      </div>
-                      <div>
-                        Start Time: <b>{day.startTime}</b>
-                      </div>
-                      <div>
-                        End Time: <b>{day.endTime}</b>
-                      </div>
-                      <div>
-                        Slot: <b>{day.totalSlots}</b>
-                      </div>
-                    </div>
-                  
-                </div>
-              );
-            })} */}
+                      </TableCell>
+                      <TableCell>
+                        <label htmlFor={day.weekname}>{day.weekname}</label>
+                      </TableCell>
+                      <TableCell>
+                        <b>{day.startTime}</b>
+                      </TableCell>
+                      <TableCell>
+                        <b>{day.endTime}</b>
+                      </TableCell>
+                      <TableCell>
+                        <b>{day.totalSlots}</b>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
 
             <div className="flex justify-center mt-5">
               <Dialog>
@@ -227,25 +180,43 @@ export const BookAppointment: FC = () => {
                   <Button
                     className="bg-c2 w-42 text-white rounded-lg hover:bg-c1"
                     onClick={() => {
-                      OnSubmit();
+                      if (scheduleId)
+                        mutate({
+                          authToken: cookies.user.token,
+                          scheduleId: scheduleId,
+                        });
                     }}
-                    disabled={dayIndex === 8}
+                    disabled={weekName === ""}
                   >
                     Book Now
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px] bg-c4">
                   <DialogHeader>
-                    <DialogTitle>Payment Completed</DialogTitle>
+                    <DialogTitle>Confirm Appointment</DialogTitle>
                     <DialogDescription>
-                      Your appointment is on :{" "}
-                      <b className="text-c1">{days[dayIndex]}</b>
+                      {isError && <>Error</>}
+                      {/* {isLoading && <LoadingSpinner />} */}
+                      {!isLoading && !isError && (
+                        <>
+                          <p>{requestAppointmentData?.message}</p>
+                          Your appointment Date : {" "}
+                          <b className="text-c1">
+                            {requestAppointmentData?.appointment.startTime.toString().substring(0,10)}
+                          </b>
+                          <br/>
+                          Your appointment Time : {" "}
+                          <b className="text-c1">
+                            {requestAppointmentData?.appointment.startTime.toString().substring(11,16)}
+                          </b>
+                        </>
+                      )}
                     </DialogDescription>
                   </DialogHeader>
 
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button className="bg-c2 hover:bg-c1">Ok</Button>
+                      <Button className="bg-c2 hover:bg-c1" disabled={isLoading || isError}>Ok</Button>
                     </DialogClose>
                   </DialogFooter>
                 </DialogContent>

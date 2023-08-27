@@ -36,6 +36,7 @@ const AppointmentPage: FC = () => {
         }
       );
       setDoctorList(response.data);
+      console.log("🚀 ~ file: AppointmentPage.tsx:39 ~ useEffect ~ response.data:", response.data)
       setIsLoading(false);
       return response.data;
     };
