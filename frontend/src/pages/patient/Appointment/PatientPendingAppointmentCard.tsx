@@ -1,11 +1,8 @@
-import { FC, useState } from "react";
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  CardContent
 } from "@/components/ui/card";
+import { FC } from "react";
 
 import {
   Dialog,
@@ -18,11 +15,8 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { DialogClose } from "@radix-ui/react-dialog";
 import { PendingAppointmentOverviewInfo } from "@/models/Appointment";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 const DoctorPendingCard: FC<{ app: PendingAppointmentOverviewInfo }> = (props) => {
   // convert Date to date and time

@@ -1,11 +1,11 @@
 import { FC } from "react";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 
-import { GetPatientPendingAppointmentsResponse } from "@/models/Appointment";
+import { GetPendingAppointmentsResponse } from "@/models/Appointment";
 import DoctorPendingCard from "./PatientPendingAppointmentCard";
 
 const DoctorPendingCards: FC<{
-  doctorFetchedData: GetPatientPendingAppointmentsResponse;
+  doctorFetchedData: GetPendingAppointmentsResponse;
   currentPage: number;
   setCurrentPage: (page: number) => void;
 }> = (props) => {

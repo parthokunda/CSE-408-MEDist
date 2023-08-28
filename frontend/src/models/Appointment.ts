@@ -59,12 +59,12 @@ export type RejectAppointmentRespone = {
   message: string;
 };
 
-export interface GetPatientPendingAppointments {
+export interface GetPendingAppointments {
   appointments: PendingAppointmentOverviewInfo[];
   totalCount: number;
 }
 
-export type GetPatientPendingAppointmentsResponse = {
+export type GetPendingAppointmentsResponse = {
   message: string;
-  pendingAppointments: GetPatientPendingAppointments;
+  pendingAppointments: GetPendingAppointments;
 };

@@ -1,13 +1,11 @@
-import { FC, useState } from "react";
-import { AiOutlineArrowLeft } from "react-icons/ai";
-import { AiOutlineArrowRight } from "react-icons/ai";
+import { FC } from "react";
+import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 
-import { DoctorPendingAttributes } from "@/models/DoctorSchema";
+import { GetPendingAppointmentsResponse } from "@/models/Appointment";
 import DoctorPendingCard from "./DoctorPendingCard";
-import exp from "constants";
 
 const DoctorPendingCards: FC<{
-  patientFetchedData: DoctorPendingAttributes[];
+  patientFetchedData: GetPendingAppointmentsResponse;
   currentPage: number;
   setCurrentPage: (page: number) => void;
 }> = (props) => {
@@ -15,8 +13,8 @@ const DoctorPendingCards: FC<{
   const recordsPerPage = 3;
   const lastIndex = props.currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
-  const records = props.patientFetchedData.slice(firstIndex, lastIndex);
-  const nPages = Math.ceil(props.patientFetchedData.length / recordsPerPage);
+  const records = props.patientFetchedData.pendingAppointments.appointments.slice(firstIndex, lastIndex);
+  const nPages = Math.ceil(props.patientFetchedData.pendingAppointments.totalCount / recordsPerPage);
   const array = [
     currentPage - 2,
     currentPage - 1,
@@ -25,7 +23,7 @@ const DoctorPendingCards: FC<{
     currentPage + 2,
   ];
   const pages = array.filter((page) => page > 0 && page <= nPages);
-  if (props.patientFetchedData && props.patientFetchedData.length === 0) {
+  if (props.patientFetchedData && props.patientFetchedData.pendingAppointments.totalCount === 0) {
     return (
       <div className="flex justify-center align-middle">No Doctor Found</div>
     );
@@ -46,16 +44,16 @@ const DoctorPendingCards: FC<{
   }
   return (
     <div className="relative h-[55vh]">
-      <div className="grid grid-cols-5 gap-4 mt-8">
-        <div className="flex ml-3">Appointment ID</div>
-        <div className="flex">Patient Name</div>
-        <div className="flex">Appointment Date</div>
-        <div className="flex">Appointment Time</div>
+      <div className="grid grid-cols-5 gap-4 mt-8 px-4">
+      <div className="flex justify-center">Appointment ID</div>
+        <div className="flex justify-center">Patient Name</div>
+        <div className="flex justify-center">Appointment Date</div>
+        <div className="flex justify-center">Appointment Time</div>
       </div>
       <div className="grid lg:grid-cols-1 md:grid-cols-3 sm:grid-cols-3 mt-3 gap-5">
         {props.patientFetchedData &&
           records.map((patient, index) => (
-            <DoctorPendingCard patient={patient} key={index} />
+            <DoctorPendingCard app={patient} key={index} />
           ))}
       </div>
       <nav className="absolute bottom-[-200px] w-full pb-3">

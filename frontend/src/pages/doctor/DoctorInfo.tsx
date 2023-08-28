@@ -10,11 +10,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { FC, useEffect, useState } from "react";
-import {
-  Controller,
-  SubmitHandler,
-  useForm
-} from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import * as z from "zod";
 import { Input } from "../../components/ui/input";
 
@@ -29,7 +25,10 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 
-import { DoctorAdditionalInfo, SpecializationAttributes } from "@/models/DoctorSchema";
+import {
+  DoctorAdditionalInfo,
+  SpecializationAttributes,
+} from "@/models/DoctorSchema";
 import { useCookies } from "react-cookie";
 
 export const DoctorInfo: FC = () => {
