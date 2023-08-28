@@ -40,10 +40,13 @@ class PrescriptionService implements PrescriptionServiceInterface {
     patientID: number
   ): Promise<{ DoctorInfo: DoctorPortion; PatientInfo: PatientPortion }> {
     try {
-      const [DoctorInfo, PatientInfo] = await Promise.all([
+      /* const [DoctorInfo, PatientInfo] = await Promise.all([
         this.getDoctorInformation(doctorID),
         this.getPatientInformation(patientID),
-      ]);
+      ]); */
+
+      const DoctorInfo = await this.getDoctorInformation(doctorID);
+      const PatientInfo = await this.getPatientInformation(patientID);
 
       return { DoctorInfo, PatientInfo };
     } catch (error) {
@@ -56,46 +59,69 @@ class PrescriptionService implements PrescriptionServiceInterface {
   }
 
   private async getDoctorInformation(doctorID: number): Promise<DoctorPortion> {
-    const payload: RPC_Request_Payload = {
-      type: "GET_DOCTOR_INFO_FOR_PRESCRIPTION",
-      data: {
-        doctorID,
-      },
-    };
+    try {
+      const payload: RPC_Request_Payload = {
+        type: "GET_DOCTOR_INFO_FOR_PRESCRIPTION",
+        data: {
+          doctorID: 2,
+        },
+      };
 
-    log.debug(payload, "payload - for 'GET_DOCTOR_INFO_FOR_PRESCRIPTION'");
+      log.debug(payload, "payload - for 'GET_DOCTOR_INFO_FOR_PRESCRIPTION'");
 
-    const doctor_response_payload: RPC_Response_Payload =
-      await broker.RPC_Request(config.PATIENT_RPC_QUEUE, payload);
+      const doctor_response_payload: RPC_Response_Payload =
+        await broker.RPC_Request(config.DOCTOR_RPC_QUEUE, payload);
 
-    if (doctor_response_payload.status !== "success")
+      log.debug(
+        doctor_response_payload,
+        "respnse payload - for 'GET_DOCTOR_INFO_FOR_PRESCRIPTION'"
+      );
+
+      if (doctor_response_payload.status !== "success")
+        throw createHttpError(500, "Error getting doctor information from RPC");
+
+      return {
+        DoctorInfo: { ...doctor_response_payload.data["DoctorInfo"] },
+        Specialization: { ...doctor_response_payload.data["Specialization"] },
+      };
+    } catch (error) {
+      log.error(error);
       throw createHttpError(500, "Error getting doctor information from RPC");
-
-    return {
-      DoctorInfo: { ...doctor_response_payload.data["DoctorInfo"] },
-      Specialization: { ...doctor_response_payload.data["Specialization"] },
-    };
+    }
   }
 
   private async getPatientInformation(
     patientID: number
   ): Promise<PatientPortion> {
-    const payload: RPC_Request_Payload = {
-      type: "GET_PATIENT_INFO_FOR_PRESCRIPTION",
-      data: {
-        patientID,
-      },
-    };
+    try {
+      const payload: RPC_Request_Payload = {
+        type: "GET_PATIENT_INFO_FOR_PRESCRIPTION",
+        data: {
+          patientID: 4,
+        },
+      };
 
-    log.debug(payload, "payload - for 'GET_PATIENT_INFO_FOR_PRESCRIPTION'");
+      log.debug(payload, "payload - for 'GET_PATIENT_INFO_FOR_PRESCRIPTION'");
 
-    const patient_response_payload: RPC_Response_Payload =
-      await broker.RPC_Request(config.PATIENT_RPC_QUEUE, payload);
+      const patient_response_payload: RPC_Response_Payload =
+        await broker.RPC_Request(config.PATIENT_RPC_QUEUE, payload);
 
-    if (patient_response_payload.status !== "success")
+      log.debug(
+        patient_response_payload,
+        "respnse payload - for 'GET_PATIENT_INFO_FOR_PRESCRIPTION'"
+      );
+
+      if (patient_response_payload.status !== "success")
+        throw createHttpError(
+          500,
+          "Error getting patient information from RPC"
+        );
+
+      return { ...patient_response_payload.data } as PatientPortion;
+    } catch (error) {
+      log.error(error);
       throw createHttpError(500, "Error getting patient information from RPC");
-
-    return { ...patient_response_payload.data } as PatientPortion;
+    }
   }
 
   // ---------------------- Generate Prescription Header ---------------------- //
@@ -124,8 +150,14 @@ class PrescriptionService implements PrescriptionServiceInterface {
         );
       }
 
+      if (!appointment) throw createHttpError(404, "Appointment not found");
+
       const doctorID = appointment.doctorID;
       const patientID = appointment.patientID;
+
+      const tempPatientInfo = await this.getPatientInformation(patientID);
+
+      log.info(tempPatientInfo, "tempPatientInfo");
 
       const { DoctorInfo, PatientInfo } = await this.getDoctorAndPatientInfo(
         doctorID,

@@ -46,7 +46,7 @@ export interface ManufacturerAttributes {
 }
 
 export interface Prescription_Medicine_Input
-  extends Omit<Prescription_MedicinesAttributes, "id"> {}
+  extends Omit<Prescription_MedicinesAttributes, "id" | "prescriptionID"> {}
 
 export interface Prescription_MedicinesAttributes {
   id: number;

@@ -127,13 +127,18 @@ class PatientService implements PatientServiceInterface {
     patientID: number
   ): Promise<RPC_Response_Payload> {
     try {
-      const patient = await this.repository.getPatientInfo(patientID);
-
       const patientInfo = (await this.getPatientAdditionalInfo(patientID))
         .PatientInfo;
 
+      if (!patientInfo) throw createHttpError(404, "Patient not found");
+
       // remove status from patientInfo
       const { status, address, dob, ...rest } = patientInfo;
+
+      log.info(rest, "patient info for prescription");
+
+      // if (rest["updatedAt"]) delete rest["updatedAt"];
+      // if (rest["createdAt"]) delete rest["createdAt"];
 
       // calculate age from dob
       const oneYear = 365.25 * 24 * 60 * 60 * 1000;
@@ -151,9 +156,12 @@ class PatientService implements PatientServiceInterface {
         },
       };
     } catch (error) {
+      log.error(error);
       return {
         status: "error",
-        data: {},
+        data: {
+          message: error.message,
+        },
       };
     }
   }
@@ -161,10 +169,16 @@ class PatientService implements PatientServiceInterface {
   // ----------------- server side RPC request handler ----------------
   async serveRPCRequest(payload: RPC_Request_Payload) {
     log.debug(payload, "Rpc request payload");
-
+    console.log(payload, "Rpc request payload");
     let response: RPC_Response_Payload = {
       status: "error",
-      data: {},
+      data: {
+        message: `request you sent - ${
+          payload.type
+        } - is not handled by the server & your data is - ${JSON.stringify(
+          payload.data
+        )}`,
+      },
     };
     switch (payload.type) {
       case "CREATE_NEW_ENTITY":
@@ -177,6 +191,9 @@ class PatientService implements PatientServiceInterface {
         return await this.getName_givenID(payload.data["patientID"]);
 
       case "GET_PATIENT_INFO_FOR_PRESCRIPTION":
+        return await this.getPatientInfo_forPrescription(
+          payload.data["patientID"]
+        );
 
       default:
         break;

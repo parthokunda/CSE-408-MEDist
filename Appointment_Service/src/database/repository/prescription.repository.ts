@@ -20,8 +20,8 @@ export interface CreatePrescriptionInput {
   symptoms: string[];
   diagnosis: string[];
   advices: string[];
-  followUpDate: Date;
-  otherNotes: string[];
+  followUpDate: Date | null;
+  otherNotes: string[] | null;
 }
 
 export interface Prescription_Repository_Interface {

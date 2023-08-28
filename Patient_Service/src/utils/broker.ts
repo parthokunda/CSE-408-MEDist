@@ -59,7 +59,10 @@ class BrokerService implements BrokerServiceInterface {
     const channel = await this.getChannel();
 
     // create a temporary queue which will be deleted once the message is consumed
-    const queue = await channel.assertQueue("", { exclusive: false });
+    const queue = await channel.assertQueue("", {
+      exclusive: true,
+      durable: false,
+    });
     //exclusive: true means that the queue will be deleted once the connection is closed
 
     log.info(

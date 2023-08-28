@@ -10,9 +10,12 @@ import broker, {
 import {
   DoctorAdditionalInfo,
   DoctorAdditionalInfo_Excluded_Properties,
+  DoctorAttributes,
   DoctorOverviewInfo,
   DoctorOverviewInfo_Excluded_Properties,
   DoctorProfileInfo,
+  PrescriptionDoctorInfo,
+  PrescriptionDoctorInfo_Excluded_Properties,
   SearchDoctorInfo,
 } from "../database/models/Doctor.model";
 
@@ -123,6 +126,39 @@ class DoctorService implements DoctorServiceInterface {
     }
   }
 
+  // ----------------- get prescription doctor info -----------------
+  async getPrescriptionDoctorInfo(
+    doctorID: number
+  ): Promise<RPC_Response_Payload> {
+    try {
+      const doctor = await doctorRepository.getDoctorInfo(doctorID);
+
+      if (!doctor) throw new Error("Doctor not found");
+
+      const doctorInfo = excludeProperties(
+        doctor.dataValues,
+        PrescriptionDoctorInfo_Excluded_Properties
+      );
+
+      const specialization = await doctor.getSpecialization();
+
+      if (!specialization) throw new Error("Specialization not found");
+
+      return {
+        status: "success",
+        data: {
+          DoctorInfo: doctorInfo,
+          Specialization: specialization.dataValues,
+        },
+      };
+    } catch (error) {
+      return {
+        status: "error",
+        data: {},
+      };
+    }
+  }
+
   // ----------------- server side RPC request handler ----------------
   async serveRPCRequest(
     payload: RPC_Request_Payload
@@ -147,6 +183,11 @@ class DoctorService implements DoctorServiceInterface {
       case "GET_SCHEDULE_INFO_FROM_ID":
         return await online_scheduleService.giveScheduleInfo(
           Number(payload.data["scheduleID"])
+        );
+
+      case "GET_DOCTOR_INFO_FOR_PRESCRIPTION":
+        return await this.getPrescriptionDoctorInfo(
+          Number(payload.data["doctorID"])
         );
 
       default:

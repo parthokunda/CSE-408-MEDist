@@ -135,7 +135,10 @@ class BrokerService implements BrokerServiceInterface {
     const uuid = uuidv4(); // correlation id
 
     const channel = await this.getChannel();
-    const queue = await channel.assertQueue("", { exclusive: false });
+    const queue = await channel.assertQueue("", {
+      exclusive: true,
+      durable: false,
+    });
 
     // send the request
     await channel.sendToQueue(

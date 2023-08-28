@@ -102,6 +102,8 @@ export interface PrescriptionDoctorInfo {
     | "gender"
     | "bmdc"
     | "issueDate"
+    | "createdAt"
+    | "updatedAt"
   >;
   Specialization: SpecializationAttributes;
 }
@@ -116,6 +118,8 @@ export const PrescriptionDoctorInfo_Excluded_Properties: (
   | "gender"
   | "bmdc"
   | "issueDate"
+  | "createdAt"
+  | "updatedAt"
 )[] = [
   "userID",
   "scheduleID",
@@ -126,6 +130,8 @@ export const PrescriptionDoctorInfo_Excluded_Properties: (
   "bmdc",
   "issueDate",
   "online_visit_fee",
+  "createdAt",
+  "updatedAt",
 ];
 
 export interface DoctorAttributes {
