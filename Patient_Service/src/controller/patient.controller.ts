@@ -68,12 +68,12 @@ class Patient_Controller implements Patient_Controller_Interface {
       //construct height as number if it is not empty
       if (req.body.height) {
         // make feet number as integer part and inches number as decimal part
-        const feet = req.body.height.feet as number;
+        const feet = typeof req.body.height.feet === "string" ? parseInt(req.body.height.feet) : req.body.height.feet as number;
+        
         let inches = req.body.height.inches as number;
 
         //make inches to decimal
         inches = inches / 100;
-
         req.body.height = feet + inches;
       }
 

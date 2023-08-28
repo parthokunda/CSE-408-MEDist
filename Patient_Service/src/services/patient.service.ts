@@ -194,7 +194,7 @@ class PatientService implements PatientServiceInterface {
       // inches is the decimal part of height
       let inches = height - feet;
       // convert inches to integer
-      inches = Math.floor(inches * 100);
+      inches = Math.round(inches * 100);
 
       const updatedPatientAdditionalInfo = {
         ...patientAdditionalInfo,
