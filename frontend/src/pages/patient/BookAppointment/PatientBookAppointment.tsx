@@ -257,7 +257,7 @@ export const BookAppointment: FC = () => {
                 <DialogContent className="flex flex-col m:max-w-[425px] bg-c4 items-center justify-center">
                   <DialogHeader className="flex">
                     <DialogTitle className="text-c1">Confirm Appointment</DialogTitle>
-                    <div>{isLoading && <LoadingSpinner />}</div>
+                    <div className="flex items-center justify-center">{isLoading && <LoadingSpinner />}</div>
                     <DialogDescription>
                       {isError && <>Error</>}
                       {!isLoading && !isError && (

@@ -37,7 +37,7 @@ export const PatientInfo: FC = () => {
     return <p>Error Getting info</p>
 
   if(isLoading || !isFetched){
-    return <LoadingSpinner/>
+    return <div className="flex h-60 items-center justify-center"><LoadingSpinner/></div>
   }
 
   //we will probably navigate to a default page from here
