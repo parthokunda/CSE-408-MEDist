@@ -55,10 +55,7 @@ const AppRouter: FC = () => {
           path="doctor/pendingAppointments"
           element={<PatientSearchPage />}
         />
-        <Route
-          path="patient/bookAppointment/:doctorID"
-          element={<BookAppointment />}
-        />
+        
         {/* <Route path="patient/searchDoctor" element={<DoctorSearchPage />} /> */}
         <Route path="/patient/*" element={<PatientRouter />} />
       </Route>

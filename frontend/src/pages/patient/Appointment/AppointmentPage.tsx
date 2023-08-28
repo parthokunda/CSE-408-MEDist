@@ -7,6 +7,7 @@ import { FC, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import DoctorSearchCards from "./DoctorSearchCards";
 import SearchDoctor from "./SearchDoctor";
+import PatientPendingAppointments from "./PatientPendingAppointments";
 
 const AppointmentPage: FC = () => {
   const [cookies] = useCookies(["user"]);
@@ -66,8 +67,8 @@ const AppointmentPage: FC = () => {
         )}</>
       </TabsContent>
       <TabsContent value="pendingAppointments">
-        {/* <PatientPendingAppointments/> */}
-        <p>HI</p>
+        <PatientPendingAppointments/>
+        {/* <p>HI</p> */}
       </TabsContent>
     </Tabs>
   );

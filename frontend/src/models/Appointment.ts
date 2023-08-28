@@ -51,11 +51,20 @@ export type ConfirmAppointmentResponseInfo = {
 };
 
 export type ConfirmAppointmentResponse = {
-  message: string,
-  appointment: ConfirmAppointmentResponseInfo
-}
-
+  message: string;
+  appointment: ConfirmAppointmentResponseInfo;
+};
 
 export type RejectAppointmentRespone = {
-  message: string,
+  message: string;
+};
+
+export interface GetPatientPendingAppointments {
+  appointments: PendingAppointmentOverviewInfo[];
+  totalCount: number;
 }
+
+export type GetPatientPendingAppointmentsResponse = {
+  message: string;
+  pendingAppointments: GetPatientPendingAppointments;
+};

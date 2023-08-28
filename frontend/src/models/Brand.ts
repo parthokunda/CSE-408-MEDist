@@ -148,29 +148,9 @@ export interface PatientPendingAttributes {
   meetLink: string;
 }
 
-export interface PendingAppointments {
-  appointments: PendingAppointmentOverviewInfo[];
-  totalCount: number;
-}
 
 export interface Patient_or_Doctor_Info {
   id: number;
   name: string;
   email: string;
-}
-
-export interface PendingAppointmentOverviewInfo {
-  id: number;
-  type: string;
-
-  patientInfo: Patient_or_Doctor_Info | null;
-
-  doctorInfo: Patient_or_Doctor_Info | null;
-
-  startTime: string;
-  endTime: string;
-
-  status: string;
-
-  meetingLink: string;
 }

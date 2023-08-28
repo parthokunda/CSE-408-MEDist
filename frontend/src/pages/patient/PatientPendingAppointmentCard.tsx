@@ -17,12 +17,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { PendingAppointmentOverviewInfo } from "@/models/Brand";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { PendingAppointmentOverviewInfo } from "@/models/Appointment";
 
 const DoctorPendingCard: FC<{ app: PendingAppointmentOverviewInfo }> = (props) => {
   // convert Date to date and time
@@ -37,74 +37,34 @@ const DoctorPendingCard: FC<{ app: PendingAppointmentOverviewInfo }> = (props) =
   const minute = date.getMinutes();
   var min = minute.toString();
   if (minute < 10) min = minute.toString().padStart(2, "0");
-  const sec = date.getSeconds();
   const dateStr = `${day}/${month}/${year}`;
   const timeStr = `${hr}:${min}`;
-  var availability = false;
-  const end=new Date(props.app.endTime);
   function isAvailable() {
-    if (date < new Date()) availability = true;
-    else availability = false;
-    return availability;
+    if (date < new Date()) return false;
+    return true;
   }
-  const [modalOpen, setModalOpen] = useState(false);
 
-  function DialogDemo() {
-    return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline">Edit Profile</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>
-              Make changes to your profile here. Click save when you're done.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input id="name" value="Pedro Duarte" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right">
-                Username
-              </Label>
-              <Input id="username" value="@peduarte" className="col-span-3" />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="submit">Save changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    );
-  }
 
   return (
     <div>
-      <Card className="flex flex-col drop-shadow-lg overflow-hidden">
-        <CardContent>
-          <div className="grid grid-cols-5 gap-4">
-            <div className="flex mt-3 text-xl">{props.app.id}</div>
-            <div className="flex mt-3 text-c1 text-xl font-bold">
+      <Card className="flex flex-col drop-shadow-lg overflow-hidden mx-3">
+        <CardContent className="p-2 px-0">
+          <div className="grid grid-cols-5 gap-4 align-middle">
+            <div className="flex text-xl items-center justify-center">{props.app.id}</div>
+            <div className="flex text-c1 text-xl font-bold items-center justify-center">
               {props.app.doctorInfo!.name}
             </div>
-            <div className="flex mt-3 text-xl">{dateStr}</div>
-            <div className="flex mt-3 text-xl">{timeStr}</div>
+            <div className="flex text-xl items-center justify-center">{dateStr}</div>
+            <div className="flex text-xl items-center justify-center">{timeStr}</div>
 
             <Dialog>
               <DialogTrigger asChild>
                 <Button
                   disabled={!isAvailable()}
-                  className="bg-c2 w-42 text-white rounded-lg hover:bg-c1 mt-5"
+                  className="bg-c2 w-42 text-white rounded-lg hover:bg-c1 m-2"
                   onClick={() => {
-                    navigator.clipboard.writeText(props.app.meetingLink);
+                    navigator.clipboard.writeText(props.app.meetingLink ? props.app.meetingLink : "");
                     console.log("Link Copied");
-                    setModalOpen(true);
                   }}
                 >
                   Get Link
@@ -126,24 +86,9 @@ const DoctorPendingCard: FC<{ app: PendingAppointmentOverviewInfo }> = (props) =
               </DialogContent>
             </Dialog>
 
-            {/* <Button
-              disabled={!isAvailable()}
-              className="bg-c2 w-42 text-white rounded-lg hover:bg-c1 mt-5"
-              onClick={() => {
-                navigator.clipboard.writeText(props.doctor.meetLink);
-                console.log("Link Copied");
-                setModalOpen(true);
-              }}
-            >
-              Get Link
-            </Button> */}
           </div>
         </CardContent>
       </Card>
-      {/* {
-        modalOpen && (
-        DialogDemo())
-      } */}
     </div>
   );
 };

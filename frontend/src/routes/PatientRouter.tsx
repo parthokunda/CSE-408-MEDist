@@ -1,21 +1,10 @@
-import NavBar from "@/components/customUI/NavBar";
 import { ProfileStatus } from "@/models/LoginSignUpSchema";
-import { navIcon } from "@/models/navIcon";
 import AppointmentPage from "@/pages/patient/Appointment/AppointmentPage";
-import DoctorSearchPage from "@/pages/patient/DoctorSearchPage";
+import BookAppointment from "@/pages/patient/BookAppointment/PatientBookAppointment";
 import PatientInfo from "@/pages/patient/PatientInfo";
 import { FC } from "react";
 import { useCookies } from "react-cookie";
 import { Navigate, Route, Routes } from "react-router-dom";
-
-const navList: navIcon[] = [
-  { name: "Medicines", link: "/searchMedicines" },
-  { name: "Prescriptions", link: "/prescriptions" },
-  { name: "Appointments", link: "/appointments", role: "patient" },
-  { name: "Account", link: "/patient/account" },
-  { name: "Logout", link: "/logout/" }, //! careful with the first /. cookies path problem otherwise
-  // TODO: add a logout icon insted of this
-];
 
 const PatientRouter: FC = () => {
   const [cookies] = useCookies(["user"]);
@@ -25,10 +14,14 @@ const PatientRouter: FC = () => {
     }
     return (
       <Routes>
-        <Route >
+        <Route>
           <Route path="/" element={<PatientInfo />} />
           <Route path="/account" element={<PatientInfo />} />
-          <Route path="/searchDoctor" element={<AppointmentPage/>} />
+          <Route path="/searchDoctor" element={<AppointmentPage />} />
+          <Route
+            path="/bookAppointment/:doctorID"
+            element={<BookAppointment />}
+          />
         </Route>
       </Routes>
     );
