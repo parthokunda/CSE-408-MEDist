@@ -1,5 +1,5 @@
 import { PatientAdditionalInfoForm } from "@/models/FormSchema";
-import { PatientAttributes } from "@/models/UserInfo";
+import { UpdatedPatientAttributes } from "@/models/UserInfo";
 import axios from "axios";
 import { initializeApp } from "firebase/app";
 import {
@@ -23,6 +23,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "../../components/ui/input";
+import { FIREBASE_CONFIG } from "@/lib/firebaseConfig";
+import { useMutation } from "@tanstack/react-query";
+import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 
 const bloodGroups = [
   { key: 1, value: "A+" },
@@ -34,16 +37,6 @@ const bloodGroups = [
   { key: 7, value: "AB+" },
   { key: 8, value: "AB-" },
 ];
-
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyCHZ4fFHB6mG2e1QfU8njqeZnbhmRnO9Go",
-  authDomain: "medist-photos-8c6bf.firebaseapp.com",
-  projectId: "medist-photos-8c6bf",
-  storageBucket: "medist-photos-8c6bf.appspot.com",
-  messagingSenderId: "488575338890",
-  appId: "1:488575338890:web:af4e96b6e455fcf9296073",
-  measurementId: "G-QB6RHMBMMK",
-};
 
 const uploadImage = async (selectedFile: File | null) => {
   if (selectedFile) {
@@ -76,7 +69,10 @@ const infoSubmitHandler = async (
     dob: data.dateOfBirth,
     address: "BUET",
     bloodGroup: data.bloodGroup,
-    height: Number(data.height_feet + "." + data.height_inches),
+    height: {
+      feet: data.height_feet,
+      inches: data.height_inches,
+    },
     weight: data.weight,
     image: data.image,
   };
@@ -97,7 +93,7 @@ const infoSubmitHandler = async (
 };
 
 const PatientInfoForm: FC<{
-  patientInfo: PatientAttributes;
+  patientInfo: UpdatedPatientAttributes;
   userToken: string;
 }> = (props) => {
   initializeApp(FIREBASE_CONFIG);
@@ -110,8 +106,8 @@ const PatientInfoForm: FC<{
       mobileNumber: props.patientInfo.phone
         ? props.patientInfo.phone
         : undefined,
-      height_feet: 5,
-      height_inches: 3,
+      height_feet: props.patientInfo.height.feet,
+      height_inches: props.patientInfo.height.inches,
       weight: props.patientInfo.weight ? props.patientInfo.weight : undefined,
       bloodGroup: props.patientInfo.bloodGroup
         ? props.patientInfo.bloodGroup
@@ -122,9 +118,6 @@ const PatientInfoForm: FC<{
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [downloadURL, setDownloadURL] = useState<string>(
-    props.patientInfo.image ? props.patientInfo.image : ""
-  );
 
   const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
@@ -132,13 +125,17 @@ const PatientInfoForm: FC<{
   };
 
   const onSubmit = async (data: z.infer<typeof PatientAdditionalInfoForm>) => {
-    const imageURL = await infoSubmitHandler(
-      data,
-      props.userToken,
-      selectedFile
-    );
-    setDownloadURL(imageURL);
+    mutateProfile(data);
   };
+
+  const {mutate: mutateProfile, isLoading: isSubmittingProfile, isSuccess} = useMutation({
+    mutationKey: ["submitProfileInfo"],
+    mutationFn: (data: z.infer<typeof PatientAdditionalInfoForm>) => infoSubmitHandler(data, props.userToken, selectedFile),
+  })
+
+  if(isSubmittingProfile){
+    return <div className="flex justify-center"><LoadingSpinner/></div>
+  }
 
   return (
     <>
@@ -231,7 +228,6 @@ const PatientInfoForm: FC<{
                   </div>
                 )}
               />
-              {/* <div></div> */}
               <Controller
                 name="height_inches"
                 control={forms.control}
@@ -243,6 +239,7 @@ const PatientInfoForm: FC<{
                   </div>
                 )}
               />
+              {/* <div></div> */}
             </div>
             <div className="grid grid-cols-2 w-[50%]">
               Weight:
@@ -256,33 +253,35 @@ const PatientInfoForm: FC<{
                 )}
               />
             </div>
-            <div className="grid grid-cols-2 w-[50%]">
+            <div className="grid grid-cols-2 w-[50%] ">
               Blood Group:
-              <Controller
-                name="bloodGroup"
-                control={forms.control}
-                render={({ field }) => (
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {bloodGroups.map((department) => (
-                        <SelectItem
-                          key={department.key}
-                          value={department.value}
-                        >
-                          {department.value}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                    <p>{forms.formState.errors.bloodGroup?.message}</p>
-                  </Select>
-                )}
-              />
+              <div className="bg-white">
+                <Controller
+                  name="bloodGroup"
+                  control={forms.control}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {bloodGroups.map((department) => (
+                          <SelectItem
+                            key={department.key}
+                            value={department.value}
+                          >
+                            {department.value}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                      <p>{forms.formState.errors.bloodGroup?.message}</p>
+                    </Select>
+                  )}
+                />
+              </div>
             </div>
           </div>
           <div className="flex flex-col justify-center items-center gap-3 ">
@@ -311,7 +310,6 @@ const PatientInfoForm: FC<{
                     onBlur={field.onBlur}
                     onChange={(e) => {
                       handleFileInput(e);
-                      // field.onChange(downloadURL);
                     }}
                   />
                 </div>

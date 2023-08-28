@@ -1,16 +1,16 @@
-import { FC } from "react";
 import axios from "axios";
+import { FC } from "react";
 import { useCookies } from "react-cookie";
 
 import { useQuery } from "@tanstack/react-query";
 import PatientInfoForm from "./PatientInfoForm";
 
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
-import { PatientAttributes } from "@/models/UserInfo";
+import { UpdatedPatientAttributes } from "@/models/UserInfo";
 
 const getPatientInfo = async (
   bearerToken: string
-): Promise<PatientAttributes> => {
+): Promise<UpdatedPatientAttributes> => {
   const response = await axios.get(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
@@ -44,8 +44,6 @@ export const PatientInfo: FC = () => {
   // if(patientInfo.status && patientInfo.status.startsWith(UserStatus.FULLY_REGISTERED)){
   //   return <p>You are fully registered</p>
   // }
-
-  console.log(patientInfo);
 
   return <PatientInfoForm patientInfo={patientInfo} userToken={cookies.user.token}/>
 };

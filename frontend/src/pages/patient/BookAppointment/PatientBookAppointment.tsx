@@ -7,7 +7,6 @@ import DoctorDetailsCard from "./DoctorDetailsCard";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,

@@ -39,3 +39,24 @@ export interface PatientAttributes {
   height: number;
   weight: number;
 };
+
+export type UpdatedPatientAttributes = {
+  id: number;
+  status: UserStatus;
+  //userID: number;
+
+  // additional info
+  email: string;
+  image: string;
+  name: string;
+  phone: string;
+  gendar: UserGender;
+  dob: Date;
+  address: string;
+  bloodGroup: UserBloodGroup;
+  height: {
+    feet: number,
+    inches: number,
+  };
+  weight: number;
+}
