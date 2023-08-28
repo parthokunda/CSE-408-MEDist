@@ -61,7 +61,8 @@ const LoginCard: FC = () => {
           profile_status: data.profile_status,
         },
         {
-          path: "/"
+          path: "/",
+          maxAge: 3600,
         }
       );
       console.log(cookies.user);

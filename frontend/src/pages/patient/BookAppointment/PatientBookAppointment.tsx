@@ -30,13 +30,19 @@ import { useCookies } from "react-cookie";
 
 import { DoctorProfileInfo, SingleDaySchedule } from "@/models/DoctorSchema";
 import { useMutation } from "@tanstack/react-query";
-import { RequestAppointmentInfo } from "@/models/Appointment";
+import { ConfirmAppointmentResponse, RejectAppointmentRespone, RequestAppointmentInfo } from "@/models/Appointment";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 
 type inputObject = {
   authToken: string;
   scheduleId: number;
 };
+
+
+type confirmRejectObject = {
+  authToken: string,
+  appointmentId: number,
+}
 
 const getDate = (date: Date | undefined): string => {
   if (date === undefined) return "";
@@ -71,14 +77,51 @@ const onSubmit = async (
   return response.data;
 };
 
+const sendConfirmation = async (authToken: string, appointmentId: number) : Promise<ConfirmAppointmentResponse> => {
+  console.log("confirming app");
+  const response = await axios.put(
+    `${import.meta.env.VITE_DB_URL}:${
+      import.meta.env.VITE_DB_PORT
+    }/api/appointment/book-online-appointment/confirm/${appointmentId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Replace with your actual token
+      },
+    }
+  );
+  console.log("🚀 ~ file: PatientBookAppointment.tsx:87 ~ sendConfirmation ~ response:", response.data);
+  return response.data;
+  
+};
+
+const sendRejection = async (authToken: string, appointmentId: number) : Promise<RejectAppointmentRespone> => {
+  console.log("rejecting app");
+  const response = await axios.delete(
+    `${import.meta.env.VITE_DB_URL}:${
+      import.meta.env.VITE_DB_PORT
+    }/api/appointment/book-online-appointment/cancel/${appointmentId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Replace with your actual token
+      },
+    }
+  );
+  console.log("🚀 ~ file: PatientBookAppointment.tsx:87 ~ sendConfirmation ~ response:", response.data);
+  return response.data;
+}
+
 export const BookAppointment: FC = () => {
   const { doctorID } = useParams();
   console.log(doctorID);
   const [cookies] = useCookies(["user"]);
   const [weekName, setWeekName] = useState<string>("");
-  const [singleDay, setSingleDay] = useState<SingleDaySchedule>();
+  const [requestedAppDialog, setRequestedAppDialog] = useState<boolean>(false);
+  const [appConfirmDialog, setAppConfirmDialog] = useState<boolean>(false);
+  const [rejectConfirmDialog, setRejectConfirmDialog] = useState<boolean>(false);
   const [doctordetails, setDoctorDetails] = useState<DoctorProfileInfo>();
   const [scheduleId, setScheduleId] = useState<number>();
+
 
   useEffect(() => {
     async function fetchData() {
@@ -118,6 +161,26 @@ export const BookAppointment: FC = () => {
       onSubmit(input.authToken, input.scheduleId),
   });
 
+  const {
+    mutate: mutateConfirmation,
+    isLoading: isLoadingConfirm,
+    isError: isErrorConfirm,
+    data: ConfirmAppointmentResponse
+  } = useMutation({
+    mutationFn: (input: confirmRejectObject) => 
+      sendConfirmation(input.authToken, input.appointmentId)
+  })
+
+  const {
+    mutate: mutateReject,
+    isLoading: isLoadingReject,
+    isError: isErrorReject,
+    data: RejectAppointmentResponse
+  } = useMutation({
+    mutationFn: (input: confirmRejectObject) =>
+      sendRejection(input.authToken, input.appointmentId)
+  })
+
   return (
     <>
       <div className="flex text-c1 text-3xl font-bold justify-center m-6">
@@ -136,7 +199,7 @@ export const BookAppointment: FC = () => {
                   <TableHead>Weekday</TableHead>
                   <TableHead>Start Time</TableHead>
                   <TableHead>End Time</TableHead>
-                  <TableHead>Total Slot</TableHead>
+                  <TableHead>Remaining Slot</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -151,7 +214,6 @@ export const BookAppointment: FC = () => {
                           id={day.id.toString()}
                           onChange={() => {
                             setWeekName(day.weekname);
-                            setSingleDay(day);
                             setScheduleId(day.id);
                           }}
                         />
@@ -166,7 +228,7 @@ export const BookAppointment: FC = () => {
                         <b>{day.endTime}</b>
                       </TableCell>
                       <TableCell>
-                        <b>{day.totalSlots}</b>
+                        <b>{day.remainingSlots}</b>
                       </TableCell>
                     </TableRow>
                   );
@@ -175,7 +237,7 @@ export const BookAppointment: FC = () => {
             </Table>
 
             <div className="flex justify-center mt-5">
-              <Dialog>
+              <Dialog open={requestedAppDialog}>
                 <DialogTrigger asChild>
                   <Button
                     className="bg-c2 w-42 text-white rounded-lg hover:bg-c1"
@@ -185,38 +247,140 @@ export const BookAppointment: FC = () => {
                           authToken: cookies.user.token,
                           scheduleId: scheduleId,
                         });
+                      setRequestedAppDialog(true);
                     }}
                     disabled={weekName === ""}
                   >
                     Book Now
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] bg-c4">
-                  <DialogHeader>
-                    <DialogTitle>Confirm Appointment</DialogTitle>
+                <DialogContent className="flex flex-col m:max-w-[425px] bg-c4 items-center justify-center">
+                  <DialogHeader className="flex">
+                    <DialogTitle className="text-c1">Confirm Appointment</DialogTitle>
+                    <div>{isLoading && <LoadingSpinner />}</div>
                     <DialogDescription>
                       {isError && <>Error</>}
-                      {/* {isLoading && <LoadingSpinner />} */}
                       {!isLoading && !isError && (
                         <>
-                          <p>{requestAppointmentData?.message}</p>
-                          Your appointment Date : {" "}
-                          <b className="text-c1">
-                            {requestAppointmentData?.appointment.startTime.toString().substring(0,10)}
-                          </b>
+                          {requestAppointmentData?.message}
                           <br/>
-                          Your appointment Time : {" "}
+                          Your appointment Date :{" "}
                           <b className="text-c1">
-                            {requestAppointmentData?.appointment.startTime.toString().substring(11,16)}
+                            {requestAppointmentData?.appointment.startTime
+                              .toString()
+                              .substring(0, 10)}
+                          </b>
+                          <br />
+                          Your appointment Time :{" "}
+                          <b className="text-c1">
+                            {requestAppointmentData?.appointment.startTime
+                              .toString()
+                              .substring(11, 16)}
                           </b>
                         </>
                       )}
                     </DialogDescription>
                   </DialogHeader>
 
-                  <DialogFooter>
+                  <DialogFooter className="">
                     <DialogClose asChild>
-                      <Button className="bg-c2 hover:bg-c1" disabled={isLoading || isError}>Ok</Button>
+                      <>
+                        <Button
+                          className="bg-c2 hover:bg-c1 "
+                          disabled={isLoading || isError}
+                          onClick={() => {
+                            setRequestedAppDialog(false);
+                            if (requestAppointmentData !== undefined)
+                              {mutateConfirmation({
+                                authToken: cookies.user.token,
+                                appointmentId: requestAppointmentData.appointment.id
+                              });
+                              setAppConfirmDialog(true);}
+                          }}
+                        >
+                          Confirm
+                        </Button>
+                        <Button
+                          className="bg-red-700 hover:bg-red-500"
+                          disabled={isLoading}
+                          onClick={() => {
+                            setRequestedAppDialog(false);
+                            if(requestAppointmentData !== undefined){
+                              mutateReject({
+                                authToken: cookies.user.token,
+                                appointmentId: requestAppointmentData.appointment.id,
+                              });
+                              setRejectConfirmDialog(true);
+                            }
+                          }}
+                        >
+                          Close
+                        </Button>
+                      </>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={appConfirmDialog}>
+                <DialogContent className="flex flex-col m:max-w-[425px] bg-c4">
+                  <DialogHeader className="flex justify-center items-center">
+                    <DialogTitle>Confirmation</DialogTitle>
+                    <div>{isLoadingConfirm && <LoadingSpinner />}</div>
+                    <DialogDescription>
+                      {isErrorConfirm && <>Error</>}
+                      {!isLoadingConfirm && !isErrorConfirm && (
+                        <>
+                          {ConfirmAppointmentResponse?.message}
+                          <br/>
+                          <a href={ConfirmAppointmentResponse?.appointment.meetingLink?.toString()} className="text-c1 mt-6 font-bold">Meeting Link</a>
+                        </>
+                      )}
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <DialogFooter className="">
+                    <DialogClose asChild>
+                        <Button
+                          className="bg-c2 hover:bg-c1 "
+                          disabled={isLoading}
+                          onClick={() => {
+                              setAppConfirmDialog(false);
+                          }}
+                        >
+                          OK
+                        </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={rejectConfirmDialog}>
+                <DialogContent className="flex flex-col m:max-w-[425px] bg-c4">
+                  <DialogHeader className="flex justify-center items-center">
+                    <DialogTitle>Cancel</DialogTitle>
+                    <div>{isLoadingReject && <LoadingSpinner />}</div>
+                    <DialogDescription>
+                      {isErrorReject && <>Error</>}
+                      {!isLoadingReject && !isErrorReject && (
+                        <>
+                          {RejectAppointmentResponse?.message}
+                        </>
+                      )}
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <DialogFooter className="">
+                    <DialogClose asChild>
+                        <Button
+                          className="bg-c2 hover:bg-c1 "
+                          disabled={isLoading}
+                          onClick={() => {
+                              setRejectConfirmDialog(false);
+                          }}
+                        >
+                          OK
+                        </Button>
                     </DialogClose>
                   </DialogFooter>
                 </DialogContent>
