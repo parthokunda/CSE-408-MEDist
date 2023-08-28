@@ -30,11 +30,11 @@ const ACCEPTED_IMAGE_TYPES = [
 export const DoctorAdditionalInfoForm = z.object({
   name:z.string().nonempty(),
   gender: z.union([z.literal("male"), z.literal("female"), z.literal("other")]),
-  dateOfBirth: z.string(),
+  dateOfBirth: z.union([z.string(), z.date()]),
   bmdcNumber: z
     .string()
     .max(20, { message: "BMDC number cannot exceed 20 characters" }),
-  issueDate: z.string(),
+  issueDate: z.union([z.string(), z.date()]),
   mobileNumber: z.string().nonempty(),
   department: z.string().nonempty(),
   degrees: z.string().nonempty({ message: "Degrees cannot be empty" }),

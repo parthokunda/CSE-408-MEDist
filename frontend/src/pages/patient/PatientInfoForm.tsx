@@ -26,6 +26,7 @@ import { Input } from "../../components/ui/input";
 import { FIREBASE_CONFIG } from "@/lib/firebaseConfig";
 import { useMutation } from "@tanstack/react-query";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
+import ImageComponent from "../../components/ImageComponent";
 
 const bloodGroups = [
   { key: 1, value: "A+" },
@@ -128,7 +129,7 @@ const PatientInfoForm: FC<{
     mutateProfile(data);
   };
 
-  const {mutate: mutateProfile, isLoading: isSubmittingProfile, isSuccess} = useMutation({
+  const {mutate: mutateProfile, isLoading: isSubmittingProfile} = useMutation({
     mutationKey: ["submitProfileInfo"],
     mutationFn: (data: z.infer<typeof PatientAdditionalInfoForm>) => infoSubmitHandler(data, props.userToken, selectedFile),
   })
@@ -284,38 +285,7 @@ const PatientInfoForm: FC<{
               </div>
             </div>
           </div>
-          <div className="flex flex-col justify-center items-center gap-3 ">
-            <p className="text-lg font-bold">Profile Picture</p>
-            {selectedFile && (
-              <Avatar className="w-[250px] h-[250px]">
-                <AvatarImage src={URL.createObjectURL(selectedFile)} />
-                <AvatarFallback>Loading</AvatarFallback>
-              </Avatar>
-            )}
-            {!selectedFile && props.patientInfo.image && (
-              <Avatar className="w-[250px] h-[250px]">
-                <AvatarImage src={props.patientInfo.image} />
-                <AvatarFallback>Loading</AvatarFallback>
-              </Avatar>
-            )}
-            <Controller
-              name="image"
-              control={forms.control}
-              render={({ field }) => (
-                <div className="flex flex-col">
-                  <Input
-                    type="file"
-                    ref={field.ref}
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    onChange={(e) => {
-                      handleFileInput(e);
-                    }}
-                  />
-                </div>
-              )}
-            />
-          </div>
+          <ImageComponent selectedFile={selectedFile} imageURL={props.patientInfo.image} formControl={forms.control} handleFileInput={handleFileInput}/>
         </div>
         <Button
           type="submit"

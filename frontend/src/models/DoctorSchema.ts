@@ -1,3 +1,5 @@
+import { UserGender } from "./UserInfo";
+
 export interface SpecializationAttributes {
   id: number;
   name: string;
@@ -12,7 +14,7 @@ export interface DoctorAttributes {
   name: string;
   email: string;
   phone: string;
-  gendar: string;
+  gendar: UserGender;
   dob: Date;
   bmdc: string;
   issueDate: Date;
