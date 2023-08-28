@@ -21,11 +21,6 @@ export const AddSchedule: FC = () => {
     defaultValues: {},
     resolver: zodResolver(DoctorOnlineScheduleForm),
   });
-  //   const onSubmit: SubmitHandler<z.infer<typeof DoctorOnlineScheduleForm>> = (
-  //     data
-  //   ) => {
-  //     console.log(data);
-  //   };
 
   const [Saturday, setSaturday] = useState(false);
   const [Sunday, setSunday] = useState(false);
@@ -71,11 +66,13 @@ export const AddSchedule: FC = () => {
             headers: {
               Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
             },
-            }
-          );
-        setSize(response.data.OnlineSchedule.schedule.length);
-        // setContact(response.data.doctorInfo.phone);
-        console.log(response.data, size, contact);
+          }
+        );
+        console.log(
+          "🚀 ~ file: AddSchedule.tsx:71 ~ fetchData ~ response:",
+          response.data
+        );
+        setSize(response.data.OnlineSchedule.schedules.length);
       } catch (err) {
         console.log(err);
       }
@@ -85,7 +82,6 @@ export const AddSchedule: FC = () => {
   useEffect(() => {
     console.log(size);
   }, [size]);
-
 
   const [cookies] = useCookies(["user"]);
   const onSubmit: () => void = async () => {
@@ -151,7 +147,7 @@ export const AddSchedule: FC = () => {
       ],
     };
     console.log(values.schedule);
-    if(size===0){
+    if (size === 0) {
       const response = await axios.post(
         `${import.meta.env.VITE_DB_URL}:${
           import.meta.env.VITE_DB_PORT
@@ -164,20 +160,22 @@ export const AddSchedule: FC = () => {
           },
         }
       );
+      console.log("🚀 ~ file: AddSchedule.tsx:163 ~ constonSubmit: ~ response:", response.data)
+    } else {
+      const response = await axios.put(
+        `${import.meta.env.VITE_DB_URL}:${
+          import.meta.env.VITE_DB_PORT
+        }/api/doctor/online-visit`,
+        values,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("🚀 ~ file: AddSchedule.tsx:176 ~ constonSubmit: ~ response:", response.data)
     }
-    else{
-    const response = await axios.put(
-      `${import.meta.env.VITE_DB_URL}:${
-        import.meta.env.VITE_DB_PORT
-      }/api/doctor/online-visit`,
-      values,
-      {
-        headers: {
-          Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
-          "Content-Type": "application/json",
-        },
-      }
-    );}
     // console.log(values);
     // console.log(response.data);
   };

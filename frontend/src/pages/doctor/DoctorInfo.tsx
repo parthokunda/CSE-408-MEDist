@@ -30,9 +30,11 @@ import {
   SpecializationAttributes,
 } from "@/models/DoctorSchema";
 import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
 export const DoctorInfo: FC = () => {
   const [cookies] = useCookies(["user"]);
+  const navigate = useNavigate();
   var doctorInfo: DoctorAdditionalInfo;
   const forms = useForm<z.infer<typeof DoctorAdditionalInfoForm>>({
     defaultValues: {
@@ -150,10 +152,6 @@ export const DoctorInfo: FC = () => {
     console.log("here");
   };
   console.log(cookies.user);
-  // if(selectedFile){
-  //   console.log((selectedFile))
-  // };
-  // console.log(forms.getValues("image"));
   return (
     <>
       <div className="text-black text-large justify-center text-large mt-5 font-bold gap-5 ml-6">
@@ -308,36 +306,47 @@ export const DoctorInfo: FC = () => {
               />
             </div>
           </div>
-          <div className="flex-[30%] flex flex-col ml- gap-5">
-            <Controller
-              name="image"
-              control={forms.control}
-              render={({ field: { ref, name, onBlur, onChange } }) => (
-                <div className="flex flex-col">
-                  <Label htmlFor="profilePicture">Profile Picture</Label>
-                  <Input
-                    type="file"
-                    ref={ref}
-                    name={name}
-                    onBlur={onBlur}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      // onChange(e.target.files?.[0]);
-                      handleFileInput(e);
-                      onChange(downloadURL);
-                    }}
-                  />
-                  {selectedFile && (
-                    // src={URL.createObjectURL(selectedFile)};
-                    <img
-                      className="w-[250px] h-[250px]"
-                      src={URL.createObjectURL(selectedFile)}
-                      alt="img"
+          <div className="flex-[30%] flex flex-col gap-5">
+            <div className="grid grid-row-2 flex-grow">
+              <Controller
+                name="image"
+                control={forms.control}
+                render={({ field: { ref, name, onBlur, onChange } }) => (
+                  <div className="flex flex-col">
+                    <Label htmlFor="profilePicture">Profile Picture</Label>
+                    <Input
+                      type="file"
+                      ref={ref}
+                      name={name}
+                      onBlur={onBlur}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        // onChange(e.target.files?.[0]);
+                        handleFileInput(e);
+                        onChange(downloadURL);
+                      }}
                     />
-                  )}
-                </div>
-              )}
-            />
+                    {selectedFile && (
+                      // src={URL.createObjectURL(selectedFile)};
+                      <img
+                        className="w-[250px] h-[250px]"
+                        src={URL.createObjectURL(selectedFile)}
+                        alt="img"
+                      />
+                    )}
+                  </div>
+                )}
+              />
+              <Button
+                className="bg-c1 w-fit"
+                onClick={() => {
+                  console.log("trying");
+                  navigate("/doctor/addSchedule");
+                }}
+              >
+                Edit Schedule
+              </Button>
+            </div>
           </div>
         </div>
         <Button

@@ -1,14 +1,14 @@
-import { FC, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
+import { FC } from "react";
+import { Link } from "react-router-dom";
 
-import { navIcon } from "../../models/navIcon";
 import { Outlet } from "react-router-dom";
+import { navIcon } from "../../models/navIcon";
 
 const NavBar: FC<{ navList: navIcon[] }> = (props) => {
   return (

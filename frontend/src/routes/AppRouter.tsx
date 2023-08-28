@@ -14,6 +14,7 @@ import { useCookies } from "react-cookie";
 import { Navigate, Route, Routes } from "react-router-dom";
 import AuthRoute from "./AuthRouter";
 import PatientRouter from "./PatientRouter";
+import DoctorRouter from "./DoctorRouter";
 
 const AppRouter: FC = () => {
   const [cookies] = useCookies(["user"]);
@@ -49,15 +50,9 @@ const AppRouter: FC = () => {
           path="/manufacturer/:manufacturerId"
           element={<ManufacturerDescriptionPage />}
         />
-        <Route path="/doctor/info/" element={<DoctorInfo />} />
-        <Route path="doctor/addSchedule" element={<AddSchedule />} />
-        <Route
-          path="doctor/pendingAppointments"
-          element={<PatientSearchPage />}
-        />
-        
         {/* <Route path="patient/searchDoctor" element={<DoctorSearchPage />} /> */}
         <Route path="/patient/*" element={<PatientRouter />} />
+        <Route path="/doctor/*" element={ <DoctorRouter /> } />
       </Route>
       <Route path="/logout/" element={<Logout />} />
 

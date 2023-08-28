@@ -6,6 +6,8 @@ import { FC } from "react";
 import { useCookies } from "react-cookie";
 import { Navigate, Route, Routes } from "react-router-dom";
 
+
+
 const PatientRouter: FC = () => {
   const [cookies] = useCookies(["user"]);
   if (cookies.user && cookies.user.role && cookies.user.role == "patient") {
@@ -18,9 +20,7 @@ const PatientRouter: FC = () => {
           <Route path="/" element={<PatientInfo />} />
           <Route path="/account" element={<PatientInfo />} />
           <Route path="/searchDoctor" element={<AppointmentPage />} />
-          <Route
-            path="/bookAppointment/:doctorID"
-            element={<BookAppointment />}
+          <Route path="/bookAppointment/:doctorID" element={<BookAppointment />}
           />
         </Route>
       </Routes>
