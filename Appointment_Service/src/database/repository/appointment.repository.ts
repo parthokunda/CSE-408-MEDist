@@ -364,7 +364,7 @@ class AppointmentRepository implements Appointment_Repository_Interface {
         endTime: req.appointmentEndTime,
 
         //expiry time after 10 minutes
-        expires_at: new Date(Date.now() + 10 * 60 * 1000),
+        expires_at: new Date(Date.now() + 60 * 1000),
 
         timeSlotID: req.timeSlotID,
 

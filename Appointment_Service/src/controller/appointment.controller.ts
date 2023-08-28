@@ -185,14 +185,18 @@ class Appointment_Controller implements Appointment_Controller_Interface {
       const endTime = timeSlotInfo.endTime;
       const totalSlots = timeSlotInfo.totalSlots;
 
-      const today = new Date().getDay();
+      const today = (new Date().getDay() + 2) % 7;
 
       let appointmentDay: Date;
+
+      log.info(`weekday - ${weekday} && today - ${today} `);
 
       // construct appointmentDay from weekday
       if (weekday < today)
         appointmentDay = this.setAppointmentDay(weekday, false);
       else appointmentDay = this.setAppointmentDay(weekday, true);
+
+      log.info(appointmentDay.toDateString(), "appointment day setted");
 
       // construct appointment_day_start_time and appointment_day_end_time
       const appointment_day_start_time = new Date(

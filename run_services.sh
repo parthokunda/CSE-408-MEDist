@@ -30,7 +30,7 @@ if [ $# -eq 1 ]; then
             if [ -d "$folder" ]; then
                 pushd $folder >> /dev/null
                 pnpm i >> /dev/null
-                gnome-terminal --title="$folder" -- bash -c "pnpm start; exec bash"
+                gnome-terminal --title="$folder" -- bash -c "pnpm run dev; exec bash"
                 popd >> /dev/null
             fi
         done
