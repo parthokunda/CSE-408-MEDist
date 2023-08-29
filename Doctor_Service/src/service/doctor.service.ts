@@ -13,6 +13,7 @@ import {
   DoctorOverviewInfo,
   DoctorOverviewInfo_Excluded_Properties,
   DoctorProfileInfo,
+  DoctorProfileInfo_Excluded_Properties,
   SearchDoctorInfo,
 } from "../database/models/Doctor.model";
 
@@ -256,6 +257,11 @@ class DoctorService implements DoctorServiceInterface {
       const specialization = await doctor.getSpecialization();
       const onlineSchedules = await doctor.getOnlineSchedules();
 
+      const doctorInfo = excludeProperties(
+        doctor.dataValues,
+        DoctorProfileInfo_Excluded_Properties
+      );
+
       const onlineSchedulesInfo = onlineSchedules.map((schedule) => {
         return excludeProperties(
           schedule.dataValues,
@@ -269,7 +275,7 @@ class DoctorService implements DoctorServiceInterface {
       });
 
       return {
-        DoctorInfo: doctor.dataValues,
+        DoctorInfo: doctorInfo,
         Specialization: specialization?.dataValues || {},
         OnlineSchedule: {
           visit_fee: doctor.online_visit_fee,
