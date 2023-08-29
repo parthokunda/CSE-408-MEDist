@@ -139,7 +139,11 @@ class BrokerService implements BrokerServiceInterface {
     const channel = await this.getChannel();
 
     // create a temporary queue which will be deleted once the message is consumed
-    const queue = await channel.assertQueue("", { exclusive: true, durable: false });
+    const queue = await channel.assertQueue("", {
+      exclusive: false,
+      durable: false,
+      autoDelete: true,
+    });
     //exclusive: true means that the queue will be deleted once the connection is closed
 
     log.info(
@@ -171,6 +175,8 @@ class BrokerService implements BrokerServiceInterface {
 
         (msg: Message | null) => {
           if (msg && msg.properties.correlationId === uuid) {
+            //delete the queue
+            channel.deleteQueue(queue.queue);
             // if correlation id matches, that means the response is for the request we sent
             resolve(JSON.parse(msg.content.toString()) as RPC_Response_Payload);
             clearTimeout(timeout);
