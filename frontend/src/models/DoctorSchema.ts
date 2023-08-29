@@ -4,7 +4,7 @@ export interface SpecializationAttributes {
   id: number;
   name: string;
 }
-export interface DoctorAttributes {
+export type DoctorAttributes = {
   id: number;
   status: string;
   userID: number;

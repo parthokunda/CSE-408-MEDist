@@ -23,16 +23,15 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
+import { FIREBASE_CONFIG } from "@/lib/firebaseConfig";
 import {
   DoctorAdditionalInfo,
   DoctorAttributes,
   SpecializationAttributes,
 } from "@/models/DoctorSchema";
-import { useCookies } from "react-cookie";
-import { FIREBASE_CONFIG } from "@/lib/firebaseConfig";
 import { useMutation } from "@tanstack/react-query";
-import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
+import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import ImageComponent from "../../components/ImageComponent";
 
@@ -103,14 +102,14 @@ export const DoctorInfoForm: FC<{
 
   const forms = useForm<z.infer<typeof DoctorAdditionalInfoForm>>({
     defaultValues: {
-      name: props.doctorInfo.name,
+      name: props.doctorInfo.name ? props.doctorInfo.name : "",
       gender: props.doctorInfo.gendar,
-      dateOfBirth: props.doctorInfo.dob,
-      department: props.specialization.name,
-      bmdcNumber: props.doctorInfo.bmdc,
-      issueDate: props.doctorInfo.issueDate,
-      mobileNumber: props.doctorInfo.phone,
-      degrees: props.doctorInfo.degrees.join(", "),
+      dateOfBirth: props.doctorInfo.dob ? props.doctorInfo.dob : "",
+      department: props.specialization.name ? props.specialization.name : "",
+      bmdcNumber: props.doctorInfo.bmdc ? props.doctorInfo.bmdc : "",
+      issueDate: props.doctorInfo.issueDate ? props.doctorInfo.issueDate : "",
+      mobileNumber: props.doctorInfo.phone ? props.doctorInfo.phone : "",
+      degrees: props.doctorInfo.degrees ? props.doctorInfo.degrees.join(", ") : "",
       image: props.doctorInfo.image ? props.doctorInfo.image : undefined,
     },
     // resolver: zodResolver(DoctorAdditionalInfoForm),
@@ -177,14 +176,11 @@ export const DoctorInfoForm: FC<{
     setTimeout(() => {
         navigate("/");
     }, 1500)
-    return <p className="flex justify-center text-3xl mt-12">Error Submitting Info. Logging Out.</p>
+    return <p className="flex justify-center text-3xl mt-12">Error Submitting Info. Reloading.</p>
   }
 
   return (
     <>
-      <div className="text-black text-large justify-center text-large mt-5 font-bold gap-5 ml-6">
-        Additional Info
-      </div>
       <form
         onSubmit={forms.handleSubmit(onSubmit)}
         className="flex flex-col w-screen justify-start gap-5 ml-6"
@@ -199,7 +195,7 @@ export const DoctorInfoForm: FC<{
                 control={forms.control}
                 render={({ field }) => (
                   <div>
-                    <Input {...field} placeholder="name" />
+                    <Input {...field} placeholder="Name" />
                     <p>{forms.formState.errors.name?.message}</p>
                   </div>
                 )}
@@ -324,7 +320,6 @@ export const DoctorInfoForm: FC<{
             </div>
 
             <div className="grid grid-cols-2 w-[50%]">
-              {/* add degrees */}
               Degrees:
               <Controller
                 name="degrees"
@@ -375,6 +370,7 @@ export const DoctorInfoForm: FC<{
             />
           </div> */}
         </div>
+        
         <Button
           type="submit"
           className="bg-c1 w-36 mx-auto text-white hover:bg-c2 mt-4"
