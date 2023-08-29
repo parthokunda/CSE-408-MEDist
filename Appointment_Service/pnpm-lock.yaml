@@ -11,6 +11,9 @@ dependencies:
   amqplib:
     specifier: ^0.10.3
     version: 0.10.3
+  apicache:
+    specifier: ^1.6.3
+    version: 1.6.3
   bcrypt:
     specifier: ^5.1.0
     version: 5.1.0
@@ -338,6 +341,11 @@ packages:
       normalize-path: 3.0.0
       picomatch: 2.3.1
     dev: true
+
+  /apicache@1.6.3:
+    resolution: {integrity: sha512-jS3VfUFpQ9BesFQZcdd1vVYg3ZsO2kGPmTJHqycIYPAQs54r74CRiyj8DuzJpwzLwIfCBYzh4dy9Jt8xYbo27w==}
+    engines: {node: '>=8'}
+    dev: false
 
   /aproba@2.0.0:
     resolution: {integrity: sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==}

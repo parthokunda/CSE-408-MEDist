@@ -13,12 +13,7 @@ const payload: RPC_Request_Payload = {
 
 ## kill port if already in use
 ```bash
-npx kill-port 3000
-npx kill-port 3001
-npx kill-port 3002
-npx kill-port 3003
-npx kill-port 3004
-npx kill-port 3005
+npx kill-port 3000 3001 3002 3003 3004 3005
 ```
 
 

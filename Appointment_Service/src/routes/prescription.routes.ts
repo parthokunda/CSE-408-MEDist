@@ -2,6 +2,8 @@
 import express from "express";
 import { Request, Response, NextFunction } from "express";
 import {} from "../utils/custom.d";
+import apicache from "apicache";
+const cache = apicache.middleware;
 
 // internal imports
 import validateRequest from "./middleware/validateRequest";
@@ -20,6 +22,7 @@ prescriptionRouter.get(
   "/generate-prescription-header/:appointmentID",
   authorize(false, false),
   validateRequest(prescriptionSchema.Generate_Prescription_Header),
+  cache("2 minutes"),
   prescriptionController.generatePrescriptionHeader
 );
 

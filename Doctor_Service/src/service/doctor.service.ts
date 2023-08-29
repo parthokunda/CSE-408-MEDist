@@ -15,6 +15,7 @@ import {
   DoctorOverviewInfo_Excluded_Properties,
   DoctorProfileInfo,
   DoctorProfileInfo_Excluded_Properties,
+  PrescriptionDoctorInfo_Excluded_Properties,
   SearchDoctorInfo,
 } from "../database/models/Doctor.model";
 
