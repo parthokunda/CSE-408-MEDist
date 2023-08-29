@@ -4,6 +4,7 @@ import { object, string, union, TypeOf, number, date, any } from "zod";
 // internal imports
 import { DoctorStatus, DoctorGendar } from "../database/models/Doctor.model";
 import log from "../utils/logger";
+import { WeekName } from "../database/models/Online_Schedule.model";
 
 export interface Doctor_Schema_Interface {
   //doctor update info
@@ -97,7 +98,7 @@ class DoctorSchema implements Doctor_Schema_Interface {
       //   totalSlots: number
       // }
 
-      schedule: any({
+      /* schedule: any({
         required_error: "Schedule is required",
       }).refine(
         (val) => {
@@ -132,7 +133,107 @@ class DoctorSchema implements Doctor_Schema_Interface {
               totalSlots: number
             }`,
         }
-      ),
+      ),*/
+
+      schedule: object({
+        //either all are present or none
+        weekname: string().optional(),
+        weekday: number().optional(),
+        startTime: string().optional(),
+        endTime: string().optional(),
+        totalSlots: number().optional(),
+      })
+        .array()
+        .min(1)
+        .refine(
+          (val) => {
+            for (let schedule of val) {
+              // an object may be empty {}
+              if (Object.keys(schedule).length === 0) continue;
+
+              // or check schedule has the following structure or not
+              if (
+                !(
+                  (schedule.weekname !== undefined ||
+                    schedule.weekday !== undefined) &&
+                  schedule.startTime !== undefined &&
+                  schedule.endTime !== undefined &&
+                  schedule.totalSlots !== undefined
+                )
+              )
+                return false;
+
+              // now desired structure is present
+              // check for valid values
+
+              if (
+                schedule.weekname !== undefined &&
+                WeekName.indexOf(
+                  schedule.weekname.charAt(0).toUpperCase() +
+                    schedule.weekname.slice(1).toLowerCase()
+                ) === -1
+              )
+                return false;
+
+              if (
+                schedule.weekday !== undefined &&
+                schedule.weekday < 0 &&
+                schedule.weekday > 6
+              )
+                return false;
+
+              if (
+                schedule.startTime !== undefined &&
+                schedule.endTime !== undefined
+              ) {
+                // check both are of format HH:MM
+                const startTime = schedule.startTime.split(":");
+                const endTime = schedule.endTime.split(":");
+
+                if (startTime.length !== 2 || endTime.length !== 2)
+                  return false;
+
+                const startHour = Number(startTime[0]);
+                const startMin = Number(startTime[1]);
+
+                const endHour = Number(endTime[0]);
+                const endMin = Number(endTime[1]);
+
+                if (
+                  startHour < 0 ||
+                  startHour > 23 ||
+                  endHour < 0 ||
+                  endHour > 23
+                )
+                  return false;
+
+                if (startMin < 0 || startMin > 59 || endMin < 0 || endMin > 59)
+                  return false;
+
+                // check start time is less than end time
+                if (startHour > endHour) return false;
+                else if (startHour === endHour && startMin > endMin)
+                  return false;
+              } else return false;
+
+              if (schedule.totalSlots !== undefined && schedule.totalSlots <= 0)
+                return false;
+
+              return true;
+            }
+          },
+          {
+            message: `Schedule must be an array of objects
+            in which an object may be empty {} or with the following structure:
+            {
+              weekname: string (optional if weekday is present),
+              weekday: number (optional if weekname is present),
+              startTime: string (required),
+              endTime: string (required),
+              totalSlots: number (required)
+            }`,
+          }
+        ),
     }),
   });
 
