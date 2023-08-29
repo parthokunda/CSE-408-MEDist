@@ -71,10 +71,20 @@ export const RegisterCardForm = z
 
 export type RegisterCardFormType = z.infer<typeof RegisterCardForm>;
 
+const daysOfWeekSchema = z.enum([
+  "Friday",
+  "Saturday",
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+]);
+
 export const DoctorOnlineScheduleForm = z.object({
   days: z
     .object({
-      day: z.string().nonempty(),
+      day: daysOfWeekSchema,
       startTime: z.string().nonempty(),
       endTime: z.string().nonempty(),
       slot: z.string().nonempty(),

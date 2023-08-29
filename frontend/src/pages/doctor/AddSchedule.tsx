@@ -1,158 +1,116 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Controller,
-  SubmitHandler,
-  useForm,
-  useFieldArray,
-} from "react-hook-form";
-import * as z from "zod";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Input } from "../../components/ui/input";
-import { FC, useEffect } from "react";
-import { useState } from "react";
-import axios from "axios";
+import ScheudulePerDayInput from "@/components/SchedulePerDayInput";
 import { Button } from "@/components/ui/button";
-import { useCookies } from "react-cookie";
+import { Input } from "@/components/ui/input";
+import {
+  OnlineScheduleOverview,
+  OnlineScheduleOverviewInfo,
+  WeekName,
+  daysOfWeek,
+} from "@/models/DoctorSchema";
 import { DoctorOnlineScheduleForm } from "@/models/FormSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { FC, useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
-export const AddSchedule: FC = () => {
+export type sendScheduleInfoType = {
+  weekname: string;
+  startTime: string;
+  endTime: string;
+  totalSlots: number;
+};
+
+const getStartTime = (
+  weekDay: number,
+  scheduleData: OnlineScheduleOverviewInfo[]
+) => {
+  const foundObject = scheduleData.find(scheduleObj => scheduleObj.weekday === weekDay);
+  if(foundObject){
+    return foundObject.startTime;
+  }
+  return undefined;
+};
+
+const getEndTime = (
+  weekDay: number,
+  scheduleData: OnlineScheduleOverviewInfo[]
+) => {
+  const foundObject = scheduleData.find(scheduleObj => scheduleObj.weekday === weekDay);
+  if(foundObject){
+    return foundObject.endTime;
+  }
+  return undefined;
+};
+
+const doesExist = (
+  weekDay: number,
+  scheduleData: OnlineScheduleOverviewInfo[]
+): boolean => {
+  const exist = scheduleData.some(item => item.weekday === weekDay);
+  return exist;
+};
+
+const getSlot = (
+  weekDay: number,
+  scheduleData: OnlineScheduleOverviewInfo[]
+) => {
+  const foundObject = scheduleData.find(scheduleObj => scheduleObj.weekday === weekDay);
+  if(foundObject){
+    return foundObject.totalSlots;
+  }
+  return undefined;
+};
+
+export const AddSchedule: FC<{ scheduleData: OnlineScheduleOverview }> = (
+  props
+) => {
+  const [cost, setCost] = useState<number>(props.scheduleData.visit_fee);
+  useEffect(() => {
+    console.log("🚀 ~ file: AddSchedule.tsx:77 ~ cost:", cost)
+    
+  },[cost]);
+
+  let allSchedules = props.scheduleData.schedules.map(
+    ({ weekname, startTime, endTime, totalSlots }) => ({
+      weekname,
+      startTime,
+      endTime,
+      totalSlots,
+    })
+  );
+
+  const rmeoveScheduleData = (weekName: WeekName) => {
+    allSchedules = allSchedules.filter((scheduleObj) => scheduleObj.weekname !== weekName);
+  }
+
+  const addScheduleData = (newScheduleData: sendScheduleInfoType) => {
+    allSchedules = allSchedules.filter((scheduleObj) => scheduleObj.weekname !== newScheduleData.weekname);
+    allSchedules.push(newScheduleData);
+    console.log(allSchedules);
+  };
+
   const forms = useForm<z.infer<typeof DoctorOnlineScheduleForm>>({
     defaultValues: {},
     resolver: zodResolver(DoctorOnlineScheduleForm),
   });
 
-  const [Saturday, setSaturday] = useState(false);
-  const [Sunday, setSunday] = useState(false);
-  const [Monday, setMonday] = useState(false);
-  const [Tuesday, setTuesday] = useState(false);
-  const [Wednesday, setWednesday] = useState(false);
-  const [Thursday, setThursday] = useState(false);
-  const [Friday, setFriday] = useState(false);
-  const [SatStart, setSatStart] = useState("00:00:00");
-  const [SatEnd, setSatEnd] = useState("");
-  const [SunStart, setSunStart] = useState("00:00");
-  const [SunEnd, setSunEnd] = useState("");
-  const [MonStart, setMonStart] = useState("");
-  const [MonEnd, setMonEnd] = useState("");
-  const [TueStart, setTueStart] = useState("");
-  const [TueEnd, setTueEnd] = useState("");
-  const [WedStart, setWedStart] = useState("");
-  const [WedEnd, setWedEnd] = useState("");
-  const [ThuStart, setThuStart] = useState("");
-  const [ThuEnd, setThuEnd] = useState("");
-  const [FriStart, setFriStart] = useState("");
-  const [FriEnd, setFriEnd] = useState("");
-  const [SatSlots, setSatSlots] = useState("");
-  const [SunSlots, setSunSlots] = useState("");
-  const [MonSlots, setMonSlots] = useState("");
-  const [TueSlots, setTueSlots] = useState("");
-  const [WedSlots, setWedSlots] = useState("");
-  const [ThuSlots, setThuSlots] = useState("");
-  const [FriSlots, setFriSlots] = useState("");
-  const [contact, setContact] = useState("");
-  const [cost, setCost] = useState("");
-
-  const [size, setSize] = useState(0);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_DB_URL}:${
-            import.meta.env.VITE_DB_PORT
-          }/api/doctor/profile-info`,
-          {
-            headers: {
-              Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
-            },
-          }
-        );
-        console.log(
-          "🚀 ~ file: AddSchedule.tsx:71 ~ fetchData ~ response:",
-          response.data
-        );
-        setSize(response.data.OnlineSchedule.schedules.length);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    fetchData();
-  }, []);
-  useEffect(() => {
-    console.log(size);
-  }, [size]);
-
   const [cookies] = useCookies(["user"]);
   const onSubmit: () => void = async () => {
-    const values = {
-      visitFee: Number(cost),
-      schedule: [
-        Saturday
-          ? {
-              weekday: 0,
-              startTime: SatStart,
-              endTime: SatEnd,
-              totalSlots: Number(SatSlots),
-            }
-          : {},
-        Sunday
-          ? {
-              weekday: 1,
-              startTime: SunStart,
-              endTime: SunEnd,
-              totalSlots: Number(SunSlots),
-            }
-          : {},
-        Monday
-          ? {
-              weekday: 2,
-              startTime: MonStart,
-              endTime: MonEnd,
-              totalSlots: Number(MonSlots),
-            }
-          : {},
-        Tuesday
-          ? {
-              weekday: 3,
-              startTime: TueStart,
-              endTime: TueEnd,
-              totalSlots: Number(TueSlots),
-            }
-          : {},
-        Wednesday
-          ? {
-              weekday: 4,
-              startTime: WedStart,
-              endTime: WedEnd,
-              totalSlots: Number(WedSlots),
-            }
-          : {},
-        Thursday
-          ? {
-              weekday: 5,
-              startTime: ThuStart,
-              endTime: ThuEnd,
-              totalSlots: Number(ThuSlots),
-            }
-          : {},
-        Friday
-          ? {
-              weekday: 6,
-              startTime: FriStart,
-              endTime: FriEnd,
-              totalSlots: Number(FriSlots),
-            }
-          : {},
-      ],
-    };
-    console.log(values.schedule);
-    if (size === 0) {
+    const dataToSubmit  = {
+      visitFee: 500,
+      schedule: allSchedules,
+    }
+    console.log("🚀 ~ file: AddSchedule.tsx:105 ~ constonSubmit: ~ dataToSubmit:", dataToSubmit)
+    
+    if (props.scheduleData.schedules.length === 0 && !props.scheduleData.visit_fee) {
+      console.log("POSTING");
       const response = await axios.post(
         `${import.meta.env.VITE_DB_URL}:${
           import.meta.env.VITE_DB_PORT
         }/api/doctor/online-visit`,
-        values,
+        dataToSubmit,
         {
           headers: {
             Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
@@ -160,13 +118,16 @@ export const AddSchedule: FC = () => {
           },
         }
       );
-      console.log("🚀 ~ file: AddSchedule.tsx:163 ~ constonSubmit: ~ response:", response.data)
+      console.log(
+        "🚀 ~ file: AddSchedule.tsx:163 ~ post: ~ response:",
+        response.data
+      );
     } else {
       const response = await axios.put(
         `${import.meta.env.VITE_DB_URL}:${
           import.meta.env.VITE_DB_PORT
         }/api/doctor/online-visit`,
-        values,
+        dataToSubmit,
         {
           headers: {
             Authorization: `Bearer ${cookies.user.token}`, // Replace with your actual token
@@ -174,10 +135,11 @@ export const AddSchedule: FC = () => {
           },
         }
       );
-      console.log("🚀 ~ file: AddSchedule.tsx:176 ~ constonSubmit: ~ response:", response.data)
+      console.log(
+        "🚀 ~ file: AddSchedule.tsx:176 ~ put: ~ response:",
+        response.data
+      );
     }
-    // console.log(values);
-    // console.log(response.data);
   };
 
   return (
@@ -188,411 +150,33 @@ export const AddSchedule: FC = () => {
 
       <div className="flex flex-col ml-6 mt-5 gap-5">
         <div className="flex gap-3">
-          Contact Number :
-          <Input
-            type="text"
-            className="flex w-42"
-            placeholder={contact}
-            value={contact}
-            onChange={(e) => setContact(e.target.value)}
-          />
-        </div>
-        <div className="flex gap-3">
           Cost :
           <Input
-            type="text"
+            type="number"
             className="flex w-42"
-            placeholder={cost}
             value={cost}
-            onChange={(e) => setCost(e.target.value)}
+            onChange={(e) => setCost(e.target.valueAsNumber)}
           />
         </div>
       </div>
 
       <div className="flex-[60%] flex flex-col ml-6 mt-5 gap-5">
         Edit Schedule
-        <div className="grid grid-cols-4 gap-4">
-          <div>
-            <input
-              id="sat"
-              type="checkbox"
-              checked={Saturday}
-              onChange={() => setSaturday(!Saturday)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-            <label
-              htmlFor="sat"
-              className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              Sat
-            </label>
-          </div>
-          <div>
-            <label htmlFor="appt">Choose start time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={SatStart}
-              disabled={!Saturday}
-              onChange={(e) => {
-                setSatStart(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <label htmlFor="appt">Choose End time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={SatEnd}
-              disabled={!Saturday}
-              onChange={(e) => {
-                setSatEnd(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <Input
-              id="appt"
-              name="appt"
-              className="w-42"
-              placeholder="Enter Slots"
-              value={SatSlots}
-              disabled={!Saturday}
-              onChange={(e) => {
-                setSatSlots(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <input
-              id="sun"
-              type="checkbox"
-              checked={Sunday}
-              onChange={() => setSunday(!Sunday)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-            <label
-              htmlFor="sun"
-              className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              Sun
-            </label>
-          </div>
-          <div>
-            <label htmlFor="appt">Choose start time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={SunStart}
-              disabled={!Sunday}
-              onChange={(e) => {
-                setSunStart(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <label htmlFor="appt">Choose End time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={SunEnd}
-              disabled={!Sunday}
-              onChange={(e) => {
-                setSunEnd(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <Input
-              id="appt"
-              name="appt"
-              className="w-42"
-              placeholder="Enter Slots"
-              value={SunSlots}
-              disabled={!Sunday}
-              onChange={(e) => {
-                setSunSlots(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <input
-              id="mon"
-              type="checkbox"
-              checked={Monday}
-              onChange={() => setMonday(!Monday)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-            <label
-              htmlFor="mon"
-              className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              Mon
-            </label>
-          </div>
-          <div>
-            <label htmlFor="appt">Choose start time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={MonStart}
-              disabled={!Monday}
-              onChange={(e) => {
-                setMonStart(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <label htmlFor="appt">Choose End time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={MonEnd}
-              disabled={!Monday}
-              onChange={(e) => {
-                setMonEnd(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <Input
-              id="appt"
-              name="appt"
-              className="w-42"
-              placeholder="Enter Slots"
-              value={MonSlots}
-              disabled={!Monday}
-              onChange={(e) => {
-                setMonSlots(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <input
-              id="tue"
-              type="checkbox"
-              checked={Tuesday}
-              onChange={() => setTuesday(!Tuesday)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-            <label
-              htmlFor="tue"
-              className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              Tue
-            </label>
-          </div>
-          <div>
-            <label htmlFor="appt">Choose start time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={TueStart}
-              disabled={!Tuesday}
-              onChange={(e) => {
-                setTueStart(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <label htmlFor="appt">Choose End time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={TueEnd}
-              disabled={!Tuesday}
-              onChange={(e) => {
-                setTueEnd(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <Input
-              id="appt"
-              name="appt"
-              className="w-42"
-              placeholder="Enter Slots"
-              value={TueSlots}
-              disabled={!Tuesday}
-              onChange={(e) => {
-                setTueSlots(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <input
-              id="wed"
-              type="checkbox"
-              checked={Wednesday}
-              onChange={() => setWednesday(!Wednesday)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-            <label
-              htmlFor="wed"
-              className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              Wed
-            </label>
-          </div>
-          <div>
-            <label htmlFor="appt">Choose start time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={WedStart}
-              disabled={!Wednesday}
-              onChange={(e) => {
-                setWedStart(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <label htmlFor="appt">Choose End time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={WedEnd}
-              disabled={!Wednesday}
-              onChange={(e) => {
-                setWedEnd(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <Input
-              id="appt"
-              name="appt"
-              className="w-42"
-              placeholder="Enter Slots"
-              value={WedSlots}
-              disabled={!Wednesday}
-              onChange={(e) => {
-                setWedSlots(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <input
-              id="thu"
-              type="checkbox"
-              checked={Thursday}
-              onChange={() => setThursday(!Thursday)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-            <label
-              htmlFor="thu"
-              className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              Thu
-            </label>
-          </div>
-          <div>
-            <label htmlFor="appt">Choose start time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={ThuStart}
-              disabled={!Thursday}
-              onChange={(e) => {
-                setThuStart(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <label htmlFor="appt">Choose End time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={ThuEnd}
-              disabled={!Thursday}
-              onChange={(e) => {
-                setThuEnd(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <Input
-              id="appt"
-              name="appt"
-              className="w-42"
-              placeholder="Enter Slots"
-              value={ThuSlots}
-              disabled={!Thursday}
-              onChange={(e) => {
-                setThuSlots(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <input
-              id="fri"
-              type="checkbox"
-              checked={Friday}
-              onChange={() => setFriday(!Friday)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-            <label
-              htmlFor="fri"
-              className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              Fri
-            </label>
-          </div>
-          <div>
-            <label htmlFor="appt">Choose start time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={FriStart}
-              disabled={!Friday}
-              onChange={(e) => {
-                setFriStart(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <label htmlFor="appt">Choose End time:</label>
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              value={FriEnd}
-              disabled={!Friday}
-              onChange={(e) => {
-                setFriEnd(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <Input
-              id="appt"
-              name="appt"
-              className="w-42"
-              placeholder="Enter Slots"
-              value={FriSlots}
-              disabled={!Friday}
-              onChange={(e) => {
-                setFriSlots(e.target.value);
-              }}
-            />
-          </div>
-        </div>
+        {daysOfWeek.map((weekDay: WeekName, id: number) => (
+          <ScheudulePerDayInput
+            weekName={weekDay}
+            key={weekDay}
+            isChecked={doesExist(id, props.scheduleData.schedules)}
+            startTime={getStartTime(id, props.scheduleData.schedules)}
+            endTime={getEndTime(id, props.scheduleData.schedules)}
+            slots={getSlot(id, props.scheduleData.schedules)}
+            addHandler={addScheduleData}
+            removeHandler={rmeoveScheduleData}
+          />
+        ))
+        }
       </div>
-      {/* button */}
+
       <div className="flex justify-center mt-5">
         <Button
           className="flex bg-c2 justify-center w-42 h-10 text-white rounded-lg hover:bg-c1"

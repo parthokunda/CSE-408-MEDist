@@ -29,8 +29,9 @@ const getDoctorInfo = async (authToken: string): Promise<DoctorProfileInfo> => {
 
 const getDefaultTab = (doctorInfoData : DoctorAttributes, scheduleData: OnlineScheduleOverview) : "schedule" | "info" => {
   for(const key in doctorInfoData){
-    if(key !== 'image' && doctorInfoData[key] === null)
+    if(key !== 'image' && doctorInfoData[key] === null){
       return "info";
+    }
   }
   if(scheduleData.visit_fee === null || scheduleData.schedules.length === 0){
     return "schedule"
@@ -76,17 +77,9 @@ const DoctorInfo: FC = () => {
         />
       </TabsContent>
       <TabsContent value="schedule">
-        <AddSchedule/>
+        <AddSchedule scheduleData={doctorProfileData.OnlineSchedule}/>
       </TabsContent>
     </Tabs>
-  );
-
-  return (
-    <DoctorInfoForm
-      doctorInfo={doctorProfileData.DoctorInfo}
-      specialization={doctorProfileData.Specialization}
-      userToken={cookies.user.token}
-    />
   );
 };
 

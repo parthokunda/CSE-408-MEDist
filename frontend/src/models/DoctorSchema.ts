@@ -21,7 +21,6 @@ export type DoctorAttributes = {
   degrees: string[];
 
   specializationID: number;
-  scheduleID: number;
 }
 export interface DoctorProfileInfo {
   DoctorInfo: DoctorAttributes;
@@ -96,3 +95,15 @@ export interface DoctorPendingAttributes {
   date: Date;
   meetLink: string;
 }
+
+export const daysOfWeek = [
+  "Friday",
+  "Saturday",
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+] as const;
+
+export type WeekName = typeof daysOfWeek[number];
