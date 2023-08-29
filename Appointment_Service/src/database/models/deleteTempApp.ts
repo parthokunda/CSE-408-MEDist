@@ -9,7 +9,7 @@ import broker, { RPC_Request_Payload } from "../../utils/broker";
 import { config } from "../../config";
 
 // delete temporary appointments every 10 minutes
-const deleteTempApp = cron.schedule("*/10 * * * *", async () => {
+const deleteTempApp = cron.schedule("*/1 * * * *", async () => {
   //this means every 10 minutes
   try {
     const now = new Date();

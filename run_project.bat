@@ -1,11 +1,12 @@
 @echo off
 
 REM check port 3000, 3001, 3002, 3003, 3004, 3005 is free or not, if not free, kill the process
-@REM for %%P in (3000 3001 3002 3003 3004 3005) do (
-@REM     for /f "tokens=5" %%a in ('netstat -aon ^| findstr %%P') do (
-@REM         taskkill /f /pid %%a
-@REM     )
-@REM )
+@REM for /f "tokens=5" %%a in ('netstat -aon ^| find ":3000" ^| find "LISTENING"') do taskkill /f /pid %%a
+@REM for /f "tokens=5" %%a in ('netstat -aon ^| find ":3001" ^| find "LISTENING"') do taskkill /f /pid %%a
+@REM for /f "tokens=5" %%a in ('netstat -aon ^| find ":3002" ^| find "LISTENING"') do taskkill /f /pid %%a
+@REM for /f "tokens=5" %%a in ('netstat -aon ^| find ":3003" ^| find "LISTENING"') do taskkill /f /pid %%a
+@REM for /f "tokens=5" %%a in ('netstat -aon ^| find ":3004" ^| find "LISTENING"') do taskkill /f /pid %%a
+@REM for /f "tokens=5" %%a in ('netstat -aon ^| find ":3005" ^| find "LISTENING"') do taskkill /f /pid %%a
 
 @REM start cmd /k "npx kill-port 3000 3001 3002 3003 3004 3005"
 REM close the current cmd window

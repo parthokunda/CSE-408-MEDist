@@ -50,6 +50,17 @@ class BrokerService implements BrokerServiceInterface {
     return this.channel;
   }
 
+  async closeConnectionAndChannel() {
+    if (this.channel) {
+      await this.channel.close();
+      this.channel = null;
+    }
+    if (this.amqlibConnection) {
+      await this.amqlibConnection.close();
+      this.amqlibConnection = null;
+    }
+  }
+
   async RPC_Request(
     RPC_QUEUE_NAME: string,
     requestPayload: RPC_Request_Payload
@@ -57,19 +68,11 @@ class BrokerService implements BrokerServiceInterface {
     const uuid = uuidv4(); // correlation id
 
     const channel = await this.getChannel();
-
-    // create a temporary queue which will be deleted once the message is consumed
     const queue = await channel.assertQueue("", {
-      exclusive: true,
+      exclusive: false,
       durable: false,
+      autoDelete: true,
     });
-    //exclusive: true means that the queue will be deleted once the connection is closed
-
-    log.info(
-      `Sending RPC request: ${JSON.stringify(
-        requestPayload
-      )} to ${RPC_QUEUE_NAME}`
-    );
 
     // send the request
     await channel.sendToQueue(
@@ -95,6 +98,10 @@ class BrokerService implements BrokerServiceInterface {
         (msg: Message | null) => {
           if (msg && msg.properties.correlationId === uuid) {
             // if correlation id matches, that means the response is for the request we sent
+
+            //delete the queue
+            channel.deleteQueue(queue.queue);
+
             resolve(JSON.parse(msg.content.toString()) as RPC_Response_Payload);
             clearTimeout(timeout);
           } else {
