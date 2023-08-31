@@ -29,7 +29,7 @@ const AppointmentPage: FC = () => {
           import.meta.env.VITE_DB_PORT
         }/api/doctor/search/${currentPage}?name=${
           searchTerm.name
-        }&specializationID=${searchTerm.department}&pagination=3`,
+        }&specializationID=${searchTerm.department}&pagination=5`,
         {
           headers: {
             Authorization: `Bearer ${userToken}`, // Replace with your actual token
@@ -68,7 +68,6 @@ const AppointmentPage: FC = () => {
       </TabsContent>
       <TabsContent value="pendingAppointments">
         <PatientPendingAppointments/>
-        {/* <p>HI</p> */}
       </TabsContent>
     </Tabs>
   );

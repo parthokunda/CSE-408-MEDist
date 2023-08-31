@@ -1,4 +1,5 @@
 import ScheudulePerDayInput from "@/components/SchedulePerDayInput";
+import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -81,10 +82,18 @@ export const AddSchedule: FC<{ scheduleData: OnlineScheduleOverview }> = (
   const [cost, setCost] = useState<number>(props.scheduleData.visit_fee);
   const [scheduleErrors, setScheduleErrors] = useState<string[]>([]);
   const { toast } = useToast();
+  const [allSchedules, setAllSchedules] = useState(props.scheduleData.schedules.map(
+    ({ weekname, startTime, endTime, totalSlots }) => ({
+      weekname,
+      startTime,
+      endTime,
+      totalSlots,
+    })
+  ));
 
   const updateScheduleError = (weekName : string, isError: boolean) => {
     if(isError) setScheduleErrors( prevState => {
-      if(!prevState.includes(weekName)) return prevState.concat(weekName);
+      if(!prevState.includes(weekName))  { prevState.push(weekName); return prevState;}
       else return prevState;
     });
     if(!isError){
@@ -96,39 +105,36 @@ export const AddSchedule: FC<{ scheduleData: OnlineScheduleOverview }> = (
   }
 
   useEffect(() => {
-    console.log(scheduleErrors);
+    console.log(scheduleErrors, "errors in schedule");
   }, [scheduleErrors]);
 
-  let allSchedules = props.scheduleData.schedules.map(
-    ({ weekname, startTime, endTime, totalSlots }) => ({
-      weekname,
-      startTime,
-      endTime,
-      totalSlots,
-    })
-  );
+  useEffect(() => {
+    console.log("allSchedules ", allSchedules);
+  },[allSchedules]);
 
   const rmeoveScheduleData = (weekName: WeekName) => {
-    allSchedules = allSchedules.filter(
-      (scheduleObj) => scheduleObj.weekname !== weekName
-    );
+    setAllSchedules(prevSchedules => {
+      return prevSchedules.filter(scheduleObj => scheduleObj.weekname !== weekName);
+    })
   };
 
   const addScheduleData = (newScheduleData: sendScheduleInfoType) => {
-    allSchedules = allSchedules.filter(
-      (scheduleObj) => scheduleObj.weekname !== newScheduleData.weekname
-    );
-    allSchedules.push(newScheduleData);
-    console.log(allSchedules);
+    setAllSchedules(prevSchedules => {
+      prevSchedules = prevSchedules.filter(
+        (scheduleObj) => scheduleObj.weekname !== newScheduleData.weekname
+      );
+      prevSchedules.push(newScheduleData);
+      return prevSchedules;
+    });
   };
 
   const [cookies] = useCookies(["user"]);
   const onSubmit: () => void = async () => {
-    console.log("onSubmit loading");
     const dataToSubmit = {
-      visitFee: 500,
+      visitFee: cost,
       schedule: allSchedules,
     };
+    console.log("🚀 ~ file: AddSchedule.tsx:132 ~ constonSubmit: ~ dataToSubmit:", dataToSubmit)
 
     if (
       props.scheduleData.schedules.length === 0 &&
@@ -169,6 +175,14 @@ export const AddSchedule: FC<{ scheduleData: OnlineScheduleOverview }> = (
         response.data
       );
     }
+    toast({
+      title: "Submitted",
+      description: "Schedule Submitted",
+      action: (
+        <ToastAction altText="Goto schedule to undo">OK</ToastAction>
+      ),
+    })
+    
   };
 
   return (

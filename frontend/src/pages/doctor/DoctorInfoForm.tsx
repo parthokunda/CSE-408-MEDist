@@ -138,7 +138,6 @@ export const DoctorInfoForm: FC<{
           }
         );
         setSpecializations(response.data);
-        console.log(response.data);
       } catch (error) {
         setFetchSpecializationError(true);
       }

@@ -18,8 +18,8 @@ const ScheudulePerDayInput: FC<{weekName: WeekName, isChecked: boolean, removeHa
   useEffect(() => {
     if((totalSlots === 0 || startTime > endTime) && isChecked) {setIsError(true);}
     else setIsError(false);
-    if(isChecked && !isError) props.addHandler({weekname: props.weekName, startTime: startTime, endTime: endTime, totalSlots: totalSlots});
-    if(!isChecked && !isError) props.removeHandler(props.weekName);
+    if(isChecked && !(totalSlots === 0 || startTime > endTime)) props.addHandler({weekname: props.weekName, startTime: startTime, endTime: endTime, totalSlots: totalSlots});
+    if(!isChecked || (totalSlots === 0 || startTime > endTime)) props.removeHandler(props.weekName);
   },[startTime, endTime, totalSlots, isChecked, setIsError]);
 
   useEffect(() => {

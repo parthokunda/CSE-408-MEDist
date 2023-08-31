@@ -13,7 +13,6 @@ import { navIcon } from "../../models/navIcon";
 const NavBar: FC<{ navList: navIcon[] }> = (props) => {
   return (
     <>
-      {console.log(props.navList)}
       <NavigationMenu>
         <div className="flex items-center w-screen h-14 bg-c1 font-inter ">
           <div className="font-bold text-3xl text-c4 ml-4 flex-grow">
