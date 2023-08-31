@@ -2,18 +2,24 @@ import ScheudulePerDayInput from "@/components/SchedulePerDayInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
+import { ToastAction } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/components/ui/use-toast";
+import {
   OnlineScheduleOverview,
   OnlineScheduleOverviewInfo,
   WeekName,
   daysOfWeek,
 } from "@/models/DoctorSchema";
-import { DoctorOnlineScheduleForm } from "@/models/FormSchema";
-import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { FC, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
 
 export type sendScheduleInfoType = {
   weekname: string;
@@ -26,8 +32,10 @@ const getStartTime = (
   weekDay: number,
   scheduleData: OnlineScheduleOverviewInfo[]
 ) => {
-  const foundObject = scheduleData.find(scheduleObj => scheduleObj.weekday === weekDay);
-  if(foundObject){
+  const foundObject = scheduleData.find(
+    (scheduleObj) => scheduleObj.weekday === weekDay
+  );
+  if (foundObject) {
     return foundObject.startTime;
   }
   return undefined;
@@ -37,8 +45,10 @@ const getEndTime = (
   weekDay: number,
   scheduleData: OnlineScheduleOverviewInfo[]
 ) => {
-  const foundObject = scheduleData.find(scheduleObj => scheduleObj.weekday === weekDay);
-  if(foundObject){
+  const foundObject = scheduleData.find(
+    (scheduleObj) => scheduleObj.weekday === weekDay
+  );
+  if (foundObject) {
     return foundObject.endTime;
   }
   return undefined;
@@ -48,7 +58,7 @@ const doesExist = (
   weekDay: number,
   scheduleData: OnlineScheduleOverviewInfo[]
 ): boolean => {
-  const exist = scheduleData.some(item => item.weekday === weekDay);
+  const exist = scheduleData.some((item) => item.weekday === weekDay);
   return exist;
 };
 
@@ -56,8 +66,10 @@ const getSlot = (
   weekDay: number,
   scheduleData: OnlineScheduleOverviewInfo[]
 ) => {
-  const foundObject = scheduleData.find(scheduleObj => scheduleObj.weekday === weekDay);
-  if(foundObject){
+  const foundObject = scheduleData.find(
+    (scheduleObj) => scheduleObj.weekday === weekDay
+  );
+  if (foundObject) {
     return foundObject.totalSlots;
   }
   return undefined;
@@ -67,10 +79,25 @@ export const AddSchedule: FC<{ scheduleData: OnlineScheduleOverview }> = (
   props
 ) => {
   const [cost, setCost] = useState<number>(props.scheduleData.visit_fee);
+  const [scheduleErrors, setScheduleErrors] = useState<string[]>([]);
+  const { toast } = useToast();
+
+  const updateScheduleError = (weekName : string, isError: boolean) => {
+    if(isError) setScheduleErrors( prevState => {
+      if(!prevState.includes(weekName)) return prevState.concat(weekName);
+      else return prevState;
+    });
+    if(!isError){
+      setScheduleErrors( prevState => {
+        if(prevState.includes(weekName)) return prevState.filter(item => item !== weekName);
+        else return prevState;
+      })
+    }
+  }
+
   useEffect(() => {
-    console.log("🚀 ~ file: AddSchedule.tsx:77 ~ cost:", cost)
-    
-  },[cost]);
+    console.log(scheduleErrors);
+  }, [scheduleErrors]);
 
   let allSchedules = props.scheduleData.schedules.map(
     ({ weekname, startTime, endTime, totalSlots }) => ({
@@ -82,29 +109,31 @@ export const AddSchedule: FC<{ scheduleData: OnlineScheduleOverview }> = (
   );
 
   const rmeoveScheduleData = (weekName: WeekName) => {
-    allSchedules = allSchedules.filter((scheduleObj) => scheduleObj.weekname !== weekName);
-  }
+    allSchedules = allSchedules.filter(
+      (scheduleObj) => scheduleObj.weekname !== weekName
+    );
+  };
 
   const addScheduleData = (newScheduleData: sendScheduleInfoType) => {
-    allSchedules = allSchedules.filter((scheduleObj) => scheduleObj.weekname !== newScheduleData.weekname);
+    allSchedules = allSchedules.filter(
+      (scheduleObj) => scheduleObj.weekname !== newScheduleData.weekname
+    );
     allSchedules.push(newScheduleData);
     console.log(allSchedules);
   };
 
-  const forms = useForm<z.infer<typeof DoctorOnlineScheduleForm>>({
-    defaultValues: {},
-    resolver: zodResolver(DoctorOnlineScheduleForm),
-  });
-
   const [cookies] = useCookies(["user"]);
   const onSubmit: () => void = async () => {
-    const dataToSubmit  = {
+    console.log("onSubmit loading");
+    const dataToSubmit = {
       visitFee: 500,
       schedule: allSchedules,
-    }
-    console.log("🚀 ~ file: AddSchedule.tsx:105 ~ constonSubmit: ~ dataToSubmit:", dataToSubmit)
-    
-    if (props.scheduleData.schedules.length === 0 && !props.scheduleData.visit_fee) {
+    };
+
+    if (
+      props.scheduleData.schedules.length === 0 &&
+      !props.scheduleData.visit_fee
+    ) {
       console.log("POSTING");
       const response = await axios.post(
         `${import.meta.env.VITE_DB_URL}:${
@@ -144,12 +173,12 @@ export const AddSchedule: FC<{ scheduleData: OnlineScheduleOverview }> = (
 
   return (
     <>
-      <div className="flex text-c1 text-large font-bold justify-center mt-6">
+      <p className="flex text-c1 text-3xl font-bold justify-center mt-6">
         Edit Online Clinic
-      </div>
+      </p>
 
-      <div className="flex flex-col ml-6 mt-5 gap-5">
-        <div className="flex gap-3">
+      <div className="flex flex-col m-6 gap-5">
+        <div className="flex gap-3 items-center">
           Cost :
           <Input
             type="number"
@@ -160,31 +189,56 @@ export const AddSchedule: FC<{ scheduleData: OnlineScheduleOverview }> = (
         </div>
       </div>
 
-      <div className="flex-[60%] flex flex-col ml-6 mt-5 gap-5">
-        Edit Schedule
-        {daysOfWeek.map((weekDay: WeekName, id: number) => (
-          <ScheudulePerDayInput
-            weekName={weekDay}
-            key={weekDay}
-            isChecked={doesExist(id, props.scheduleData.schedules)}
-            startTime={getStartTime(id, props.scheduleData.schedules)}
-            endTime={getEndTime(id, props.scheduleData.schedules)}
-            slots={getSlot(id, props.scheduleData.schedules)}
-            addHandler={addScheduleData}
-            removeHandler={rmeoveScheduleData}
-          />
-        ))
-        }
+      <div className="flex flex-col m-6">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead></TableHead>
+              <TableHead>Week Day</TableHead>
+              <TableHead>Start Time</TableHead>
+              <TableHead>End Time</TableHead>
+              <TableHead>Total Slot</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {daysOfWeek.map((weekDay: WeekName, id: number) => (
+              <ScheudulePerDayInput
+                weekName={weekDay}
+                key={weekDay}
+                isChecked={doesExist(id, props.scheduleData.schedules)}
+                startTime={getStartTime(id, props.scheduleData.schedules)}
+                endTime={getEndTime(id, props.scheduleData.schedules)}
+                slots={getSlot(id, props.scheduleData.schedules)}
+                addHandler={addScheduleData}
+                removeHandler={rmeoveScheduleData}
+                setScheduleError={updateScheduleError}
+              />
+            ))}
+          </TableBody>
+        </Table>
       </div>
 
       <div className="flex justify-center mt-5">
         <Button
           className="flex bg-c2 justify-center w-42 h-10 text-white rounded-lg hover:bg-c1"
-          onClick={() => onSubmit()}
+          onClick={() => {
+            if(scheduleErrors.length === 0) onSubmit();
+            else {
+              console.log("error should see toast");
+              toast({
+                title: "Error on Form",
+                description: "StartTime should be less than EndTime and TotalSlots > 0",
+                action: (
+                  <ToastAction altText="Goto schedule to undo">OK</ToastAction>
+                ),
+              })
+            }
+          }}
         >
           Save
         </Button>
       </div>
+      <Toaster/>
     </>
   );
 };

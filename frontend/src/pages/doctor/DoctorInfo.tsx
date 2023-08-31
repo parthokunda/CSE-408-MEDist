@@ -54,7 +54,7 @@ const DoctorInfo: FC = () => {
 
   if (isLoading) {
     return (
-      <div>
+      <div className="flex justify-center mt-12">
         <LoadingSpinner />
       </div>
     );

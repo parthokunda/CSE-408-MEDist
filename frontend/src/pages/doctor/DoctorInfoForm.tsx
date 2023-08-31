@@ -34,6 +34,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import ImageComponent from "../../components/ImageComponent";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const uploadImage = async (selectedFile: File | null) => {
   if (selectedFile) {
@@ -55,9 +56,13 @@ const uploadImage = async (selectedFile: File | null) => {
 const submitProfileInfo = async (
   data: z.infer<typeof DoctorAdditionalInfoForm>,
   userToken: string,
-  imageFile: File | null
+  imageFile: File | null,
+  specializationList: SpecializationAttributes[]
 ): Promise<DoctorAdditionalInfo> => {
   data.image = (await uploadImage(imageFile)) as string;
+  const choosenSpecializaiton = specializationList.find(
+    (item) => item.name === data.department
+  );
   const profileData = {
     name: data.name,
     phone: data.mobileNumber,
@@ -66,9 +71,10 @@ const submitProfileInfo = async (
     bmdc: data.bmdcNumber,
     issueDate: data.issueDate,
     degrees: data.degrees,
-    specializationID: 2,
+    specializationID: choosenSpecializaiton ? choosenSpecializaiton.id : 0,
     image: data.image,
   };
+  console.log("🚀 ~ file: DoctorInfoForm.tsx:72 ~ profileData:", profileData);
 
   const respone = await axios.put(
     `${import.meta.env.VITE_DB_URL}:${
@@ -87,9 +93,9 @@ const submitProfileInfo = async (
 };
 
 export const DoctorInfoForm: FC<{
-  doctorInfo: DoctorAttributes,
-  specialization: SpecializationAttributes,
-  userToken: string,
+  doctorInfo: DoctorAttributes;
+  specialization: SpecializationAttributes;
+  userToken: string;
 }> = (props) => {
   initializeApp(FIREBASE_CONFIG);
   const [cookies] = useCookies(["user"]);
@@ -97,7 +103,8 @@ export const DoctorInfoForm: FC<{
   const [specializations, setSpecializations] = useState<
     SpecializationAttributes[]
   >([]);
-  const [fetchSpecializationsError, setFetchSpecializationError] = useState<boolean>(false);
+  const [fetchSpecializationsError, setFetchSpecializationError] =
+    useState<boolean>(false);
   const navigate = useNavigate();
 
   const forms = useForm<z.infer<typeof DoctorAdditionalInfoForm>>({
@@ -109,7 +116,9 @@ export const DoctorInfoForm: FC<{
       bmdcNumber: props.doctorInfo.bmdc ? props.doctorInfo.bmdc : "",
       issueDate: props.doctorInfo.issueDate ? props.doctorInfo.issueDate : "",
       mobileNumber: props.doctorInfo.phone ? props.doctorInfo.phone : "",
-      degrees: props.doctorInfo.degrees ? props.doctorInfo.degrees.join(", ") : "",
+      degrees: props.doctorInfo.degrees
+        ? props.doctorInfo.degrees.join(", ")
+        : "",
       image: props.doctorInfo.image ? props.doctorInfo.image : undefined,
     },
     // resolver: zodResolver(DoctorAdditionalInfoForm),
@@ -149,19 +158,25 @@ export const DoctorInfoForm: FC<{
     mutateProfile(data);
   };
 
-  const { mutate: mutateProfile, isLoading: isSubmittingProfile, isError: isSubmittingProfileError } = useMutation(
-    {
-      mutationKey: ["submitDoctorProfileInfo"],
-      mutationFn: (data: z.infer<typeof DoctorAdditionalInfoForm>) =>
-        submitProfileInfo(data, props.userToken, selectedFile),
-    }
-  );
+  const {
+    mutate: mutateProfile,
+    isLoading: isSubmittingProfile,
+    isError: isSubmittingProfileError,
+  } = useMutation({
+    mutationKey: ["submitDoctorProfileInfo"],
+    mutationFn: (data: z.infer<typeof DoctorAdditionalInfoForm>) =>
+      submitProfileInfo(data, props.userToken, selectedFile, specializations),
+  });
 
-  if(fetchSpecializationsError){
+  if (fetchSpecializationsError) {
     setTimeout(() => {
-        navigate("/");
-    }, 1500)
-    return <p className="flex justify-center text-3xl mt-12">Error Fetching Specializtion list. Reloading.</p>
+      navigate("/");
+    }, 1500);
+    return (
+      <p className="flex justify-center text-3xl mt-12">
+        Error Fetching Specializtion list. Reloading.
+      </p>
+    );
   }
 
   if (isSubmittingProfile) {
@@ -172,11 +187,15 @@ export const DoctorInfoForm: FC<{
     );
   }
 
-  if(isSubmittingProfileError){
+  if (isSubmittingProfileError) {
     setTimeout(() => {
-        navigate("/");
-    }, 1500)
-    return <p className="flex justify-center text-3xl mt-12">Error Submitting Info. Reloading.</p>
+      navigate("/");
+    }, 1500);
+    return (
+      <p className="flex justify-center text-3xl mt-12">
+        Error Submitting Info. Reloading.
+      </p>
+    );
   }
 
   return (
@@ -252,24 +271,25 @@ export const DoctorInfoForm: FC<{
                 control={forms.control}
                 render={({ field }) => (
                   <div className="flex-[50%] flex-col">
-                    <Select
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger className="flex width-2 bg-white">
-                        <SelectValue placeholder={field.value}/>
+                    <Select onValueChange={field.onChange}>
+                      <SelectTrigger className="flex bg-white">
+                        <SelectValue placeholder={field.value} />
                       </SelectTrigger>
                       <SelectContent>
-                        {specializations.map(
-                          (department: SpecializationAttributes) => (
-                            <SelectItem
-                              key={department.name}
-                              value={department.id.toString()}
-                            >
-                              {department.name.toString()}
-                            </SelectItem>
-                          )
-                        )}
+                        <ScrollArea className="h-72 rounded-md">
+                          {specializations.map(
+                            (department: SpecializationAttributes) => (
+                              <SelectItem
+                                key={department.name}
+                                value={department.name.toString()}
+                              >
+                                {department.name.toString()}
+                              </SelectItem>
+                            )
+                          )}
+                        </ScrollArea>
                       </SelectContent>
+
                       <p>{forms.formState.errors.department?.message}</p>
                     </Select>
                   </div>
@@ -336,7 +356,12 @@ export const DoctorInfoForm: FC<{
               />
             </div>
           </div>
-          <ImageComponent selectedFile={selectedFile} imageURL={props.doctorInfo.image} formControl={forms.control} handleFileInput={handleFileInput}/>
+          <ImageComponent
+            selectedFile={selectedFile}
+            imageURL={props.doctorInfo.image}
+            formControl={forms.control}
+            handleFileInput={handleFileInput}
+          />
           {/* <div className="flex flex-col justify-center items-center gap-3 ">
             <p className="text-lg font-bold">Profile Picture</p>
             {selectedFile && (
@@ -370,7 +395,6 @@ export const DoctorInfoForm: FC<{
             />
           </div> */}
         </div>
-        
         <Button
           type="submit"
           className="bg-c1 w-36 mx-auto text-white hover:bg-c2 mt-4"
