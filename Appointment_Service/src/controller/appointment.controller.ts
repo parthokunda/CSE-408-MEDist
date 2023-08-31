@@ -70,18 +70,24 @@ class Appointment_Controller implements Appointment_Controller_Interface {
   private setAppointmentDay(weekday: number, thisweek: boolean): Date {
     let today: number, appointmentDay: Date;
 
-    today = new Date().getDay();
+    today = (new Date().getDay() + 2)%7;
+    const day_diff = weekday - today;
 
-    if (thisweek) {
-      appointmentDay = new Date();
-    } else {
-      // appointmentDay is next week
-      appointmentDay = new Date();
-      appointmentDay.setDate(appointmentDay.getDate() + 7);
-    }
+
+    // if (thisweek) {
+    //   appointmentDay = new Date();
+    // } else {
+    //   // appointmentDay is next week
+    //   appointmentDay = new Date();
+    //   appointmentDay.setDate(appointmentDay.getDate() + 7);
+    // }
+
+    appointmentDay = new Date();
+
+  
 
     appointmentDay.setDate(
-      appointmentDay.getDate() + (weekday - 2 - today) // -2 because weekday starts from 2
+      appointmentDay.getDate() + (day_diff >=0 ? day_diff%7 : (day_diff + 7)%7) // -2 because weekday starts from 2
     );
     appointmentDay.setHours(0, 0, 0, 0);
 
