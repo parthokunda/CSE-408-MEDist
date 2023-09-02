@@ -11,8 +11,9 @@ import PatientPendingAppointments from "./PatientPendingAppointments";
 
 const AppointmentPage: FC = () => {
   const [cookies] = useCookies(["user"]);
+  const recordsPerPage = 5;
   const [doctorSearchTerm, setDoctorSearchTerm] =
-    useState<DoctorSearchFormType>({ name: "D", department: "2" });
+    useState<DoctorSearchFormType>({ name: "", department: "" });
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [doctorList, setDoctorList] = useState<SearchDoctorInfo | null>(null);
@@ -29,7 +30,7 @@ const AppointmentPage: FC = () => {
           import.meta.env.VITE_DB_PORT
         }/api/doctor/search/${currentPage}?name=${
           searchTerm.name
-        }&specializationID=${searchTerm.department}&pagination=5`,
+        }&specializationID=${searchTerm.department}&pagination=${recordsPerPage}`,
         {
           headers: {
             Authorization: `Bearer ${userToken}`, // Replace with your actual token
@@ -42,9 +43,9 @@ const AppointmentPage: FC = () => {
       return response.data;
     };
 
-    console.log(isLoading);
-    fetchDoctorsList(doctorSearchTerm, 1, cookies.user.token);
-  }, [doctorSearchTerm]);
+    // console.log(isLoading);
+    fetchDoctorsList(doctorSearchTerm, currentPage, cookies.user.token);
+  }, [doctorSearchTerm,currentPage]);
 
   return (
     <Tabs defaultValue="searchDoctor">
@@ -62,6 +63,7 @@ const AppointmentPage: FC = () => {
           <DoctorSearchCards
             doctorFetchedData={doctorList}
             currentPage={currentPage}
+            recordsPerPage={recordsPerPage}
             setCurrentPage={setCurrentPage}
           />
         )}</>

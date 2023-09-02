@@ -6,15 +6,16 @@ import DoctorSearchCard from "./DoctorSearchCard";
 const DoctorSearchCards: FC<{
   doctorFetchedData: SearchDoctorInfo;
   currentPage: number;
+  recordsPerPage: number;
   setCurrentPage: (page: number) => void;
 }> = (props) => {
   const { currentPage, setCurrentPage } = props;
-  const recordsPerPage = 3;
-  const lastIndex = props.currentPage * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
+  // const recordsPerPage = 3;
+  const lastIndex = props.currentPage * props.recordsPerPage;
+  const firstIndex = lastIndex - props.recordsPerPage;
   console.log(props.doctorFetchedData);
   const records = props.doctorFetchedData.Doctors;
-  const nPages = Math.ceil(props.doctorFetchedData.totalCount / recordsPerPage);
+  const nPages = Math.ceil(props.doctorFetchedData.totalCount / props.recordsPerPage);
   const array = [
     currentPage - 2,
     currentPage - 1,
