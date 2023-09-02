@@ -9,6 +9,8 @@ if [ $# -eq 0 ]; then
     gnome-terminal -- bash -c "cd Auth_Service/ && npm run dev; exec bash"
     gnome-terminal -- bash -c "cd Patient_Service/ && npm run dev; exec bash"
     gnome-terminal -- bash -c "cd Medicine_Service/ && npm run dev; exec bash"
+    gnome-terminal -- bash -c "cd Doctor_Service/ && npm run dev; exec bash"
+    gnome-terminal -- bash -c "cd Appointment_Service/ && npm run dev; exec bash"
     if ss -tuln | grep -q ":3000"; then
         echo "Port $PORT is occupied."
         PID=$(sudo lsof -t -i :3000)
