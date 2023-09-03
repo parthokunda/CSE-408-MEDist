@@ -74,12 +74,7 @@ class PatientSchema implements Patient_Schema_Interface {
             // check if it has feet and inches
             if (val.hasOwnProperty("feet") && val.hasOwnProperty("inches")) {
               // check if feet is number and inches is number
-              if (
-                typeof val.feet === "number" &&
-                typeof val.inches === "number"
-              ) {
                 return true;
-              }
             }
           }
 
