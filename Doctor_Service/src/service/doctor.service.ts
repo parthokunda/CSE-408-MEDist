@@ -162,6 +162,7 @@ class DoctorService implements DoctorServiceInterface {
   ): Promise<DoctorAdditionalInfo> {
     try {
       const doctor = await doctorRepository.getDoctorInfo(doctorID);
+
       const doctorInfo = excludeProperties(
         doctor.dataValues,
         DoctorAdditionalInfo_Excluded_Properties
