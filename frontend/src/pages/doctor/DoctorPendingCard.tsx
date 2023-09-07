@@ -1,7 +1,4 @@
-import {
-  Card,
-  CardContent
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { FC } from "react";
 
 import {
@@ -17,10 +14,13 @@ import { DialogClose } from "@radix-ui/react-dialog";
 
 import { Button } from "@/components/ui/button";
 import { PendingAppointmentOverviewInfo } from "@/models/Appointment";
+import { useNavigate } from "react-router-dom";
 
-
-const DoctorPendingCard: FC<{ app: PendingAppointmentOverviewInfo }> = (props) => {
+const DoctorPendingCard: FC<{ app: PendingAppointmentOverviewInfo }> = (
+  props
+) => {
   // convert Date to date and time
+  const navigate = useNavigate();
   console.log(props.app);
   const date = new Date(props.app.startTime);
   const year = date.getFullYear();
@@ -39,26 +39,39 @@ const DoctorPendingCard: FC<{ app: PendingAppointmentOverviewInfo }> = (props) =
     return true;
   }
 
-
   return (
     <div>
       <Card className="flex flex-col drop-shadow-lg overflow-hidden mx-3">
         <CardContent className="p-2 px-0">
-          <div className="grid grid-cols-5 gap-4 align-middle">
-            <div className="flex text-xl items-center justify-center">{props.app.id}</div>
+          <div className="grid grid-cols-6 gap-4 align-middle">
+            <div className="flex text-xl items-center justify-center">
+              {props.app.id}
+            </div>
             <div className="flex text-c1 text-xl font-bold items-center justify-center">
               {props.app.patientInfo?.name}
             </div>
-            <div className="flex text-xl items-center justify-center">{dateStr}</div>
-            <div className="flex text-xl items-center justify-center">{timeStr}</div>
-
+            <div className="flex text-xl items-center justify-center">
+              {dateStr}
+            </div>
+            <div className="flex text-xl items-center justify-center">
+              {timeStr}
+            </div>
+            <Button
+              disabled={!isAvailable()}
+              className="bg-c2 w-42 text-white rounded-lg hover:bg-c1 m-2"
+              onClick={() => {navigate(`/doctor/prescription/${props.app.id}`)}}
+            >
+              Prescribe
+            </Button>
             <Dialog>
               <DialogTrigger asChild>
                 <Button
                   disabled={!isAvailable()}
                   className="bg-c2 w-42 text-white rounded-lg hover:bg-c1 m-2"
                   onClick={() => {
-                    navigator.clipboard.writeText(props.app.meetingLink ? props.app.meetingLink : "");
+                    navigator.clipboard.writeText(
+                      props.app.meetingLink ? props.app.meetingLink : ""
+                    );
                     console.log("Link Copied");
                   }}
                 >
@@ -67,20 +80,20 @@ const DoctorPendingCard: FC<{ app: PendingAppointmentOverviewInfo }> = (props) =
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px] bg-c4">
                 <DialogHeader>
-                    <DialogTitle>Link Copied to Clipboard</DialogTitle>
-                    <DialogDescription>
-                        Your Link is : <b className="text-c1">{props.app.meetingLink}</b>
-                    </DialogDescription>
+                  <DialogTitle>Link Copied to Clipboard</DialogTitle>
+                  <DialogDescription>
+                    Your Link is :{" "}
+                    <b className="text-c1">{props.app.meetingLink}</b>
+                  </DialogDescription>
                 </DialogHeader>
 
                 <DialogFooter>
-                    <DialogClose asChild>
-                  <Button className="bg-c2 hover:bg-c1">OK</Button>
+                  <DialogClose asChild>
+                    <Button className="bg-c2 hover:bg-c1">OK</Button>
                   </DialogClose>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-
           </div>
         </CardContent>
       </Card>

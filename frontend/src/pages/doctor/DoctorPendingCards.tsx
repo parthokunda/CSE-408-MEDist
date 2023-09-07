@@ -44,7 +44,7 @@ const DoctorPendingCards: FC<{
   }
   return (
     <div className="relative h-[55vh]">
-      <div className="grid grid-cols-5 gap-4 mt-8 px-4">
+      <div className="grid grid-cols-6 gap-4 mt-8 px-4">
       <div className="flex justify-center">Appointment ID</div>
         <div className="flex justify-center">Patient Name</div>
         <div className="flex justify-center">Appointment Date</div>

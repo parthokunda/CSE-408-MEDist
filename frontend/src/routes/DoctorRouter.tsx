@@ -1,7 +1,7 @@
 import { ProfileStatus } from "@/models/LoginSignUpSchema";
-import AddSchedule from "@/pages/doctor/AddSchedule";
 import DoctorInfo from "@/pages/doctor/DoctorInfo";
 import PatientSearchPage from "@/pages/doctor/DoctorPendingAppointments";
+import DoctorEditPrescription from "@/pages/doctor/Prescription/DoctorEditPrescription";
 import { FC } from "react";
 import { useCookies } from "react-cookie";
 import { Navigate, Route, Routes } from "react-router-dom";
@@ -17,8 +17,8 @@ const DoctorRouter: FC = () => {
         <Route>
           <Route path="/" element={<DoctorInfo />} />
           <Route path="/account" element={<DoctorInfo />} />
-          <Route path="/addSchedule" element={<AddSchedule />} />
           <Route path="/pendingAppointments" element={<PatientSearchPage />} />
+          <Route path="/prescription/:prescriptionId" element={<DoctorEditPrescription />} />
         </Route>
       </Routes>
     );
