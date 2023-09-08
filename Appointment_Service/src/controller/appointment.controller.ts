@@ -67,22 +67,22 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     this.View_Pending_Appointments = this.View_Pending_Appointments.bind(this);
   }
 
-  private setAppointmentDay(weekday: number, thisweek: boolean): Date {
-    let today: number, appointmentDay: Date;
+  private setAppointmentDay(weekday: number): Date {
+    const today = (new Date().getDay() + 2) % 7;
+    const dayDiff = weekday - today;
 
-    today = new Date().getDay();
+    log.debug("weekday : " + weekday + " today : " + today);
 
-    if (thisweek) {
-      appointmentDay = new Date();
-    } else {
-      // appointmentDay is next week
-      appointmentDay = new Date();
-      appointmentDay.setDate(appointmentDay.getDate() + 7);
+    let appointmentDay = new Date();
+
+    if (dayDiff < 0) {
+      //same day next week
+      appointmentDay.setDate(appointmentDay.getDate() + 7 + dayDiff);
+    } else if (dayDiff > 0) {
+      //same day this week
+      appointmentDay.setDate(appointmentDay.getDate() + dayDiff);
     }
 
-    appointmentDay.setDate(
-      appointmentDay.getDate() + (weekday - 2 - today) // -2 because weekday starts from 2
-    );
     appointmentDay.setHours(0, 0, 0, 0);
 
     log.info(
@@ -185,16 +185,8 @@ class Appointment_Controller implements Appointment_Controller_Interface {
       const endTime = timeSlotInfo.endTime;
       const totalSlots = timeSlotInfo.totalSlots;
 
-      const today = (new Date().getDay() + 2) % 7;
-
-      let appointmentDay: Date;
-
-      log.info(`weekday - ${weekday} && today - ${today} `);
-
       // construct appointmentDay from weekday
-      if (weekday < today)
-        appointmentDay = this.setAppointmentDay(weekday, false);
-      else appointmentDay = this.setAppointmentDay(weekday, true);
+      const appointmentDay: Date = new Date(this.setAppointmentDay(weekday));
 
       log.info(appointmentDay.toDateString(), "appointment day setted");
 
