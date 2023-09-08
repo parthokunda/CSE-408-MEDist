@@ -30,6 +30,13 @@ export interface PrescriptionControllerInterface {
     next: NextFunction
   );
 
+  //get prescription - access by all
+  getPrescription(
+    req: Request<Create_Prescription_Params_Input>,
+    res: Response,
+    next: NextFunction
+  );
+
   // temporary method to test prescription header - access by all
   generatePrescriptionHeader(
     req: Request<Create_Prescription_Params_Input>,
@@ -103,6 +110,23 @@ class PrescriptionController implements PrescriptionControllerInterface {
     } catch (error) {
       log.error(error);
       next(createHttpError(500, "Error generating prescription header"));
+    }
+  }
+
+  // ----------------- Get Prescription ----------------- //
+  async getPrescription(
+    req: Request<Create_Prescription_Params_Input>,
+    res: Response,
+    next: NextFunction
+  ) {
+    const appointmentID = Number(req.params.appointmentID);
+
+    try {
+      const prescription: PrescriptionOutput =
+        await prescriptionService.getPrescription(appointmentID);
+      res.status(200).json(prescription);
+    } catch (error) {
+      next(createHttpError(500, "Error getting prescription"));
     }
   }
 }

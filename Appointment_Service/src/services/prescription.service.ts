@@ -53,6 +53,9 @@ export interface PrescriptionServiceInterface {
     input: CreatePrescriptionInput
   ): Promise<PrescriptionOutput>;
 
+  //get prescription
+  getPrescription(appointmentID: number): Promise<PrescriptionOutput>;
+
   //generate prescription output
   generatePrescriptionOutput(
     prescriptionID: number
@@ -271,6 +274,30 @@ class PrescriptionService implements PrescriptionServiceInterface {
     }
   }
 
+  // ---------------------- Get Prescription ---------------------- //
+  async getPrescription(appointmentID: number): Promise<PrescriptionOutput> {
+    try {
+      const prescription =
+        await prescriptionRepository.getPrescription_fromAppointmentID(
+          appointmentID
+        );
+
+      if (!prescription) throw createHttpError(404, "Prescription not found");
+
+      const prescriptionOutput = await this.generatePrescriptionOutput(
+        prescription.id
+      );
+
+      if (!prescriptionOutput)
+        throw createHttpError(500, "Error generating prescription output");
+
+      return prescriptionOutput;
+    } catch (error) {
+      log.error(error);
+      throw error;
+    }
+  }
+
   async generatePrescriptionOutput(
     prescriptionID: number
   ): Promise<PrescriptionOutput> {
@@ -308,7 +335,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
       return {
         Header: prescriptionHeader,
         Medicines: brandInfos,
-        ...prescription,
+        ...prescription.dataValues,
       };
     } catch (error) {
       log.error(error);

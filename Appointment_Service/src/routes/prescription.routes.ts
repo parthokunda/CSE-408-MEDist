@@ -34,4 +34,13 @@ prescriptionRouter.post(
   prescriptionController.createPrescription
 );
 
+// get prescription - only accessible to all
+prescriptionRouter.get(
+  "/get-prescription/:appointmentID",
+  authorize(false, false),
+  validateRequest(prescriptionSchema.Generate_Prescription_Header),
+  cache("2 minutes"),
+  prescriptionController.getPrescription
+);
+
 export default prescriptionRouter;
