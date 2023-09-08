@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 // internal imports
 import { config } from "../config";
 import log from "./logger";
-import { MedicineRPCServiceInterface } from "rpc_service/medicine.rpc.service";
+import { MedicineRPCServiceInterface } from "../rpc_service/medicine.rpc.service";
 
 export interface RPC_Request_Payload {
   type: string;

@@ -13,29 +13,55 @@ import { config } from "../config";
 // import models
 import {
   Appointment,
+  BrandInfo,
   DoctorPortion,
   PatientPortion,
   Prescription,
   PrescriptionHeader,
+  PrescriptionOutput,
 } from "../database/models";
 
 // repository instance
 import {
+  CreatePrescriptionInput,
   appointmentRepository,
   prescriptionRepository,
 } from "../database/repository";
 
 export interface PrescriptionServiceInterface {
+  //private methods
+  getAllMedicineInfos(brandIDs: number[]): Promise<BrandInfo[]>;
+  getSingleMedicineInfo(brandID: number): Promise<BrandInfo>;
+
+  getDoctorAndPatientInfo(
+    doctorID: number,
+    patientID: number
+  ): Promise<{ DoctorInfo: DoctorPortion; PatientInfo: PatientPortion }>;
+
+  getDoctorInformation(doctorID: number): Promise<DoctorPortion>;
+
+  getPatientInformation(patientID: number): Promise<PatientPortion>;
+
   //generate prescription header
   generatePrescriptionHeader(
     appointmentID: number | null,
     prescriptionID: number | null
   ): Promise<PrescriptionHeader>;
+
+  //create prescription
+  createPrescription(
+    input: CreatePrescriptionInput
+  ): Promise<PrescriptionOutput>;
+
+  //generate prescription output
+  generatePrescriptionOutput(
+    prescriptionID: number
+  ): Promise<PrescriptionOutput>;
 }
 
 class PrescriptionService implements PrescriptionServiceInterface {
   //get DoctorInfo and PatientInfo parallelly
-  private async getDoctorAndPatientInfo(
+  async getDoctorAndPatientInfo(
     doctorID: number,
     patientID: number
   ): Promise<{ DoctorInfo: DoctorPortion; PatientInfo: PatientPortion }> {
@@ -58,7 +84,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
     }
   }
 
-  private async getDoctorInformation(doctorID: number): Promise<DoctorPortion> {
+  async getDoctorInformation(doctorID: number): Promise<DoctorPortion> {
     try {
       const payload: RPC_Request_Payload = {
         type: "GET_DOCTOR_INFO_FOR_PRESCRIPTION",
@@ -90,9 +116,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
     }
   }
 
-  private async getPatientInformation(
-    patientID: number
-  ): Promise<PatientPortion> {
+  async getPatientInformation(patientID: number): Promise<PatientPortion> {
     try {
       const payload: RPC_Request_Payload = {
         type: "GET_PATIENT_INFO_FOR_PRESCRIPTION",
@@ -121,6 +145,49 @@ class PrescriptionService implements PrescriptionServiceInterface {
     } catch (error) {
       log.error(error);
       throw createHttpError(500, "Error getting patient information from RPC");
+    }
+  }
+
+  async getAllMedicineInfos(brandIDs: number[]): Promise<BrandInfo[]> {
+    const brandInfos: BrandInfo[] = [];
+
+    for (const brandID of brandIDs) {
+      const brandInfo = await this.getSingleMedicineInfo(brandID);
+      brandInfos.push(brandInfo);
+    }
+
+    return brandInfos;
+  }
+
+  async getSingleMedicineInfo(brandID: number): Promise<BrandInfo> {
+    const payload: RPC_Request_Payload = {
+      type: "GET_BRANDINFO_BY_ID",
+      data: {
+        brandID,
+      },
+    };
+
+    log.debug(payload, "payload - for 'GET_BRANDINFO_BY_ID'");
+
+    try {
+      const medicine_response_payload: RPC_Response_Payload =
+        await broker.RPC_Request(config.MEDICINE_RPC_QUEUE, payload);
+
+      log.debug(
+        medicine_response_payload,
+        "respnse payload - for 'GET_BRANDINFO_BY_ID'"
+      );
+
+      if (medicine_response_payload.status !== "success")
+        throw createHttpError(
+          500,
+          "Error getting medicine information from RPC"
+        );
+
+      return { ...medicine_response_payload.data } as BrandInfo;
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Error getting medicine information from RPC");
     }
   }
 
@@ -172,6 +239,76 @@ class PrescriptionService implements PrescriptionServiceInterface {
           type: appointment.type,
           time: appointment.startTime,
         },
+      };
+    } catch (error) {
+      log.error(error);
+      throw error;
+    }
+  }
+
+  async createPrescription(
+    input: CreatePrescriptionInput
+  ): Promise<PrescriptionOutput> {
+    try {
+      const newPrescription = await prescriptionRepository.createPrescription(
+        input
+      );
+
+      if (!newPrescription)
+        throw createHttpError(500, "Error creating prescription in database");
+
+      const prescriptionOutput = await this.generatePrescriptionOutput(
+        newPrescription.id
+      );
+
+      if (!prescriptionOutput)
+        throw createHttpError(500, "Error generating prescription output");
+
+      return prescriptionOutput;
+    } catch (error) {
+      log.error(error);
+      throw error;
+    }
+  }
+
+  async generatePrescriptionOutput(
+    prescriptionID: number
+  ): Promise<PrescriptionOutput> {
+    try {
+      const prescription =
+        await prescriptionRepository.getPrescription_fromPrescriptionID(
+          prescriptionID
+        );
+
+      if (!prescription) throw createHttpError(404, "Prescription not found");
+
+      const prescriptionHeader = await this.generatePrescriptionHeader(
+        null,
+        prescriptionID
+      );
+
+      if (!prescriptionHeader)
+        throw createHttpError(500, "Error generating prescription header");
+
+      const prescription_medicines =
+        await prescription.getPrescription_Medicines();
+
+      if (!prescription_medicines)
+        throw createHttpError(
+          500,
+          "Error getting prescription_medicines from database"
+        );
+
+      const medicineIDs = prescription_medicines.map(
+        (prescription_medicine) => prescription_medicine.medicineID
+      );
+
+      const brandInfos = await this.getAllMedicineInfos(medicineIDs);
+
+      return {
+        Header: prescriptionHeader,
+        Medicines: brandInfos,
+        ...prescription,
       };
     } catch (error) {
       log.error(error);

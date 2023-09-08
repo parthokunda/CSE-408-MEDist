@@ -17,6 +17,7 @@ import {
 } from "../schema/prescription.schema";
 import {
   PrescriptionHeader,
+  PrescriptionOutput,
   Prescription_Medicine_Input,
 } from "../database/models";
 import { CreatePrescriptionInput } from "../database/repository";
@@ -95,17 +96,10 @@ class PrescriptionController implements PrescriptionControllerInterface {
     log.info(createPrescriptionInput, "prescription creation input");
 
     try {
-      /* const prescriptionHeader: PrescriptionHeader =
-        await prescriptionService.generatePrescriptionHeader(
-          appointmentID,
-          null
-        );
+      const newPrescription: PrescriptionOutput =
+        await prescriptionService.createPrescription(createPrescriptionInput);
 
-      if (!prescriptionHeader) {
-        throw createHttpError(500, "Error generating prescription header");
-      } */
-
-      res.status(200).json(createPrescriptionInput);
+      res.status(200).json(newPrescription);
     } catch (error) {
       log.error(error);
       next(createHttpError(500, "Error generating prescription header"));

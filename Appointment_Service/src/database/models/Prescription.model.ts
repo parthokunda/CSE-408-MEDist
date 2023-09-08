@@ -15,7 +15,9 @@ import {
 // sequelize connection
 import sequelizeConnection from "../config";
 import Appointment from "./Appointment.model";
-import Prescription_Medicines from "./Prescription_Medicines.model";
+import Prescription_Medicines, {
+  BrandInfo,
+} from "./Prescription_Medicines.model";
 
 export interface DoctorPortion {
   DoctorInfo: {
@@ -70,6 +72,11 @@ export interface PrescriptionAttributes {
   advices: string[];
   followUpDate: Date;
   otherNotes: string[];
+}
+
+export interface PrescriptionOutput extends PrescriptionAttributes {
+  Header: PrescriptionHeader;
+  Medicines: BrandInfo[];
 }
 
 class Prescription extends Model implements PrescriptionAttributes {

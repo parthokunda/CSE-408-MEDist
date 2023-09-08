@@ -11,6 +11,7 @@ import {
   Appointment,
   Prescription_Medicine_Input,
   Prescription_Medicines,
+  PrescriptionOutput,
 } from "../models";
 
 export interface CreatePrescriptionInput {
@@ -156,7 +157,28 @@ class PrescriptionRepository implements Prescription_Repository_Interface {
       await prescription.setAppointment(appointment);
 
       // add medicines
-      await this.addMedicines(prescription, input.medicines);
+      try {
+        await this.addMedicines(prescription, input.medicines);
+      } catch (error) {
+        log.error(error);
+
+        const existingMedicines =
+          await prescription.getPrescription_Medicines();
+
+        if (existingMedicines) {
+          await Promise.all(
+            existingMedicines.map(async (medicine) => {
+              await medicine.destroy();
+            })
+          );
+        }
+
+        await prescription.destroy();
+        throw createHttpError(
+          500,
+          "Error adding medicines to prescription. prescription deleted. medicines also deleted"
+        );
+      }
 
       // this return type will be changed
       return prescription;

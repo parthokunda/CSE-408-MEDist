@@ -17,11 +17,27 @@ class MedicineRPCService implements MedicineRPCServiceInterface {
     payload: RPC_Request_Payload
   ): Promise<RPC_Response_Payload> {
     let response: RPC_Response_Payload = {
-      status: "error",
+      status: "unauthorized",
       data: {},
     };
     log.info(payload, "received payload");
     switch (payload.type) {
+      case "GET_BRANDINFO_BY_ID":
+        try {
+          const brandInfo =
+            await dbService.brandService.getBrandById_withoutDescription(
+              Number(payload.data["brandID"])
+            );
+          if (!brandInfo) throw new Error("Brand not found");
+
+          response.status = "success";
+          response.data = brandInfo;
+        } catch (err) {
+          log.error(err.message);
+          response.status = "error";
+          response.data["error"] = err.message;
+        }
+
       default:
         return response;
     }

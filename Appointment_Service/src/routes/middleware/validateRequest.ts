@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { AnyZodObject } from "zod";
 import createError from "http-errors";
+import log from "../../utils/logger";
 
 const validateRequest =
   (schema: AnyZodObject) =>
@@ -14,7 +15,8 @@ const validateRequest =
       });
       next();
     } catch (err: any) {
-      throw createError(400, err.errors);
+      log.error("Error validating request: ", err);
+      throw createError.BadRequest(err.errors[0]);
     }
   };
 

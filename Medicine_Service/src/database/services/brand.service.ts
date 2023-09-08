@@ -48,6 +48,7 @@ const createEmptyBrandDescriptionInfo = (): DescriptionAttributes => {
 };
 interface Brand_Service_Interface {
   getBrandById(id: number): Promise<BrandDescription>;
+  getBrandById_withoutDescription(id: number): Promise<BrandInfo>;
 
   getBrandByName(_name: string): Promise<Brand>; // this is used in webScrapping
 
@@ -62,6 +63,31 @@ interface Brand_Service_Interface {
 
 export default class dbService_Brand implements Brand_Service_Interface {
   constructor() {}
+
+  async getBrandById_withoutDescription(id: number): Promise<BrandInfo> {
+    const brand = await Brand.findByPk(id);
+    if (brand === null) {
+      log.error(`Brand with id ${id} not found`);
+      return null;
+    }
+
+    const dosageForm = await brand.getDosageForm();
+    const generic = await brand.getGeneric();
+    const manufacturer = await brand.getManufacturer();
+
+    const brandDescription: BrandInfo = {
+      Brand: {
+        id: brand.id,
+        name: brand.name,
+        strength: brand.strength,
+      },
+      DosageForm: dosageForm.dataValues,
+      Generic: generic.dataValues,
+      Manufacturer: manufacturer.dataValues,
+    };
+
+    return brandDescription;
+  }
 
   async getBrandById(id: number): Promise<BrandDescription> {
     const brand = await Brand.findByPk(id);

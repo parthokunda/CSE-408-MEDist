@@ -12,11 +12,6 @@ import {
 import sequelizeConnection from "../config";
 import Prescription from "./Prescription.model";
 
-export interface SearchBrandOutput {
-  brandInfos: BrandInfo[];
-  totalCount: number;
-}
-
 export interface BrandInfo {
   Brand: {
     id: number;
@@ -51,12 +46,13 @@ export interface Prescription_Medicine_Input
 export interface Prescription_MedicinesAttributes {
   id: number;
   medicineID: number;
+
   prescriptionID: number;
 
   //instructions
   dosage: string;
   when: string;
-  duration: string;
+  duration: number;
 }
 
 class Prescription_Medicines
@@ -70,7 +66,7 @@ class Prescription_Medicines
   //instructions
   public dosage!: string;
   public when!: string;
-  public duration!: string;
+  public duration!: number;
 
   // define associations
   public prescriptionID!: number;
@@ -111,7 +107,7 @@ Prescription_Medicines.init(
     },
 
     duration: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },

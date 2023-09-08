@@ -52,7 +52,7 @@ REM run the project
 for %%F in (Auth_Service Patient_Service Doctor_Service Medicine_Service Appointment_Service proxy) do (
 
     REM open a new cmd window in each folder and run the server and name the window with the folder name
-    start "%%~F" cmd /k "cd %%~F\ && pnpm run dev" /title %%~F
+    start "%%F" cmd /k "cd %%~F\ && pnpm run dev" /title %%~F
 )
 
 

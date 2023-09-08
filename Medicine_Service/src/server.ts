@@ -12,13 +12,17 @@ import { notFoundHandler, defaultErrorHandler } from "./utils/error-handler";
 import dbInit from "./database/init";
 dbInit();
 
+// message broker
+import messageBroker from "./utils/broker";
+import medicineRpcService from "./rpc_service/medicine.rpc.service";
+messageBroker.RPC_Observer(medicineRpcService);
+
 const app = express();
 app.use(cors());
 
 // pre-route middlewares
 app.use(express.json());
 app.use(cors());
-
 
 app.use(router);
 

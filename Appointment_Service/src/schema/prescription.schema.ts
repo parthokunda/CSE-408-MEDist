@@ -55,7 +55,7 @@ class Prescription_Schema implements Prescription_Schema_Interface {
           .positive()
           .refine((val) => {
             return Number.isInteger(val);
-          }, "medicineID must be an integer"),
+          }, "medicineID must be an positive integer"),
 
         dosage: string({
           required_error: "dosage is required",
@@ -65,9 +65,13 @@ class Prescription_Schema implements Prescription_Schema_Interface {
           required_error: "when is required",
         }),
 
-        duration: string({
+        duration: number({
           required_error: "duration is required",
-        }),
+        })
+          .positive()
+          .refine((val) => {
+            return Number.isInteger(val);
+          }, "duration must be an positive integer"),
       })
         .array()
         .min(1, "medicines must have atleast 1 item"),
