@@ -1,5 +1,3 @@
-import { FC, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -10,9 +8,11 @@ import {
 } from "@/components/ui/select";
 import usePrescribedStore from "@/hooks/usePrescribedStore";
 import { PrescribedMedType } from "@/models/Prescriptions";
+import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { TiTick, TiTickOutline } from "react-icons/ti";
 import { IconContext } from "react-icons";
+import { TiTick } from "react-icons/ti";
+import SearchMedicine from "./SearchMedicine";
 
 const onMedNameUpdate = (data: PrescribedMedType) => {
   console.log(
@@ -64,11 +64,7 @@ const PrescriptionMedInsert: FC = () => {
       onSubmit={medSearchForm.handleSubmit(onAddMed)}
     >
       <div className="pl-.5 col-span-5">
-        <Controller
-          control={medSearchForm.control}
-          name="name"
-          render={({ field }) => <Input {...field} />}
-        />
+        <SearchMedicine form={medSearchForm}/>
       </div>
       <div className="col-span-3 grid grid-cols-3 gap-0.5">
         <div>
@@ -119,9 +115,6 @@ const PrescriptionMedInsert: FC = () => {
           render={({ field }) => <Input {...field} />}
         />
       </div>
-      {/* <div className="col-span-1 flex items-center justify-center">
-        <TiTick />
-      </div> */}
       <div className="flex items-center justify-center" onClick={medSearchForm.handleSubmit(onAddMed)}>
           <IconContext.Provider value={{ size: "2em" }}>
             <TiTick />
