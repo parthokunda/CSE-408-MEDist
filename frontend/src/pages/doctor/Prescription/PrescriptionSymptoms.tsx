@@ -45,7 +45,7 @@ const PrescriptionSymptoms : FC = () => {
         <div className="flex flex-col">
           <div className="flex items-center pl-4 pt-2">
             <p className="text-c1 font-bold text-xl">Symptoms</p>
-            <p className="pl-2">(max 3)</p>
+            <p className="pl-2">(max 5)</p>
           </div>
   
           {symptomsList.map((item, index) => (

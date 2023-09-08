@@ -2,6 +2,7 @@ import { FC } from "react";
 import { useParams } from "react-router-dom";
 import PrescriptionLeftSide from "./PrescriptionLeftSide";
 import PrescriptionPatientInfo from "./PrescriptionPatientInfo";
+import PrescriptionRightSide from "./PrescriptionRightSide";
 
 const DoctorEditPrescription: FC = () => {
   const { prescriptionId } = useParams();
@@ -14,7 +15,9 @@ const DoctorEditPrescription: FC = () => {
             <div className="col-span-2 bg-[#EFDAEA] h-full">
               <PrescriptionLeftSide/>
             </div>
-            <div className="col-span-4 bg-[#FFFFFF] h-full">Here</div>
+            <div className="col-span-4 bg-[#FFFFFF] h-full p-4">
+              <PrescriptionRightSide/>
+            </div>
         </div>
       </div>
       <div className="col-span-1 bg-gray-300 h-full border border-black">Past Prescriptions</div>
