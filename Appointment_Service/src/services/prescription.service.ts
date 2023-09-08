@@ -27,6 +27,7 @@ import {
   appointmentRepository,
   prescriptionRepository,
 } from "../database/repository";
+import { appointmentService } from ".";
 
 export interface PrescriptionServiceInterface {
   //private methods
@@ -242,6 +243,12 @@ class PrescriptionService implements PrescriptionServiceInterface {
           type: appointment.type,
           time: appointment.startTime,
         },
+        OldAppointments: await appointmentService.Get_Other_Appointments(
+          appointment.olderAppointmentIDs
+        ),
+        SharedAppointments: await appointmentService.Get_Other_Appointments(
+          appointment.otherAppointmentIDs
+        ),
       };
     } catch (error) {
       log.error(error);

@@ -15,8 +15,13 @@ import {
   AppointmentTimeSlot,
   AppointmentType,
   Patient_or_Doctor_Info,
-  PendingAppointmentOverviewInfo,
+  AppointmentOverviewInfo,
   PendingAppointments,
+  FinalAppointmentOverviewInfo,
+  OlderAppointmentOverviewInfo,
+  OlderAppointmentOverviewInfo_Excluded_Properties,
+  AppointmentStatus,
+  PrescriptionOutput,
 } from "../database/models";
 
 // repository instance
@@ -30,6 +35,8 @@ import {
 import { SlotRequest } from "../controller/appointment.controller";
 import { config } from "../config";
 import brokerService from "../utils/broker";
+import { excludeProperties } from "../utils/necessary_functions";
+import prescriptionService from "./prescription.service";
 
 export interface AppointmentServiceInterface {
   // check if patient has already booked an appointment
@@ -49,14 +56,26 @@ export interface AppointmentServiceInterface {
     doctorID: number,
     patientID: number,
     slotRequest: SlotRequest
-  ): Promise<PendingAppointmentOverviewInfo>;
+  ): Promise<AppointmentOverviewInfo>;
 
   // confirm online appointment
   Confirm_Temporary_Online_Appointment(
     appointmentID: number,
     patientID: number,
     patientEmail: string
-  ): Promise<PendingAppointmentOverviewInfo>;
+  ): Promise<AppointmentOverviewInfo>;
+
+  // get other appointments
+  Get_Other_Appointments(
+    appointmentIDs: number[]
+  ): Promise<AppointmentOverviewInfo[]>;
+
+  // add other prescriptions to confirmed appointment
+  Add_Other_Prescriptions_To_Confirmed_Appointment(
+    appointmentID: number,
+    patientID: number,
+    otherAppointmentIDs: number[]
+  ): Promise<AppointmentOverviewInfo>;
 
   // delete appointment
   Delete_Temporary_Appointment(
@@ -71,6 +90,20 @@ export interface AppointmentServiceInterface {
     currentPage: number,
     isPatient: boolean
   ): Promise<PendingAppointments>;
+
+  // get final appointment overview info
+  Get_Final_Appointment_Overview_Info(
+    appointmentID: number,
+    doctorID: number | null,
+    patientID: number | null
+  ): Promise<FinalAppointmentOverviewInfo>;
+
+  //view appointment
+  View_Appointment(
+    appointmentID: number,
+    patientID: number | null,
+    doctorID: number | null
+  ): Promise<FinalAppointmentOverviewInfo | PrescriptionOutput>;
 
   // serve RPC request
   serveRPCRequest(payload: RPC_Request_Payload): Promise<RPC_Response_Payload>;
@@ -315,7 +348,7 @@ class AppointmentService implements AppointmentServiceInterface {
     doctorID: number,
     patientID: number,
     slotRequest: SlotRequest
-  ): Promise<PendingAppointmentOverviewInfo> {
+  ): Promise<AppointmentOverviewInfo> {
     try {
       // get a free time slot for booking appointment time
       const freeBookingAppointmentTime =
@@ -413,12 +446,175 @@ class AppointmentService implements AppointmentServiceInterface {
     }
   }
 
+  async Get_Other_Appointments(
+    appointmentIDs: number[]
+  ): Promise<AppointmentOverviewInfo[]> {
+    try {
+      const appointments = await Promise.all(
+        appointmentIDs.map(async (appointmentID) => {
+          const appointment = await appointmentRepository.Get_AppointmentInfo(
+            appointmentID
+          );
+          if (!appointment) throw createHttpError(404, "Appointment not found");
+
+          return appointment;
+        })
+      );
+
+      const appointmentOverviewInfos = appointments.map((appointment) => {
+        return {
+          id: appointment.id,
+          type: appointment.type,
+          status: appointment.status,
+
+          doctorInfo: {
+            id: appointment.doctorID,
+            name: appointment.doctorName,
+            email: appointment.doctorEmail,
+          },
+
+          patientInfo: {
+            id: appointment.patientID,
+            name: appointment.patientName,
+            email: appointment.patientEmail,
+          },
+
+          startTime: appointment.startTime,
+          endTime: appointment.endTime,
+
+          meetingLink: appointment.meetingLink,
+        };
+      });
+
+      return appointmentOverviewInfos;
+    } catch (error) {
+      log.error(error, "Error in getting other appointments");
+      throw error;
+    }
+  }
+
+  // ----------------- View Appointment ----------------- //
+  async View_Appointment(
+    appointmentID: number,
+    patientID: number | null,
+    doctorID: number | null
+  ): Promise<FinalAppointmentOverviewInfo | PrescriptionOutput> {
+    try {
+      const appointment = await appointmentRepository.Get_AppointmentInfo(
+        appointmentID
+      );
+      if (!appointment) throw createHttpError(404, "Appointment not found");
+
+      if (
+        (patientID !== null && appointment.patientID !== patientID) ||
+        (doctorID !== null && appointment.doctorID !== doctorID)
+      )
+        throw createHttpError.Unauthorized(
+          "You are not authorized to view this appointment"
+        );
+
+      if (appointment.status === AppointmentStatus.PENDING) {
+        const finalAppointmentOverviewInfo =
+          await this.Get_Final_Appointment_Overview_Info(
+            appointmentID,
+            doctorID,
+            patientID
+          );
+
+        return finalAppointmentOverviewInfo;
+      } else {
+        const prescriptionOutput = await prescriptionService.getPrescription(
+          appointmentID
+        );
+
+        return prescriptionOutput;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async Get_Final_Appointment_Overview_Info(
+    appointmentID: number,
+    doctorID: number | null,
+    patientID: number | null
+  ): Promise<FinalAppointmentOverviewInfo> {
+    try {
+      const appointment = await appointmentRepository.Get_AppointmentInfo(
+        appointmentID
+      );
+
+      if (doctorID !== null && appointment.doctorID != doctorID)
+        throw createHttpError.Unauthorized(
+          "You are not authorized to get this appointment info"
+        );
+      if (patientID !== null && appointment.patientID != patientID)
+        throw createHttpError.Unauthorized(
+          "You are not authorized to get this appointment info"
+        );
+
+      let olderAppointments: OlderAppointmentOverviewInfo[] = [];
+      let otherAppointments: OlderAppointmentOverviewInfo[] = [];
+
+      if (appointment.olderAppointmentIDs)
+        olderAppointments = (
+          await this.Get_Other_Appointments(appointment.olderAppointmentIDs)
+        ).map((appointment) => {
+          return excludeProperties(
+            appointment,
+            OlderAppointmentOverviewInfo_Excluded_Properties
+          );
+        });
+
+      if (appointment.otherAppointmentIDs)
+        otherAppointments = (
+          await this.Get_Other_Appointments(appointment.otherAppointmentIDs)
+        ).map((appointment) => {
+          return excludeProperties(
+            appointment,
+            OlderAppointmentOverviewInfo_Excluded_Properties
+          );
+        });
+
+      const finalAppointmentOverviewInfo: FinalAppointmentOverviewInfo = {
+        id: appointment.id,
+        type: appointment.type,
+        status: appointment.status,
+
+        doctorInfo: {
+          id: appointment.doctorID,
+          name: appointment.doctorName,
+          email: appointment.doctorEmail,
+        },
+
+        patientInfo: {
+          id: appointment.patientID,
+          name: appointment.patientName,
+          email: appointment.patientEmail,
+        },
+
+        startTime: appointment.startTime,
+        endTime: appointment.endTime,
+
+        meetingLink: appointment.meetingLink,
+
+        olderAppointments,
+        otherAppointments,
+      };
+
+      return finalAppointmentOverviewInfo;
+    } catch (error) {
+      log.error(error, "Error in getting final appointment overview info");
+      throw error;
+    }
+  }
+
   // ----------------- Confirm Online Appointment ----------------- //
   async Confirm_Temporary_Online_Appointment(
     appointmentID: number,
     patientID: number,
     patientEmail: string
-  ): Promise<PendingAppointmentOverviewInfo> {
+  ): Promise<FinalAppointmentOverviewInfo> {
     try {
       const appointment = await appointmentRepository.Get_AppointmentInfo(
         appointmentID
@@ -454,20 +650,60 @@ class AppointmentService implements AppointmentServiceInterface {
           appointmentInput
         );
 
-      return {
-        id: confirmedAppointment.id,
-        type: confirmedAppointment.type,
-        status: confirmedAppointment.status,
-
-        doctorInfo,
-        patientInfo: null,
-
-        startTime: confirmedAppointment.startTime,
-        endTime: confirmedAppointment.endTime,
-
-        meetingLink: confirmedAppointment.meetingLink,
-      };
+      return await this.Get_Final_Appointment_Overview_Info(
+        appointmentID,
+        doctorID,
+        patientID
+      );
     } catch (error) {
+      throw error;
+    }
+  }
+
+  // ----------------- Add Other Prescriptions To Confirmed Appointment ----------------- //
+  async Add_Other_Prescriptions_To_Confirmed_Appointment(
+    appointmentID: number,
+    patientID: number,
+    otherAppointmentIDs: number[]
+  ): Promise<FinalAppointmentOverviewInfo> {
+    try {
+      const appointment = await appointmentRepository.Get_AppointmentInfo(
+        appointmentID
+      );
+      if (!appointment) throw createHttpError(404, "Appointment not found");
+
+      if (appointment.status !== AppointmentStatus.PENDING)
+        throw createHttpError(
+          400,
+          "You can only add other appointments to pending appointment"
+        );
+
+      if (appointment.patientID !== patientID)
+        throw createHttpError.Unauthorized(
+          "You are not authorized to add prescription to this appointment"
+        );
+
+      const updatedAppointment =
+        await appointmentRepository.Add_Other_Appointments(
+          appointmentID,
+          otherAppointmentIDs
+        );
+      if (!updatedAppointment)
+        throw createHttpError(
+          500,
+          "Error in adding other appointments to confirmed appointment"
+        );
+
+      return await this.Get_Final_Appointment_Overview_Info(
+        updatedAppointment.id,
+        updatedAppointment.doctorID,
+        updatedAppointment.patientID
+      );
+    } catch (error) {
+      log.error(
+        error,
+        "Error in adding other appointments to confirmed appointment"
+      );
       throw error;
     }
   }

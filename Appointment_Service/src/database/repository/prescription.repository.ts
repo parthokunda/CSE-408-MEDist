@@ -12,10 +12,12 @@ import {
   Prescription_Medicine_Input,
   Prescription_Medicines,
   PrescriptionOutput,
+  AppointmentStatus,
 } from "../models";
 
 export interface CreatePrescriptionInput {
   appointmentID: number;
+  doctorID: number;
 
   medicines: Prescription_Medicine_Input[];
   symptoms: string[];
@@ -41,6 +43,8 @@ export interface Prescription_Repository_Interface {
 
   //create prescription
   createPrescription(input: CreatePrescriptionInput): Promise<Prescription>;
+
+  //get
 }
 
 class PrescriptionRepository implements Prescription_Repository_Interface {
@@ -135,8 +139,18 @@ class PrescriptionRepository implements Prescription_Repository_Interface {
       const appointment = await Appointment.findByPk(input.appointmentID);
 
       if (!appointment) {
-        throw createHttpError(404, "Appointment not found");
+        throw createHttpError.NotFound("Appointment not found");
       }
+
+      if (appointment.status !== AppointmentStatus.PENDING)
+        throw createHttpError.NotAcceptable(
+          "Appointment is not in pending status. Cannot create prescription"
+        );
+
+      if (appointment.doctorID !== input.doctorID)
+        throw createHttpError.Unauthorized(
+          "You are not authorized to create prescription for this appointment"
+        );
 
       const prescription = await Prescription.create({
         appointmentID: input.appointmentID,
@@ -151,6 +165,7 @@ class PrescriptionRepository implements Prescription_Repository_Interface {
         throw createHttpError(500, "Error creating prescription");
 
       appointment.prescriptionID = prescription.id;
+      appointment.status = AppointmentStatus.PRESCRIBED;
       await appointment.save();
 
       await appointment.setPrescription(prescription);

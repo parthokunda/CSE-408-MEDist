@@ -87,6 +87,7 @@ class PrescriptionController implements PrescriptionControllerInterface {
 
     const createPrescriptionInput: CreatePrescriptionInput = {
       appointmentID,
+      doctorID,
 
       medicines: req.body.medicines as Prescription_Medicine_Input[],
 

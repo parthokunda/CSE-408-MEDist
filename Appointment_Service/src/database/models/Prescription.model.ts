@@ -14,7 +14,7 @@ import {
 
 // sequelize connection
 import sequelizeConnection from "../config";
-import Appointment from "./Appointment.model";
+import Appointment, { OlderAppointmentOverviewInfo } from "./Appointment.model";
 import Prescription_Medicines, {
   BrandInfo,
 } from "./Prescription_Medicines.model";
@@ -62,6 +62,8 @@ export interface PrescriptionHeader {
   DoctorPortionInfo: DoctorPortion;
   PatientPortionInfo: PatientPortion;
   AppointmentPortionInfo: AppointmentPortion;
+  OldAppointments: OlderAppointmentOverviewInfo[];
+  SharedAppointments: OlderAppointmentOverviewInfo[];
 }
 
 export interface PrescriptionAttributes {

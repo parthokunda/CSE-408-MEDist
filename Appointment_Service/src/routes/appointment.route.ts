@@ -65,4 +65,19 @@ appointmentRouter.get(
   appointmentController.View_Pending_Appointments
 );
 
+//add other appointment - only accessible to patient
+appointmentRouter.post(
+  "/add-other-appointments/:appointmentID",
+  authorize(true, false),
+  validateRequest(appointmentSchema.Add_Other_Appointments),
+  appointmentController.Add_Other_Appointments
+);
+
+//view appointment - accessible to both patient and doctor
+appointmentRouter.get(
+  "/view-appointment/:appointmentID",
+  authorize(false, false),
+  appointmentController.View_Appointment
+);
+
 export default appointmentRouter;

@@ -6,6 +6,7 @@
   "scripts": {
     "start": "ts-node ./src/server.ts",
     "dev": "nodemon",
+    "dev_window": "ts-node ./src/utils/cleanup.ts && nodemon",
     "build": "npx tsc"
   },
   "keywords": [],

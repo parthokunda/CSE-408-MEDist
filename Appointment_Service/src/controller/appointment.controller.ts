@@ -9,6 +9,8 @@ import {
   prescription_medicineService,
 } from "../services";
 import {
+  Add_Other_Appointments_Body_Input,
+  Add_Other_Appointments_Params_Input,
   Booking_Online_Appointment_Params_Input,
   Confirm_Online_Appointment_Params_Input,
 } from "../schema/appointment.schema";
@@ -47,6 +49,17 @@ export interface Appointment_Controller_Interface {
     next: NextFunction
   );
 
+  //add other appointment - access by patient
+  Add_Other_Appointments(
+    req: Request<
+      Add_Other_Appointments_Params_Input,
+      {},
+      Add_Other_Appointments_Body_Input
+    >,
+    res: Response,
+    next: NextFunction
+  );
+
   //cancel online appointment - access by patient
   Cancel_Online_Appointment(
     req: Request<Confirm_Online_Appointment_Params_Input>,
@@ -56,6 +69,13 @@ export interface Appointment_Controller_Interface {
 
   // view pending appointments - access by both patient and doctor
   View_Pending_Appointments(req: Request, res: Response, next: NextFunction);
+
+  // view appointment - access by both patient and doctor
+  View_Appointment(
+    req: Request<Confirm_Online_Appointment_Params_Input>,
+    res: Response,
+    next: NextFunction
+  );
 }
 
 class Appointment_Controller implements Appointment_Controller_Interface {
@@ -154,6 +174,37 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     }
   }
 
+  // ----------------- Add Other Appointment ----------------- //
+  async Add_Other_Appointments(
+    req: Request<
+      Add_Other_Appointments_Params_Input,
+      {},
+      Add_Other_Appointments_Body_Input
+    >,
+    res: Response,
+    next: NextFunction
+  ) {
+    const patientID = req.user_identity?.id as number;
+    const appoinmentID = Number(req.params.appointmentID);
+    const appointmentIDs = req.body.appoinmentIDs as number[];
+
+    try {
+      const appointment =
+        await appointmentService.Add_Other_Prescriptions_To_Confirmed_Appointment(
+          appoinmentID,
+          patientID,
+          appointmentIDs
+        );
+
+      res.status(200).json({
+        message: "Appointment added successfully",
+        appointment,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   // ----------------- Book Online Appointment ----------------- //
   async Book_Online_Appointment(
     req: Request<Booking_Online_Appointment_Params_Input>,
@@ -185,10 +236,9 @@ class Appointment_Controller implements Appointment_Controller_Interface {
       const endTime = timeSlotInfo.endTime;
       const totalSlots = timeSlotInfo.totalSlots;
 
-      // construct appointmentDay from weekday
-      const appointmentDay: Date = new Date(this.setAppointmentDay(weekday));
+      const today = (new Date().getDay() + 2) % 7;
 
-      log.info(appointmentDay.toDateString(), "appointment day setted");
+      const appointmentDay: Date = this.setAppointmentDay(weekday);
 
       // construct appointment_day_start_time and appointment_day_end_time
       const appointment_day_start_time = new Date(
@@ -247,6 +297,8 @@ class Appointment_Controller implements Appointment_Controller_Interface {
           patientID,
           slotRequest
         );
+
+      log.debug(appointment.startTime.toDateString(), "appointment startTime");
 
       // send response
       res.status(200).json({
@@ -326,6 +378,13 @@ class Appointment_Controller implements Appointment_Controller_Interface {
       next(error);
     }
   }
+
+  // view appointment
+  async View_Appointment(
+    req: Request<Confirm_Online_Appointment_Params_Input>,
+    res: Response,
+    next: NextFunction
+  ) {}
 }
 
 export default new Appointment_Controller();
