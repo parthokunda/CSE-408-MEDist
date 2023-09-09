@@ -8,11 +8,12 @@ import {
 } from "@/components/ui/select";
 import usePrescribedStore from "@/hooks/usePrescribedStore";
 import { PrescribedMedType } from "@/models/Prescriptions";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { IconContext } from "react-icons";
 import { TiTick } from "react-icons/ti";
 import SearchMedicine from "./SearchMedicine";
+import { Button } from "@/components/ui/button";
 
 const onMedNameUpdate = (data: PrescribedMedType) => {
   console.log(
@@ -22,6 +23,7 @@ const onMedNameUpdate = (data: PrescribedMedType) => {
 };
 
 const PrescriptionMedInsert: FC = () => {
+  const [isShowInput, setIsShowInput] = useState<boolean>(true);
   const addToPresctionStore = usePrescribedStore((state) => state.addMed);
 
   const medSearchForm = useForm<PrescribedMedType>({
@@ -34,10 +36,14 @@ const PrescriptionMedInsert: FC = () => {
         night: 0,
       },
       duration: 0,
+      brandInfo: undefined,
     },
   });
 
   const onAddMed = (data: PrescribedMedType) => {
+    if(data.brandInfo === undefined) {
+      return;
+    }
     addToPresctionStore(data);
     medSearchForm.reset({
       name: "",
@@ -49,6 +55,7 @@ const PrescriptionMedInsert: FC = () => {
       },
       duration: 0,
     });
+    setIsShowInput(true);
   };
 
   useEffect(() => {
@@ -64,7 +71,30 @@ const PrescriptionMedInsert: FC = () => {
       onSubmit={medSearchForm.handleSubmit(onAddMed)}
     >
       <div className="pl-.5 col-span-5">
-        <SearchMedicine form={medSearchForm}/>
+        {isShowInput && (
+          <SearchMedicine form={medSearchForm} setIsShowInput={setIsShowInput}/>
+        )}
+        {isShowInput || (
+          <p
+            className="flex items-center text-c1 font-bold mt-2"
+            onClick={() => {
+              medSearchForm.setValue("brandInfo", undefined);
+              setIsShowInput(true);
+            }}
+          >
+            <img
+              src={medSearchForm.getValues("brandInfo")?.DosageForm.img_url}
+              className="ml-1 h-4 w-4"
+              placeholder="img_404"
+            />
+            <p className="pl-3">
+              {medSearchForm.getValues("brandInfo")?.Brand.name}
+            </p>
+            <p className="pl-6">
+              {medSearchForm.getValues("brandInfo")?.Brand.strength}
+            </p>
+          </p>
+        )}
       </div>
       <div className="col-span-3 grid grid-cols-3 gap-0.5">
         <div>
@@ -115,11 +145,15 @@ const PrescriptionMedInsert: FC = () => {
           render={({ field }) => <Input {...field} />}
         />
       </div>
-      <div className="flex items-center justify-center" onClick={medSearchForm.handleSubmit(onAddMed)}>
-          <IconContext.Provider value={{ size: "2em" }}>
-            <TiTick />
-          </IconContext.Provider>
-      </div>
+      <button
+        tabIndex={0}
+        className="flex mt-1 mx-2 justify-center h-8 w-8 "
+        onClick={medSearchForm.handleSubmit(onAddMed)}
+      >
+        <IconContext.Provider value={{ size: "2em", color: "blue" }}>
+          <TiTick />
+        </IconContext.Provider>
+      </button>
     </form>
   );
 };

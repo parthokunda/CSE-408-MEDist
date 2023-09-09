@@ -1,6 +1,7 @@
 import usePrescribedStore from "@/hooks/usePrescribedStore";
 import { FC } from "react";
 import { MdCancel } from "react-icons/md";
+import PrescribedMedInfo from "./PrescribedMedInfo";
 
 const PrescribedMeds: FC = () => {
   const medList = usePrescribedStore((state) => state.medList);
@@ -9,8 +10,9 @@ const PrescribedMeds: FC = () => {
     <>
       {medList.map((med, index) => (
         <div className="grid grid-cols-12 mt-2" key={index}>
-          <p className="col-span-5 px-2 pl-1">{med.name}</p>
-          <p className="col-span-3 pl-1">{`${+med.dosage.morning}+${+med.dosage.day}+${+med.dosage.night}`}</p>
+          {med.brandInfo && <PrescribedMedInfo med={med.brandInfo} />}
+          <p className="col-span-3 pl-1">{`${+med.dosage.morning}+${+med.dosage
+            .day}+${+med.dosage.night}`}</p>
           <p className="col-span-2 pl-1">
             {med.when === "after" ? "After" : "Before"}
           </p>

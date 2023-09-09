@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { FC, useEffect, useState } from "react";
 
 const PrescriptionPastHistory: FC = () => {
@@ -22,10 +22,10 @@ const PrescriptionPastHistory: FC = () => {
         </div>
 
         <div className="flex gap-2 mx-4 my-1 items-center">
-          <Input
-            className="rounded-lg"
-            onChange={handleChange}
-            value={pastHistory} 
+          <Textarea
+            className="rounded-lg h-36"
+            // onChange={handleChange}
+            // value={pastHistory} 
           />
         </div>
       </div>
