@@ -20,6 +20,8 @@
 REM Execute the kill_ports.bat script to terminate ports
 pushd %~dp0
 start /wait cmd /C "npx kill-port 3000 3001 3002 3003 3004 3005"
+rem wait for the kill-port script to finish
+
 popd
 
 
