@@ -94,10 +94,8 @@ class PrescriptionController implements PrescriptionControllerInterface {
       symptoms: req.body.symptoms,
       diagnosis: req.body.diagnosis,
       advices: req.body.advices,
-      followUpDate: req.body.followUpDate
-        ? new Date(req.body.followUpDate)
-        : null,
-
+      meetAfter: req.body.meetAfter ? Number(req.body.meetAfter) : null,
+      past_history: req.body.past_history || null,
       otherNotes: req.body.otherNotes || null,
     };
 

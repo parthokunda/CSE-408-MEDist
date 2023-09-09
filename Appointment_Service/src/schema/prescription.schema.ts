@@ -47,8 +47,9 @@ class Prescription_Schema implements Prescription_Schema_Interface {
       symptoms: string().array().min(1, "symptoms must have atleast 1 item"),
       diagnosis: string().array().min(1, "diagnosis must have atleast 1 item"),
       advices: string().array().min(1, "advices must have atleast 1 item"),
-      followUpDate: date().nullable().optional(),
+      meetAfter: number().optional(),
       otherNotes: string().array().optional(),
+      past_history: string().array().optional(),
 
       medicines: object({
         medicineID: number()

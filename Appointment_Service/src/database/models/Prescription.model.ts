@@ -73,7 +73,9 @@ export interface PrescriptionAttributes {
   diagnosis: string[];
   advices: string[];
   followUpDate: Date;
+  meetAfter: number;
   otherNotes: string[];
+  past_history: string[];
 }
 
 export interface PrescriptionOutput extends PrescriptionAttributes {
@@ -89,7 +91,9 @@ class Prescription extends Model implements PrescriptionAttributes {
   public diagnosis!: string[];
   public advices!: string[];
   public followUpDate!: Date;
+  public meetAfter!: number;
   public otherNotes!: string[];
+  public past_history!: string[];
 
   // define associations
   public getAppointment!: HasOneGetAssociationMixin<Appointment>;
@@ -142,6 +146,16 @@ Prescription.init(
 
     otherNotes: {
       type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+
+    past_history: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+
+    meetAfter: {
+      type: DataTypes.INTEGER,
       allowNull: true,
     },
   },

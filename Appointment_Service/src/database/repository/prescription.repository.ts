@@ -23,8 +23,9 @@ export interface CreatePrescriptionInput {
   symptoms: string[];
   diagnosis: string[];
   advices: string[];
-  followUpDate: Date | null;
+  meetAfter: number | null;
   otherNotes: string[] | null;
+  past_history: string[] | null;
 }
 
 export interface Prescription_Repository_Interface {
@@ -157,7 +158,7 @@ class PrescriptionRepository implements Prescription_Repository_Interface {
         symptoms: input.symptoms,
         diagnosis: input.diagnosis,
         advices: input.advices,
-        followUpDate: input.followUpDate,
+        meetAfter: input.meetAfter,
         otherNotes: input.otherNotes,
       });
 
