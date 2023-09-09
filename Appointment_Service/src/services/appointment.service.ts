@@ -450,41 +450,47 @@ class AppointmentService implements AppointmentServiceInterface {
     appointmentIDs: number[]
   ): Promise<AppointmentOverviewInfo[]> {
     try {
-      const appointments = await Promise.all(
-        appointmentIDs.map(async (appointmentID) => {
-          const appointment = await appointmentRepository.Get_AppointmentInfo(
-            appointmentID
-          );
-          if (!appointment) throw createHttpError(404, "Appointment not found");
 
-          return appointment;
-        })
-      );
+      let appointmentOverviewInfos : AppointmentOverviewInfo[] = [];
 
-      const appointmentOverviewInfos = appointments.map((appointment) => {
-        return {
-          id: appointment.id,
-          type: appointment.type,
-          status: appointment.status,
 
-          doctorInfo: {
-            id: appointment.doctorID,
-            name: appointment.doctorName,
-            email: appointment.doctorEmail,
-          },
-
-          patientInfo: {
-            id: appointment.patientID,
-            name: appointment.patientName,
-            email: appointment.patientEmail,
-          },
-
-          startTime: appointment.startTime,
-          endTime: appointment.endTime,
-
-          meetingLink: appointment.meetingLink,
-        };
-      });
+      if(appointmentIDs && appointmentIDs.length > 0 ){
+        const appointments = await Promise.all(
+          appointmentIDs.map(async (appointmentID) => {
+            const appointment = await appointmentRepository.Get_AppointmentInfo(
+              appointmentID
+            );
+            if (!appointment) throw createHttpError(404, "Appointment not found");
+  
+            return appointment;
+          })
+        );
+  
+        appointmentOverviewInfos = appointments.map((appointment) => {
+          return {
+            id: appointment.id,
+            type: appointment.type,
+            status: appointment.status,
+  
+            doctorInfo: {
+              id: appointment.doctorID,
+              name: appointment.doctorName,
+              email: appointment.doctorEmail,
+            },
+  
+            patientInfo: {
+              id: appointment.patientID,
+              name: appointment.patientName,
+              email: appointment.patientEmail,
+            },
+  
+            startTime: appointment.startTime,
+            endTime: appointment.endTime,
+  
+            meetingLink: appointment.meetingLink,
+          };
+        });
+      }
 
       return appointmentOverviewInfos;
     } catch (error) {
@@ -556,25 +562,22 @@ class AppointmentService implements AppointmentServiceInterface {
       let olderAppointments: OlderAppointmentOverviewInfo[] = [];
       let otherAppointments: OlderAppointmentOverviewInfo[] = [];
 
-      if (appointment.olderAppointmentIDs)
-        olderAppointments = (
-          await this.Get_Other_Appointments(appointment.olderAppointmentIDs)
-        ).map((appointment) => {
-          return excludeProperties(
-            appointment,
-            OlderAppointmentOverviewInfo_Excluded_Properties
-          );
-        });
+      
 
-      if (appointment.otherAppointmentIDs)
-        otherAppointments = (
-          await this.Get_Other_Appointments(appointment.otherAppointmentIDs)
-        ).map((appointment) => {
-          return excludeProperties(
-            appointment,
-            OlderAppointmentOverviewInfo_Excluded_Properties
-          );
-        });
+      if (appointment.olderAppointmentIDs && appointment.olderAppointmentIDs.length > 0){
+       const olderAppointmentOverviews = await this.Get_Other_Appointments(appointment.olderAppointmentIDs);
+
+       if(olderAppointmentOverviews && olderAppointmentOverviews.length > 0)
+        olderAppointments = olderAppointmentOverviews.map((appointment)=> excludeProperties(appointment, OlderAppointmentOverviewInfo_Excluded_Properties))
+      }
+        
+
+      if (appointment.otherAppointmentIDs && appointment.otherAppointmentIDs.length > 0){
+        const olderAppointmentOverviews = await this.Get_Other_Appointments(appointment.otherAppointmentIDs);
+ 
+        if(olderAppointmentOverviews && olderAppointmentOverviews.length > 0)
+          otherAppointments = olderAppointmentOverviews.map((appointment)=> excludeProperties(appointment, OlderAppointmentOverviewInfo_Excluded_Properties))
+       };
 
       const finalAppointmentOverviewInfo: FinalAppointmentOverviewInfo = {
         id: appointment.id,
