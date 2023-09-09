@@ -157,7 +157,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
 
     for (const brandID of brandIDs) {
       const brandInfo = await this.getSingleMedicineInfo(brandID);
-      brandInfos.push(brandInfo);
+      brandInfos.push({ ...brandInfo, dosage: "", when: "", duration: 0 });
     }
 
     return brandInfos;
@@ -337,7 +337,13 @@ class PrescriptionService implements PrescriptionServiceInterface {
         (prescription_medicine) => prescription_medicine.medicineID
       );
 
-      const brandInfos = await this.getAllMedicineInfos(medicineIDs);
+      let brandInfos = await this.getAllMedicineInfos(medicineIDs);
+
+      for (let i = 0; i < brandInfos.length; i++) {
+        brandInfos[i].dosage = prescription_medicines[i].dosage;
+        brandInfos[i].when = prescription_medicines[i].when;
+        brandInfos[i].duration = prescription_medicines[i].duration;
+      }
 
       return {
         Header: prescriptionHeader,

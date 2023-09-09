@@ -47,7 +47,9 @@ class Prescription_Schema implements Prescription_Schema_Interface {
       symptoms: string().array().min(1, "symptoms must have atleast 1 item"),
       diagnosis: string().array().min(1, "diagnosis must have atleast 1 item"),
       advices: string().array().min(1, "advices must have atleast 1 item"),
-      meetAfter: number().optional(),
+      meetAfter: union([string(), number()])
+        .transform((val) => Number(val))
+        .optional(),
       otherNotes: string().array().optional(),
       past_history: string().array().optional(),
 
@@ -66,12 +68,17 @@ class Prescription_Schema implements Prescription_Schema_Interface {
           required_error: "when is required",
         }),
 
-        duration: number({
-          required_error: "duration is required",
-        })
-          .positive()
+        duration: union([
+          string({
+            required_error: "duration is required",
+          }),
+          number({
+            required_error: "duration is required",
+          }),
+        ])
+          .transform((val) => Number(val))
           .refine((val) => {
-            return Number.isInteger(val);
+            return Number.isInteger(val) && Number(val) > 0;
           }, "duration must be an positive integer"),
       })
         .array()

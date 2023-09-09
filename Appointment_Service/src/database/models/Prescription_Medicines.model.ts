@@ -21,6 +21,10 @@ export interface BrandInfo {
   DosageForm: DosageFormAttributes;
   Generic: GenericAttributes;
   Manufacturer: ManufacturerAttributes;
+
+  dosage: string;
+  when: string;
+  duration: number;
 }
 
 export interface DosageFormAttributes {

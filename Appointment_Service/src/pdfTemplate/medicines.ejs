@@ -1,0 +1,41 @@
+<div class="medicines">
+  <div class="med-list">
+    <% if(Medicines.length > 0) { %> <% Medicines.forEach((brandInfo) => { %>
+    <div class="med-entry">
+      <div class="medBefAft">Before</div>
+      <div class="medDuration">7 days</div>
+      <div class="medName">
+        <img
+          class="medImage"
+          src="https://medex.com.bd/img/dosage-forms/capsule.png"
+        />
+        <%= brandInfo.Brand.name %> <%= brandInfo.Brand.strength %>
+      </div>
+      <div class="medWhen">1+0+1</div>
+    </div>
+
+    <% }) } %>
+  </div>
+
+  <div class="prescription-header">
+    <div class="overlap-group">
+      <div class="doctor-info">
+        <div class="doctorName">Dr. Strange</div>
+        <div class="doctor-additional">
+          <div class="contact">Contact: 017XXXXXXXX</div>
+          <div class="bmdc">BMDC : 12345</div>
+          <div class="degree">MBBS, MD - Neurology</div>
+          <div class="department">Neurologist</div>
+        </div>
+      </div>
+      <div class="prescription-info">
+        <div class="prescriptionDate">Date: 07/01/2023</div>
+        <div class="appID">Appointment ID : 4321212</div>
+      </div>
+    </div>
+  </div>
+  <img
+    class="rxImg"
+    src="https://www.freeiconspng.com/thumbs/rx-icon/rx-icon-6.png"
+  />
+</div>
