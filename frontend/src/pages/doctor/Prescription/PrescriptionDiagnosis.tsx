@@ -1,10 +1,17 @@
 import { Input } from "@/components/ui/input";
+import usePrescribedLeftStore from "@/hooks/usePrescribedLeftStore";
 import { FC, useEffect, useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { MdCancel } from "react-icons/md";
 
 const PrescriptionDiagnosis: FC = () => {
-  const [diagnosisList, setDiagnosisList] = useState<string[]>(["abcd", "hi"]);
+  // const [diagnosisList, setDiagnosisList] = useState<string[]>(["abcd", "hi"]);
+  const diagnosisList = usePrescribedLeftStore((state) => state.diagnosis);
+  const addDiagnosis = usePrescribedLeftStore((state) => state.addDiagnosis);
+  const removeDiagnosis = usePrescribedLeftStore(
+    (state) => state.removeDiagnosis
+  );
+
   const [inputString, setInputString] = useState<string>("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -13,27 +20,20 @@ const PrescriptionDiagnosis: FC = () => {
   };
 
   const addString = () => {
-    if (inputString.length > 0)
-      setDiagnosisList((prevState) => {
-        setInputString("");
-        return [...prevState, inputString];
-      });
+    if (inputString.length > 0) setInputString("");
+    addDiagnosis(inputString);
   };
 
   const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && inputString.length > 0) {
-      setDiagnosisList((prevState) => {
-        setInputString("");
-        return [...prevState, inputString];
-      });
+      addDiagnosis(inputString);
+      setInputString("");
     }
   };
 
   const removeString = (str: string) => {
     console.log(str);
-    setDiagnosisList((prevState) => {
-      return prevState.filter((item) => item !== str);
-    });
+    removeDiagnosis(str);
   };
 
   // use this to pass all elements to the parent

@@ -1,3 +1,4 @@
+import { BrandInfo } from "./Brand"
 
 export type PrescribedMedType = {
     name: string,
@@ -8,6 +9,7 @@ export type PrescribedMedType = {
         night : number,
     },
     duration: number,
+    brandInfo: BrandInfo | undefined,
 }
 
 export type PrescribedMedStoreType = {
