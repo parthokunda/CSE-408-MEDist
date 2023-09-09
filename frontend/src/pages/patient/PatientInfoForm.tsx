@@ -102,13 +102,13 @@ const PatientInfoForm: FC<{
   const forms = useForm<z.infer<typeof PatientAdditionalInfoForm>>({
     defaultValues: {
       name: props.patientInfo.name ? props.patientInfo.name : "",
-      gender: props.patientInfo.gendar ? props.patientInfo.gendar : undefined,
-      dateOfBirth: props.patientInfo.dob ? props.patientInfo.dob : undefined,
+      gender: props.patientInfo.gendar ? props.patientInfo.gendar : "other",
+      dateOfBirth: props.patientInfo.dob ? props.patientInfo.dob : "",
       mobileNumber: props.patientInfo.phone
         ? props.patientInfo.phone
-        : undefined,
-      height_feet: props.patientInfo.height.feet,
-      height_inches: props.patientInfo.height.inches,
+        : "",
+      height_feet: props.patientInfo.height.feet ? props.patientInfo.height.feet: undefined,
+      height_inches: props.patientInfo.height.inches ?props.patientInfo.height.inches:undefined,
       weight: props.patientInfo.weight ? props.patientInfo.weight : undefined,
       bloodGroup: props.patientInfo.bloodGroup
         ? props.patientInfo.bloodGroup
