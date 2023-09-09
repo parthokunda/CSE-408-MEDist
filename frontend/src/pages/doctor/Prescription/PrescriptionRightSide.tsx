@@ -4,7 +4,7 @@ import PrescribedMeds from "./PrescribedMeds";
 import PrescriptionMedInsert from "./PrescriptionMedInsert";
 import PrescriptionRightBottom from "./PrescriptionRightBottom";
 
-function PrescriptionRightSide() {
+const PrescriptionRightSide = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="grid grid-flow-row">

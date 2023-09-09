@@ -2,44 +2,80 @@ import { Button } from "@/components/ui/button";
 import usePrescribeBottomStore from "@/hooks/usePrescribedBottomStore";
 import usePrescribedLeftStore from "@/hooks/usePrescribedLeftStore";
 import usePrescribedStore from "@/hooks/usePrescribedStore";
-import { APICreatePrescriptionSchema } from "@/models/Prescriptions";
+import { POSTCreatePrescriptionBody } from "@/models/Prescriptions";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import { FC } from "react";
+import { useCookies } from "react-cookie";
+import { useNavigate, useParams } from "react-router-dom";
+
+const postCreatePrescription = async(input: {data:POSTCreatePrescriptionBody, authToken: string, appID: number}) => {
+  const response = await axios.post(
+    `${import.meta.env.VITE_DB_URL}:${
+      import.meta.env.VITE_DB_PORT
+    }/api/appointment/prescription/create-prescription/${input.appID}`,
+    input.data,
+    {
+      headers: {
+        Authorization: `Bearer ${input.authToken}`, // Replace with your actual token
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+}
 
 const PrescriptionButtons: FC = () => {
+  const {prescriptionId} = useParams();
+  const [cookies] = useCookies(["user"]);
   const leftStore = usePrescribedLeftStore();
   const medStore = usePrescribedStore();
   const bottomStore = usePrescribeBottomStore();
+  const navigate = useNavigate();
+
+  const {mutate} = useMutation({
+    mutationKey: ["createPrescription"],
+    mutationFn: postCreatePrescription,
+  })
+
+  if(!prescriptionId) return <>Invalid Prescription ID</>
 
   const onSavePrescription = () => {
-    const data: APICreatePrescriptionSchema = {
-      medicines: medStore.medList.map((item) => {
-        if(item.brandInfo){
-            return {
-                medicineID: item.brandInfo?.Brand.id,
-                dosage: item.when,
-                duration: item.duration,
-                when:
-                  +item.dosage.morning +
-                  "+" +
-                  +item.dosage.day +
-                  "+" +
-                  +item.dosage.night,
-              };
-        }
-      }),
+    const medicineDataForPost = medStore.medList.map(item => {
+      if(item.brandInfo)
+        return {
+            medicineID: item.brandInfo.Brand.id,
+            dosage: +item.dosage.morning +
+            "+" +
+            +item.dosage.day +
+            "+" +
+            +item.dosage.night as string,
+            duration: item.duration as number,
+            when: item.when as string,
+          };
+    }).filter(item => item !== undefined);
+  
+    const data = {
+      medicines: medicineDataForPost,
       symptoms: leftStore.symptoms,
       diagnosis: leftStore.diagnosis,
       advices: bottomStore.advices,
-      //! followUpDate and PastHistory add later
+      past_history: [leftStore.pastHistory],
+      meetAfter: bottomStore.meetAfter,
     };
     console.log(data);
+    mutate({data: data, authToken: cookies.user.token, appID: +prescriptionId});
   };
+
+
   const onDiscardPrescription = () => {
     leftStore.reset();
     medStore.reset();
     bottomStore.reset();
-    //? navigate back
+    navigate(-1);
   };
+
+
   return (
     <div className="flex w-full mt-4 justify-around">
       <Button className="bg-c1 h-12 w-28" onClick={onSavePrescription}>
