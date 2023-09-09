@@ -13,7 +13,6 @@ import { Controller, useForm } from "react-hook-form";
 import { IconContext } from "react-icons";
 import { TiTick } from "react-icons/ti";
 import SearchMedicine from "./SearchMedicine";
-import { Button } from "@/components/ui/button";
 
 const onMedNameUpdate = (data: PrescribedMedType) => {
   console.log(
@@ -150,7 +149,7 @@ const PrescriptionMedInsert: FC = () => {
         className="flex mt-1 mx-2 justify-center h-8 w-8 "
         onClick={medSearchForm.handleSubmit(onAddMed)}
       >
-        <IconContext.Provider value={{ size: "2em", color: "blue" }}>
+        <IconContext.Provider value={{ size: "2em", color: "green" }}>
           <TiTick />
         </IconContext.Provider>
       </button>
