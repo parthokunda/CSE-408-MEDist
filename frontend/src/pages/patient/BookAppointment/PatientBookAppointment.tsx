@@ -29,7 +29,11 @@ import { useCookies } from "react-cookie";
 
 import { DoctorProfileInfo, SingleDaySchedule } from "@/models/DoctorSchema";
 import { useMutation } from "@tanstack/react-query";
-import { ConfirmAppointmentResponse, RejectAppointmentRespone, RequestAppointmentInfo } from "@/models/Appointment";
+import {
+  ConfirmAppointmentResponse,
+  RejectAppointmentRespone,
+  RequestAppointmentInfo,
+} from "@/models/Appointment";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 
 type inputObject = {
@@ -37,11 +41,10 @@ type inputObject = {
   scheduleId: number;
 };
 
-
 type confirmRejectObject = {
-  authToken: string,
-  appointmentId: number,
-}
+  authToken: string;
+  appointmentId: number;
+};
 
 const getDate = (date: Date | undefined): string => {
   if (date === undefined) return "";
@@ -76,7 +79,10 @@ const onSubmit = async (
   return response.data;
 };
 
-const sendConfirmation = async (authToken: string, appointmentId: number) : Promise<ConfirmAppointmentResponse> => {
+const sendConfirmation = async (
+  authToken: string,
+  appointmentId: number
+): Promise<ConfirmAppointmentResponse> => {
   console.log("confirming app");
   const response = await axios.put(
     `${import.meta.env.VITE_DB_URL}:${
@@ -89,12 +95,17 @@ const sendConfirmation = async (authToken: string, appointmentId: number) : Prom
       },
     }
   );
-  console.log("🚀 ~ file: PatientBookAppointment.tsx:87 ~ sendConfirmation ~ response:", response.data);
+  console.log(
+    "🚀 ~ file: PatientBookAppointment.tsx:87 ~ sendConfirmation ~ response:",
+    response.data
+  );
   return response.data;
-  
 };
 
-const sendRejection = async (authToken: string, appointmentId: number) : Promise<RejectAppointmentRespone> => {
+const sendRejection = async (
+  authToken: string,
+  appointmentId: number
+): Promise<RejectAppointmentRespone> => {
   console.log("rejecting app");
   const response = await axios.delete(
     `${import.meta.env.VITE_DB_URL}:${
@@ -106,9 +117,12 @@ const sendRejection = async (authToken: string, appointmentId: number) : Promise
       },
     }
   );
-  console.log("🚀 ~ file: PatientBookAppointment.tsx:87 ~ sendConfirmation ~ response:", response.data);
+  console.log(
+    "🚀 ~ file: PatientBookAppointment.tsx:87 ~ sendConfirmation ~ response:",
+    response.data
+  );
   return response.data;
-}
+};
 
 export const BookAppointment: FC = () => {
   const { doctorID } = useParams();
@@ -117,10 +131,10 @@ export const BookAppointment: FC = () => {
   const [weekName, setWeekName] = useState<string>("");
   const [requestedAppDialog, setRequestedAppDialog] = useState<boolean>(false);
   const [appConfirmDialog, setAppConfirmDialog] = useState<boolean>(false);
-  const [rejectConfirmDialog, setRejectConfirmDialog] = useState<boolean>(false);
+  const [rejectConfirmDialog, setRejectConfirmDialog] =
+    useState<boolean>(false);
   const [doctordetails, setDoctorDetails] = useState<DoctorProfileInfo>();
   const [scheduleId, setScheduleId] = useState<number>();
-
 
   useEffect(() => {
     async function fetchData() {
@@ -164,21 +178,21 @@ export const BookAppointment: FC = () => {
     mutate: mutateConfirmation,
     isLoading: isLoadingConfirm,
     isError: isErrorConfirm,
-    data: ConfirmAppointmentResponse
+    data: ConfirmAppointmentResponse,
   } = useMutation({
-    mutationFn: (input: confirmRejectObject) => 
-      sendConfirmation(input.authToken, input.appointmentId)
-  })
+    mutationFn: (input: confirmRejectObject) =>
+      sendConfirmation(input.authToken, input.appointmentId),
+  });
 
   const {
     mutate: mutateReject,
     isLoading: isLoadingReject,
     isError: isErrorReject,
-    data: RejectAppointmentResponse
+    data: RejectAppointmentResponse,
   } = useMutation({
     mutationFn: (input: confirmRejectObject) =>
-      sendRejection(input.authToken, input.appointmentId)
-  })
+      sendRejection(input.authToken, input.appointmentId),
+  });
 
   return (
     <>
@@ -255,24 +269,34 @@ export const BookAppointment: FC = () => {
                 </DialogTrigger>
                 <DialogContent className="flex flex-col m:max-w-[425px] bg-c4 items-center justify-center">
                   <DialogHeader className="flex">
-                    <DialogTitle className="text-c1">Confirm Appointment</DialogTitle>
-                    <div className="flex items-center justify-center">{isLoading && <LoadingSpinner />}</div>
+                    <DialogTitle className="text-c1">
+                      Confirm Appointment
+                    </DialogTitle>
+                    <div className="flex items-center justify-center">
+                      {isLoading && <LoadingSpinner />}
+                    </div>
                     <DialogDescription>
                       {isError && <>Error</>}
                       {!isLoading && !isError && (
                         <>
                           {requestAppointmentData?.message}
-                          <br/>
+                          <br />
                           Your appointment Date :{" "}
                           <b className="text-c1">
-                            {requestAppointmentData?.appointment.startTime
-                              .toString()
-                              .substring(0, 10)}
+                            {requestAppointmentData
+                              ? new Date(
+                                  requestAppointmentData.appointment.startTime
+                                ).toLocaleDateString()
+                              : ""}
                           </b>
                           <br />
                           Your appointment Time :{" "}
                           <b className="text-c1">
-                            {requestAppointmentData? (new Date(requestAppointmentData.appointment.startTime)).toLocaleTimeString() : ""}
+                            {requestAppointmentData
+                              ? new Date(
+                                  requestAppointmentData.appointment.startTime
+                                ).toLocaleTimeString()
+                              : ""}
                           </b>
                         </>
                       )}
@@ -287,12 +311,14 @@ export const BookAppointment: FC = () => {
                           disabled={isLoading || isError}
                           onClick={() => {
                             setRequestedAppDialog(false);
-                            if (requestAppointmentData !== undefined)
-                              {mutateConfirmation({
+                            if (requestAppointmentData !== undefined) {
+                              mutateConfirmation({
                                 authToken: cookies.user.token,
-                                appointmentId: requestAppointmentData.appointment.id
+                                appointmentId:
+                                  requestAppointmentData.appointment.id,
                               });
-                              setAppConfirmDialog(true);}
+                              setAppConfirmDialog(true);
+                            }
                           }}
                         >
                           Confirm
@@ -302,10 +328,11 @@ export const BookAppointment: FC = () => {
                           disabled={isLoading}
                           onClick={() => {
                             setRequestedAppDialog(false);
-                            if(requestAppointmentData !== undefined){
+                            if (requestAppointmentData !== undefined) {
                               mutateReject({
                                 authToken: cookies.user.token,
-                                appointmentId: requestAppointmentData.appointment.id,
+                                appointmentId:
+                                  requestAppointmentData.appointment.id,
                               });
                               setRejectConfirmDialog(true);
                             }
@@ -329,8 +356,13 @@ export const BookAppointment: FC = () => {
                       {!isLoadingConfirm && !isErrorConfirm && (
                         <>
                           {ConfirmAppointmentResponse?.message}
-                          <br/>
-                          <a href={ConfirmAppointmentResponse?.appointment.meetingLink?.toString()} className="text-c1 mt-6 font-bold">Meeting Link</a>
+                          <br />
+                          <a
+                            href={ConfirmAppointmentResponse?.appointment.meetingLink?.toString()}
+                            className="text-c1 mt-6 font-bold"
+                          >
+                            Meeting Link
+                          </a>
                         </>
                       )}
                     </DialogDescription>
@@ -338,15 +370,15 @@ export const BookAppointment: FC = () => {
 
                   <DialogFooter className="">
                     <DialogClose asChild>
-                        <Button
-                          className="bg-c2 hover:bg-c1 "
-                          disabled={isLoading}
-                          onClick={() => {
-                              setAppConfirmDialog(false);
-                          }}
-                        >
-                          OK
-                        </Button>
+                      <Button
+                        className="bg-c2 hover:bg-c1 "
+                        disabled={isLoading}
+                        onClick={() => {
+                          setAppConfirmDialog(false);
+                        }}
+                      >
+                        OK
+                      </Button>
                     </DialogClose>
                   </DialogFooter>
                 </DialogContent>
@@ -360,24 +392,22 @@ export const BookAppointment: FC = () => {
                     <DialogDescription>
                       {isErrorReject && <>Error</>}
                       {!isLoadingReject && !isErrorReject && (
-                        <>
-                          {RejectAppointmentResponse?.message}
-                        </>
+                        <>{RejectAppointmentResponse?.message}</>
                       )}
                     </DialogDescription>
                   </DialogHeader>
 
                   <DialogFooter className="">
                     <DialogClose asChild>
-                        <Button
-                          className="bg-c2 hover:bg-c1 "
-                          disabled={isLoading}
-                          onClick={() => {
-                              setRejectConfirmDialog(false);
-                          }}
-                        >
-                          OK
-                        </Button>
+                      <Button
+                        className="bg-c2 hover:bg-c1 "
+                        disabled={isLoading}
+                        onClick={() => {
+                          setRejectConfirmDialog(false);
+                        }}
+                      >
+                        OK
+                      </Button>
                     </DialogClose>
                   </DialogFooter>
                 </DialogContent>
