@@ -1,11 +1,11 @@
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/lib/useDebounce";
-import { BrandInfo, SearchBrandOutput } from "@/models/Brand";
+import { BrandInfo } from "@/models/Brand";
 import { PrescribedMedType } from "@/models/Prescriptions";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import { Controller, UseFormReturn } from "react-hook-form";
 
 const fetchMedList = async (searchTerm: string): Promise<BrandInfo[]> => {
@@ -22,7 +22,8 @@ const fetchMedList = async (searchTerm: string): Promise<BrandInfo[]> => {
 };
 
 const SearchMedicine: FC<{
-  form: UseFormReturn<PrescribedMedType, any, undefined>;
+  form: UseFormReturn<PrescribedMedType, any, undefined>,
+  setIsShowInput: React.Dispatch<React.SetStateAction<boolean>>
 }> = (props) => {
   const medSearchName = props.form.watch("name", "");
   const debouncedSearchTerm = useDebounce<string>(medSearchName, 300);
@@ -46,10 +47,10 @@ const SearchMedicine: FC<{
       />
       <ScrollArea className="h-max-72 rounded-md py-1">
         {fetchedMeds &&
-          fetchedMeds.map((med) => (
-            <div
+          fetchedMeds.map((med,index) => (
+            <div key={index}
               className="my-2 pl-2 bg-c4 rounded-md flex h-8 items-center "
-              onClick={() => props.form.setValue("name", med.Brand.name)}
+              onClick={() => {props.form.setValue("name", med.Brand.name); props.form.setValue("brandInfo", med); props.setIsShowInput(false);}}
             >
               <img
                 src={med.DosageForm.img_url}

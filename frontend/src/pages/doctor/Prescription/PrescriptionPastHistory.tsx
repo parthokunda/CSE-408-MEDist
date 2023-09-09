@@ -1,11 +1,13 @@
-import { Input } from "@/components/ui/input";
-import { FC, useEffect, useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import usePrescribedLeftStore from "@/hooks/usePrescribedLeftStore";
+import { ChangeEvent, ChangeEventHandler, FC, useEffect, useState } from "react";
 
 const PrescriptionPastHistory: FC = () => {
-  const [pastHistory, setPastHistory] = useState<string>("");
+  // const [pastHistory, setPastHistory] = useState<string>("");
+  const pastHistory = usePrescribedLeftStore((state) => state.pastHistory);
+  const setPastHistory = usePrescribedLeftStore((state) => state.changeHistory);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setPastHistory(e.target.value);
   };
 
@@ -22,10 +24,10 @@ const PrescriptionPastHistory: FC = () => {
         </div>
 
         <div className="flex gap-2 mx-4 my-1 items-center">
-          <Input
-            className="rounded-lg"
+          <Textarea
+            className="rounded-lg h-36"
             onChange={handleChange}
-            value={pastHistory} 
+            value={pastHistory}
           />
         </div>
       </div>
