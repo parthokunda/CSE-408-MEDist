@@ -30,7 +30,9 @@ const AppointmentPage: FC = () => {
           import.meta.env.VITE_DB_PORT
         }/api/doctor/search/${currentPage}?name=${
           searchTerm.name
-        }&specializationID=${searchTerm.department}&pagination=${recordsPerPage}`,
+        }&specializationID=${
+          searchTerm.department
+        }&pagination=${recordsPerPage}`,
         {
           headers: {
             Authorization: `Bearer ${userToken}`, // Replace with your actual token
@@ -38,38 +40,54 @@ const AppointmentPage: FC = () => {
         }
       );
       setDoctorList(response.data);
-      console.log("🚀 ~ file: AppointmentPage.tsx:39 ~ useEffect ~ response.data:", response.data)
+      console.log(
+        "🚀 ~ file: AppointmentPage.tsx:39 ~ useEffect ~ response.data:",
+        response.data
+      );
       setIsLoading(false);
       return response.data;
     };
 
     // console.log(isLoading);
     fetchDoctorsList(doctorSearchTerm, currentPage, cookies.user.token);
-  }, [doctorSearchTerm,currentPage]);
+  }, [doctorSearchTerm, currentPage]);
 
   return (
     <Tabs defaultValue="searchDoctor">
       <TabsList className="flex justify-center bg- text-c1  border-gray-200 dark:text-gray-400 gap-6 mt-5 ">
-        <TabsTrigger value="searchDoctor">Search Doctor</TabsTrigger>
+        <TabsTrigger
+          className="text-c1 text-lg data-[state=active]:text-c1 data-[state=inactive]:text-[#B6C698]"
+          value="searchDoctor"
+        >
+          Search Doctor
+        </TabsTrigger>
         <TabsTrigger value="pendingAppointments">
           Pending Appointments
         </TabsTrigger>
       </TabsList>
       <TabsContent value="searchDoctor">
-        <><SearchDoctor onUpdate={setDoctorSearchTerm} /></>
-        <>{isLoading && <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"><LoadingSpinner /></div>}
-        {/* //! slight css bug, both specialization and doctorSearchCards loading, misplaces LoadingSpinner above */}
-        {!isLoading && doctorList && (
-          <DoctorSearchCards
-            doctorFetchedData={doctorList}
-            currentPage={currentPage}
-            recordsPerPage={recordsPerPage}
-            setCurrentPage={setCurrentPage}
-          />
-        )}</>
+        <>
+          <SearchDoctor onUpdate={setDoctorSearchTerm} />
+        </>
+        <>
+          {isLoading && (
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <LoadingSpinner />
+            </div>
+          )}
+          {/* //! slight css bug, both specialization and doctorSearchCards loading, misplaces LoadingSpinner above */}
+          {!isLoading && doctorList && (
+            <DoctorSearchCards
+              doctorFetchedData={doctorList}
+              currentPage={currentPage}
+              recordsPerPage={recordsPerPage}
+              setCurrentPage={setCurrentPage}
+            />
+          )}
+        </>
       </TabsContent>
       <TabsContent value="pendingAppointments">
-        <PatientPendingAppointments/>
+        <PatientPendingAppointments />
       </TabsContent>
     </Tabs>
   );

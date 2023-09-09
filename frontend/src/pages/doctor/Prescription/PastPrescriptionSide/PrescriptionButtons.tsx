@@ -9,8 +9,12 @@ import { FC } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate, useParams } from "react-router-dom";
 
-const postCreatePrescription = async(input: {data:POSTCreatePrescriptionBody, authToken: string, appID: number}) => {
-  const response = await axios.post(
+const postCreatePrescription = async (input: {
+  data: POSTCreatePrescriptionBody;
+  authToken: string;
+  appID: number;
+}): Promise<boolean> => {
+  await axios.post(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
     }/api/appointment/prescription/create-prescription/${input.appID}`,
@@ -22,39 +26,41 @@ const postCreatePrescription = async(input: {data:POSTCreatePrescriptionBody, au
       },
     }
   );
-  return response.data;
-}
+  return true;
+};
 
 const PrescriptionButtons: FC = () => {
-  const {prescriptionId} = useParams();
+  const { prescriptionId } = useParams();
   const [cookies] = useCookies(["user"]);
   const leftStore = usePrescribedLeftStore();
   const medStore = usePrescribedStore();
   const bottomStore = usePrescribeBottomStore();
   const navigate = useNavigate();
 
-  const {mutate} = useMutation({
+  const { mutate } = useMutation({
     mutationKey: ["createPrescription"],
     mutationFn: postCreatePrescription,
-  })
+  });
 
-  if(!prescriptionId) return <>Invalid Prescription ID</>
+  if (!prescriptionId) return <>Invalid Prescription ID</>;
 
   const onSavePrescription = () => {
-    const medicineDataForPost = medStore.medList.map(item => {
-      if(item.brandInfo)
-        return {
+    const medicineDataForPost = medStore.medList
+      .map((item) => {
+        if (item.brandInfo)
+          return {
             medicineID: item.brandInfo.Brand.id,
-            dosage: +item.dosage.morning +
-            "+" +
-            +item.dosage.day +
-            "+" +
-            +item.dosage.night as string,
+            dosage: (+item.dosage.morning +
+              "+" +
+              +item.dosage.day +
+              "+" +
+              +item.dosage.night) as string,
             duration: item.duration as number,
             when: item.when as string,
           };
-    }).filter(item => item !== undefined);
-  
+      })
+      .filter((item) => item !== undefined);
+
     const data = {
       medicines: medicineDataForPost,
       symptoms: leftStore.symptoms,
@@ -64,9 +70,12 @@ const PrescriptionButtons: FC = () => {
       meetAfter: bottomStore.meetAfter,
     };
     console.log(data);
-    mutate({data: data, authToken: cookies.user.token, appID: +prescriptionId});
+    mutate({
+      data: data,
+      authToken: cookies.user.token,
+      appID: +prescriptionId,
+    });
   };
-
 
   const onDiscardPrescription = () => {
     leftStore.reset();
@@ -74,7 +83,6 @@ const PrescriptionButtons: FC = () => {
     bottomStore.reset();
     navigate(-1);
   };
-
 
   return (
     <div className="flex w-full mt-4 justify-around">

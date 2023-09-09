@@ -1,20 +1,26 @@
 import { FC } from "react";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 
-import { GetPendingAppointmentsResponse } from "@/models/Appointment";
+import { GetPendingAppointments } from "@/models/Appointment";
 import DoctorPendingCard from "./DoctorPendingCard";
 
 const DoctorPendingCards: FC<{
-  patientFetchedData: GetPendingAppointmentsResponse;
+  patientFetchedData: GetPendingAppointments;
   currentPage: number;
   setCurrentPage: (page: number) => void;
 }> = (props) => {
+  console.log(props.patientFetchedData, "here");
   const { currentPage, setCurrentPage } = props;
   const recordsPerPage = 3;
   const lastIndex = props.currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
-  const records = props.patientFetchedData.pendingAppointments.appointments.slice(firstIndex, lastIndex);
-  const nPages = Math.ceil(props.patientFetchedData.pendingAppointments.totalCount / recordsPerPage);
+  const records = props.patientFetchedData.appointments.slice(
+    firstIndex,
+    lastIndex
+  );
+  const nPages = Math.ceil(
+    props.patientFetchedData.totalCount / recordsPerPage
+  );
   const array = [
     currentPage - 2,
     currentPage - 1,
@@ -23,7 +29,7 @@ const DoctorPendingCards: FC<{
     currentPage + 2,
   ];
   const pages = array.filter((page) => page > 0 && page <= nPages);
-  if (props.patientFetchedData && props.patientFetchedData.pendingAppointments.totalCount === 0) {
+  if (props.patientFetchedData && props.patientFetchedData.totalCount === 0) {
     return (
       <div className="flex justify-center align-middle">No Doctor Found</div>
     );
@@ -45,7 +51,7 @@ const DoctorPendingCards: FC<{
   return (
     <div className="relative h-[55vh]">
       <div className="grid grid-cols-6 gap-4 mt-8 px-4">
-      <div className="flex justify-center">Appointment ID</div>
+        <div className="flex justify-center">Appointment ID</div>
         <div className="flex justify-center">Patient Name</div>
         <div className="flex justify-center">Appointment Date</div>
         <div className="flex justify-center">Appointment Time</div>
