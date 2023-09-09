@@ -1,7 +1,7 @@
 // external imports
 import { object, string, union, TypeOf, number, date, any } from "zod";
 import log from "../utils/logger";
-import { WeekName } from "../database/models";
+import { AppointmentStatus, WeekName } from "../database/models";
 
 export interface Appointment_Schema_Interface {
   // booking online appointment
@@ -58,6 +58,11 @@ class Appointment_Schema implements Appointment_Schema_Interface {
 
     query: object({
       type: string().optional(),
+      status: string()
+        .refine((val) => {
+          return Object.values(AppointmentStatus).includes(val as any);
+        })
+        .optional(),
 
       pagination: union([number(), string()])
         .refine(

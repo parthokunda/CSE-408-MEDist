@@ -57,12 +57,12 @@ appointmentRouter.delete(
   appointmentController.Cancel_Online_Appointment
 );
 
-// search pending appointments - accessible to both patient and doctor
+// search appointments - accessible to both patient and doctor
 appointmentRouter.get(
-  "/view-pending-appointments/:currentPage",
+  "/view-appointments/:currentPage",
   authorize(false, false),
   validateRequest(appointmentSchema.Search_Pending_Appointments),
-  appointmentController.View_Pending_Appointments
+  appointmentController.Search_Appointments
 );
 
 //add other appointment - only accessible to patient

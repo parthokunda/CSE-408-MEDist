@@ -84,7 +84,7 @@ export interface AppointmentServiceInterface {
   ): Promise<void>;
 
   //search appointment
-  Search_Pending_Appointment(
+  Search_Appointments(
     req: Search_Appointment_Input,
     pagination: number,
     currentPage: number,
@@ -450,43 +450,42 @@ class AppointmentService implements AppointmentServiceInterface {
     appointmentIDs: number[]
   ): Promise<AppointmentOverviewInfo[]> {
     try {
+      let appointmentOverviewInfos: AppointmentOverviewInfo[] = [];
 
-      let appointmentOverviewInfos : AppointmentOverviewInfo[] = [];
-
-
-      if(appointmentIDs && appointmentIDs.length > 0 ){
+      if (appointmentIDs && appointmentIDs.length > 0) {
         const appointments = await Promise.all(
           appointmentIDs.map(async (appointmentID) => {
             const appointment = await appointmentRepository.Get_AppointmentInfo(
               appointmentID
             );
-            if (!appointment) throw createHttpError(404, "Appointment not found");
-  
+            if (!appointment)
+              throw createHttpError(404, "Appointment not found");
+
             return appointment;
           })
         );
-  
+
         appointmentOverviewInfos = appointments.map((appointment) => {
           return {
             id: appointment.id,
             type: appointment.type,
             status: appointment.status,
-  
+
             doctorInfo: {
               id: appointment.doctorID,
               name: appointment.doctorName,
               email: appointment.doctorEmail,
             },
-  
+
             patientInfo: {
               id: appointment.patientID,
               name: appointment.patientName,
               email: appointment.patientEmail,
             },
-  
+
             startTime: appointment.startTime,
             endTime: appointment.endTime,
-  
+
             meetingLink: appointment.meetingLink,
           };
         });
@@ -562,22 +561,39 @@ class AppointmentService implements AppointmentServiceInterface {
       let olderAppointments: OlderAppointmentOverviewInfo[] = [];
       let otherAppointments: OlderAppointmentOverviewInfo[] = [];
 
-      
+      if (
+        appointment.olderAppointmentIDs &&
+        appointment.olderAppointmentIDs.length > 0
+      ) {
+        const olderAppointmentOverviews = await this.Get_Other_Appointments(
+          appointment.olderAppointmentIDs
+        );
 
-      if (appointment.olderAppointmentIDs && appointment.olderAppointmentIDs.length > 0){
-       const olderAppointmentOverviews = await this.Get_Other_Appointments(appointment.olderAppointmentIDs);
-
-       if(olderAppointmentOverviews && olderAppointmentOverviews.length > 0)
-        olderAppointments = olderAppointmentOverviews.map((appointment)=> excludeProperties(appointment, OlderAppointmentOverviewInfo_Excluded_Properties))
+        if (olderAppointmentOverviews && olderAppointmentOverviews.length > 0)
+          olderAppointments = olderAppointmentOverviews.map((appointment) =>
+            excludeProperties(
+              appointment,
+              OlderAppointmentOverviewInfo_Excluded_Properties
+            )
+          );
       }
-        
 
-      if (appointment.otherAppointmentIDs && appointment.otherAppointmentIDs.length > 0){
-        const olderAppointmentOverviews = await this.Get_Other_Appointments(appointment.otherAppointmentIDs);
- 
-        if(olderAppointmentOverviews && olderAppointmentOverviews.length > 0)
-          otherAppointments = olderAppointmentOverviews.map((appointment)=> excludeProperties(appointment, OlderAppointmentOverviewInfo_Excluded_Properties))
-       };
+      if (
+        appointment.otherAppointmentIDs &&
+        appointment.otherAppointmentIDs.length > 0
+      ) {
+        const olderAppointmentOverviews = await this.Get_Other_Appointments(
+          appointment.otherAppointmentIDs
+        );
+
+        if (olderAppointmentOverviews && olderAppointmentOverviews.length > 0)
+          otherAppointments = olderAppointmentOverviews.map((appointment) =>
+            excludeProperties(
+              appointment,
+              OlderAppointmentOverviewInfo_Excluded_Properties
+            )
+          );
+      }
 
       const finalAppointmentOverviewInfo: FinalAppointmentOverviewInfo = {
         id: appointment.id,
@@ -712,7 +728,7 @@ class AppointmentService implements AppointmentServiceInterface {
   }
 
   // ----------------- Search Appointment ----------------- //
-  async Search_Pending_Appointment(
+  async Search_Appointments(
     req: Search_Appointment_Input,
     pagination: number,
     currentPage: number,

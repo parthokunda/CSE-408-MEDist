@@ -68,7 +68,7 @@ export interface Appointment_Controller_Interface {
   );
 
   // view pending appointments - access by both patient and doctor
-  View_Pending_Appointments(req: Request, res: Response, next: NextFunction);
+  Search_Appointments(req: Request, res: Response, next: NextFunction);
 
   // view appointment - access by both patient and doctor
   View_Appointment(
@@ -84,7 +84,7 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     this.Confirm_Online_Appointment =
       this.Confirm_Online_Appointment.bind(this);
     this.Cancel_Online_Appointment = this.Cancel_Online_Appointment.bind(this);
-    this.View_Pending_Appointments = this.View_Pending_Appointments.bind(this);
+    this.Search_Appointments = this.Search_Appointments.bind(this);
   }
 
   private setAppointmentDay(weekday: number): Date {
@@ -310,12 +310,8 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     }
   }
 
-  // view pending appointments
-  async View_Pending_Appointments(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  // search appointments
+  async Search_Appointments(req: Request, res: Response, next: NextFunction) {
     log.info(req.user_identity, "user_identity in View_Pending_Appointments");
     log.info(req.query, "query in View_Pending_Appointments");
     log.info(req.params, "params in View_Pending_Appointments");
@@ -328,7 +324,9 @@ class Appointment_Controller implements Appointment_Controller_Interface {
         ? (req.query.type as string)
         : AppointmentType.ONLINE,
 
-      status: AppointmentStatus.PENDING,
+      status: req.query.status
+        ? (req.query.status as string)
+        : AppointmentStatus.PENDING,
 
       filterByStartTime: req.query.fromDate
         ? new Date(req.query.fromDate as string)
@@ -362,17 +360,15 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     );
 
     try {
-      const pendingAppointments =
-        await appointmentService.Search_Pending_Appointment(
-          search_appointment_input,
-          req.query.pagination ? Number(req.query.pagination) : 5,
-          req.params.currentPage ? Number(req.params.currentPage) : 1,
-          role === "patient"
-        );
+      const appointments = await appointmentService.Search_Appointments(
+        search_appointment_input,
+        req.query.pagination ? Number(req.query.pagination) : 5,
+        req.params.currentPage ? Number(req.params.currentPage) : 1,
+        role === "patient"
+      );
 
       res.status(200).json({
-        message: "Pending appointments fetched successfully",
-        pendingAppointments,
+        appointments,
       });
     } catch (error) {
       next(error);
