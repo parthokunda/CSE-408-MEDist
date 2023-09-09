@@ -272,9 +272,7 @@ export const BookAppointment: FC = () => {
                           <br />
                           Your appointment Time :{" "}
                           <b className="text-c1">
-                            {requestAppointmentData?.appointment.startTime
-                              .toString()
-                              .substring(11, 16)}
+                            {requestAppointmentData? (new Date(requestAppointmentData.appointment.startTime)).toLocaleTimeString() : ""}
                           </b>
                         </>
                       )}
