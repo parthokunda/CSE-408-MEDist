@@ -160,6 +160,7 @@ class PrescriptionRepository implements Prescription_Repository_Interface {
         advices: input.advices,
         meetAfter: input.meetAfter,
         otherNotes: input.otherNotes,
+        past_history: input.past_history,
       });
 
       if (!prescription)
