@@ -361,7 +361,8 @@ class AppointmentService implements AppointmentServiceInterface {
 
       // if no free time slot found
       if (
-        freeBookingAppointmentTime.getTime() > slotRequest.day_endTime.getTime()
+        freeBookingAppointmentTime.getTime() >=
+        slotRequest.day_endTime.getTime()
       ) {
         if (
           await appointmentRepository.Is_There_Any_Temporary_Appointment_In_That_Day(

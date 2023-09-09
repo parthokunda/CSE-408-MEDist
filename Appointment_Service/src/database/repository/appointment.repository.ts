@@ -356,8 +356,10 @@ class AppointmentRepository implements Appointment_Repository_Interface {
     timeInterval_of_eachSlot: number
   ): Promise<Date> {
     try {
-      // find a time gap between day_startTime and day_endTime where no appointment is booked that is there is no entry in database
-      // for that time gap
+      const currentTime = new Date();
+
+      // if current time is greater than day_startTime then search for appointments after currentTime
+      if (currentTime > day_startTime) day_startTime = new Date(currentTime);
 
       // find all appointments in that day
       const appointments: AppointmentAttributes[] = await Appointment.findAll({
