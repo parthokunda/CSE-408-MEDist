@@ -9,17 +9,19 @@ type PrescribedBottomStoreType = {
     addAdvice: (advice: string) => void,
     removeAdvice: (advice:string) => void,
     setMeetAfter: (day: number) => void,
+    reset: () => void,
 }
 
 const usePrescribeBottomStore  = create<PrescribedBottomStoreType>(set => ({
     meetAfter: 0,
     tests: [],
-    advices: ["Drink Water"],
+    advices: [],
     addTest: (test) => set(state => ({...state, tests: [...state.tests, test]})),
     removeTest: (test) => set(state => ({...state, tests: state.tests.filter(item => item !== test)})),
     addAdvice: (adivce) => set(state => ({...state, advices: [...state.advices, adivce]})),
     removeAdvice: (advice) => set(state => ({...state, advices: state.advices.filter(item => item !== advice)})),
     setMeetAfter: (day: number) => set(state => ({...state, meetAfter: day})),
+    reset: () => set(() => ({meetAfter: 0, tests: [], advices: []}))
 }))
 
 export default usePrescribeBottomStore;

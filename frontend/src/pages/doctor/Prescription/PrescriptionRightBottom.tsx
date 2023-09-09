@@ -1,8 +1,7 @@
-import usePrescribeBottomStore from "@/hooks/usePrescribedBottomStore";
 import { FC } from "react";
 import PrescriptionAdvices from "./PrescriptionAdvices";
-import PrescriptionTests from "./PrescriptionTests";
 import PrescriptionMeetAfter from "./PrescriptionMeetAfter";
+import PrescriptionTests from "./PrescriptionTests";
 
 const PrescriptionRightBottom : FC = () => {
   return <div className="flex flex-col w-full">

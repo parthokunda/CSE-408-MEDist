@@ -4,7 +4,8 @@ import { create } from 'zustand';
 const usePrescribedStore = create<PrescribedMedStoreType>((set) => ({
     medList : [],
     addMed : (med: PrescribedMedType) => set((state) => ({medList: [...state.medList, med]})),
-    removeMed: (med: PrescribedMedType) => set((state) => ({medList: state.medList.filter(item => med !== item)}))
+    removeMed: (med: PrescribedMedType) => set((state) => ({medList: state.medList.filter(item => med !== item)})),
+    reset: () => set(() => ({medList: []})),
 }))
 
 export default usePrescribedStore;

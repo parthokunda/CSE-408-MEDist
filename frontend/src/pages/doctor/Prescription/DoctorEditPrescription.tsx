@@ -3,9 +3,24 @@ import { useParams } from "react-router-dom";
 import PrescriptionLeftSide from "./PrescriptionLeftSide";
 import PrescriptionPatientInfo from "./PrescriptionPatientInfo";
 import PrescriptionRightSide from "./PrescriptionRightSide";
+import { Button } from "@/components/ui/button";
+import usePrescribedLeftStore from "@/hooks/usePrescribedLeftStore";
+import usePrescribedStore from "@/hooks/usePrescribedStore";
+import usePrescribeBottomStore from "@/hooks/usePrescribedBottomStore";
+import PrescriptionButtons from "./PastPrescriptionSide/PrescriptionButtons";
 
 const DoctorEditPrescription: FC = () => {
   const { prescriptionId } = useParams();
+  const diagnosis = usePrescribedLeftStore(state => state.diagnosis);
+  const symptoms = usePrescribedLeftStore(state => state.symptoms);
+  const pastHistory = usePrescribedLeftStore(state => state.pastHistory);
+  const brands = usePrescribedStore(state => state.medList);
+  const advices = usePrescribeBottomStore(state => state.advices);
+  const tests = usePrescribeBottomStore(state => state.tests);
+  const meetAfter = usePrescribeBottomStore(state => state.meetAfter);
+  const onSavePrescription = () => {
+    console.log({brands, diagnosis, symptoms})
+  }
   
   return (
     <div className="grid grid-cols-4 h-screen">
@@ -20,7 +35,9 @@ const DoctorEditPrescription: FC = () => {
             </div>
         </div>
       </div>
-      <div className="col-span-1 bg-gray-300 h-full border border-black">Past Prescriptions</div>
+      <div className="col-span-1 bg-[#F4F1E7] h-full border border-black">
+        <PrescriptionButtons/>
+      </div>
     </div>
   );
 };
