@@ -145,7 +145,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
           "Error getting patient information from RPC"
         );
 
-      return { ...patient_response_payload.data } as PatientPortion;
+        return { ...patient_response_payload.data["resultData"] } as PatientPortion;
     } catch (error) {
       log.error(error);
       throw createHttpError(500, "Error getting patient information from RPC");
