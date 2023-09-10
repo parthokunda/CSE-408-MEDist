@@ -107,7 +107,7 @@ class PrescriptionController implements PrescriptionControllerInterface {
       meetAfter: req.body.meetAfter ? Number(req.body.meetAfter) : null,
       past_history: req.body.past_history || null,
       otherNotes: req.body.otherNotes || null,
-      test : req.body.test || null,
+      test: req.body.test || null,
     };
 
     log.info(createPrescriptionInput, "prescription creation input");
@@ -149,33 +149,12 @@ class PrescriptionController implements PrescriptionControllerInterface {
   ) {
     const appointmentID = Number(req.params.appointmentID);
     try {
-      const prescription: PrescriptionOutput =
-        await prescriptionService.getPrescription(appointmentID);
+      const downloadLink =
+        await prescriptionService.getPrescriptionPDFDownloadLink(appointmentID);
 
-      log.info(prescription, "prescription");
-
-      const filePath = path.resolve(__dirname, "../pdfTemplate/template.ejs");
-
-      const htmlString = fs.readFileSync(filePath).toString();
-
-      const ejsData = await ejs.render(htmlString, { ...prescription });
-
-      const options = {
-        format: "Letter",
-        ImageType: "png",
-        printBackground: true,
-        path: path.resolve(__dirname, `../pdfs/${appointmentID}.pdf`),
-        preferCSSPageSize: false,
-      };
-
-      await htmlPdf.create(ejsData, options);
-
-      var data = fs.readFileSync(
-        path.resolve(__dirname, `../pdfs/${appointmentID}.pdf`)
-      );
-      res.contentType("application/pdf");
-
-      res.send(data);
+      if (!downloadLink)
+        throw createHttpError(500, "Error getting prescription download link");
+      res.status(200).json({ downloadLink });
     } catch (error) {
       log.error(error);
       next(createHttpError(500, "Error getting prescription"));

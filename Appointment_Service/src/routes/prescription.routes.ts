@@ -46,6 +46,7 @@ prescriptionRouter.get(
 //print prescription - only accessible to patient
 prescriptionRouter.get(
   "/print-prescription/:appointmentID",
+  authorize(false, false),
   validateRequest(prescriptionSchema.Generate_Prescription_Header),
   prescriptionController.printPrescription
 );

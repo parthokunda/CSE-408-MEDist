@@ -10,6 +10,7 @@ export const config = {
   },
   MSG_QUEUE_URL: process.env.MSG_QUEUE_URL as string,
   ENVIRONMENT: process.env.NODE_ENV,
+  FIREBASE_CONFIG: JSON.parse(process.env.FIREBASE as string),
 
   SELF_RPC_QUEUE: "APPOINTMENT_RPC",
 
