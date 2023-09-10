@@ -6,6 +6,7 @@ Web-Scrapping/pnpm-lock.yaml
 proxy/node_modules
 proxy/dist
 proxy/pnpm-lock.yaml
+proxy/.env
 
 # Medicine_Service
 Medicine_Service/node_modules
