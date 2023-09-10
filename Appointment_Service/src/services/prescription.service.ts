@@ -469,6 +469,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
         brandInfos[i].duration = Number(prescription_medicines[i].duration);
       }
 
+
       if(!prescription.downloadLink){
         const downloadURL = await this.uploadPrescriptionPdf_and_getDownLoadlink(
           prescription.appointmentID
@@ -481,6 +482,12 @@ class PrescriptionService implements PrescriptionServiceInterface {
           prescription.id,
           downloadURL
         );
+        return {
+          Header: prescriptionHeader,
+          Medicines: brandInfos,
+          ...prescription.dataValues,
+          downloadLink: downloadURL,
+        };
       }
 
       return {
