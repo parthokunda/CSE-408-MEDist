@@ -606,6 +606,8 @@ class AppointmentRepository implements Appointment_Repository_Interface {
         (newAppointment) => newAppointment.id
       );
 
+      log.info(olderAppointmentIDs, "older appoinmentIDs");
+
       return olderAppointmentIDs;
     } catch (error) {
       log.error(error);
