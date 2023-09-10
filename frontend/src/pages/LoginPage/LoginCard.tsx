@@ -73,7 +73,6 @@ const LoginCard: FC = () => {
       navigate("/patient/");
     },
     onError: (error) => {
-      console.log("error detected", error);
       toast({
         title: "Error",
         description: error.response.data.message,

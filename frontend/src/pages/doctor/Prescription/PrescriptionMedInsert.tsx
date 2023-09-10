@@ -1,3 +1,8 @@
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -13,6 +18,7 @@ import { Controller, useForm } from "react-hook-form";
 import { IconContext } from "react-icons";
 import { TiTick } from "react-icons/ti";
 import SearchMedicine from "./SearchMedicine";
+import { useNavigate } from "react-router-dom";
 
 const onMedNameUpdate = (data: PrescribedMedType) => {
   console.log(
@@ -24,6 +30,7 @@ const onMedNameUpdate = (data: PrescribedMedType) => {
 const PrescriptionMedInsert: FC = () => {
   const [isShowInput, setIsShowInput] = useState<boolean>(true);
   const addToPresctionStore = usePrescribedStore((state) => state.addMed);
+  const navigate = useNavigate();
 
   const medSearchForm = useForm<PrescribedMedType>({
     defaultValues: {
@@ -40,7 +47,7 @@ const PrescriptionMedInsert: FC = () => {
   });
 
   const onAddMed = (data: PrescribedMedType) => {
-    if(data.brandInfo === undefined) {
+    if (data.brandInfo === undefined) {
       return;
     }
     addToPresctionStore(data);
@@ -71,28 +78,51 @@ const PrescriptionMedInsert: FC = () => {
     >
       <div className="pl-.5 col-span-5">
         {isShowInput && (
-          <SearchMedicine form={medSearchForm} setIsShowInput={setIsShowInput}/>
+          <SearchMedicine
+            form={medSearchForm}
+            setIsShowInput={setIsShowInput}
+          />
         )}
         {isShowInput || (
-          <p
-            className="flex items-center text-c1 font-bold mt-2"
-            onClick={() => {
-              medSearchForm.setValue("brandInfo", undefined);
-              setIsShowInput(true);
-            }}
-          >
-            <img
-              src={medSearchForm.getValues("brandInfo")?.DosageForm.img_url}
-              className="ml-1 h-4 w-4"
-              placeholder="img_404"
-            />
-            <p className="pl-3">
-              {medSearchForm.getValues("brandInfo")?.Brand.name}
-            </p>
-            <p className="pl-6">
-              {medSearchForm.getValues("brandInfo")?.Brand.strength}
-            </p>
-          </p>
+          <HoverCard>
+            <HoverCardTrigger
+              className="flex items-center text-c1 font-bold mt-2"
+              onClick={() => {
+                medSearchForm.setValue("brandInfo", undefined);
+                setIsShowInput(true);
+              }}
+            >
+              <img
+                src={medSearchForm.getValues("brandInfo")?.DosageForm.img_url}
+                className="ml-1 h-4 w-4"
+                placeholder="img_404"
+              />
+              <p className="pl-3">
+                {medSearchForm.getValues("brandInfo")?.Brand.name}
+              </p>
+              <p className="pl-6">
+                {medSearchForm.getValues("brandInfo")?.Brand.strength}
+              </p>
+            </HoverCardTrigger>
+            <HoverCardContent>
+              <div className="flex flex-col">
+                <div
+                  onClick={() => navigate(`/generic/${medSearchForm.getValues("brandInfo")?.Generic.id}`)}
+                >
+                  <p className="text-c1 font-bold">Generics:</p>{" "}
+                  {medSearchForm.getValues("brandInfo")?.Generic.name}
+                </div>
+                <div
+                  onClick={() =>
+                    navigate(`/manufacturer/${medSearchForm.getValues("brandInfo")?.Manufacturer.id}`)
+                  }
+                >
+                  <p className="text-c1 font-bold">Manufacturer: </p>{" "}
+                  {medSearchForm.getValues("brandInfo")?.Manufacturer.name}
+                </div>
+              </div>
+            </HoverCardContent>
+          </HoverCard>
         )}
       </div>
       <div className="col-span-3 grid grid-cols-3 gap-0.5">
