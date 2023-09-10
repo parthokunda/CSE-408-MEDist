@@ -14,9 +14,9 @@ import dbInit from "./database/init";
 dbInit();
 
 //message broker
-/* import messageBroker from "./utils/broker";
+import messageBroker from "./utils/broker";
 import { appointmentService } from "./services";
-messageBroker.RPC_Observer(appointmentService); */
+messageBroker.RPC_Observer(appointmentService); 
 
 const app = express();
 
