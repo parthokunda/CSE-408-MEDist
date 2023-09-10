@@ -167,7 +167,7 @@ class BrokerService implements BrokerServiceInterface {
       const timeout = setTimeout(() => {
         channel.close();
         reject(new Error("API could not fulfill the request"));
-      }, 8000);
+      }, 16000);
 
       // consume the response
       channel.consume(
