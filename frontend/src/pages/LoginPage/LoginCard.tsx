@@ -1,5 +1,8 @@
-import { FC } from "react";
+import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -7,18 +10,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { ToastAction } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/components/ui/use-toast";
 import { LoginCardForm, LoginCardFormType } from "@/models/FormSchema";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { useMutation } from "@tanstack/react-query";
-import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
-import { useNavigate } from "react-router-dom";
-import { useCookies } from "react-cookie";
 import { LoginSignupToken } from "@/models/LoginSignUpSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { FC } from "react";
+import { useCookies } from "react-cookie";
+import { Controller, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 const postLogin = async (
   data: LoginCardFormType
@@ -34,6 +37,7 @@ const postLogin = async (
 
 const LoginCard: FC = () => {
   const navigate = useNavigate();
+  const {toast} = useToast();
   const [cookies, setCookie] = useCookies(["user"]);
 
   const loginForms = useForm<LoginCardFormType>({
@@ -49,7 +53,7 @@ const LoginCard: FC = () => {
     mutate(formData);
   };
 
-  const { isLoading, mutate } = useMutation({
+  const { isLoading, mutate, error, isError } = useMutation({
     mutationKey: ["postLogin"],
     mutationFn: postLogin,
     onSuccess: (data) => {
@@ -68,12 +72,16 @@ const LoginCard: FC = () => {
       console.log(cookies.user);
       navigate("/patient/");
     },
-    onError: () => {
-      console.log("error detected");
-      setTimeout(() => {
-        navigate("/");
-      }, 1500);
-      return <p>Error Loading Page. Reloading...</p>;
+    onError: (error) => {
+      console.log("error detected", error);
+      toast({
+        title: "Error",
+        description: error.response.data.message,
+        action: (
+          <ToastAction altText="Refresh" onClick={() => {navigate(0);}}>Reload</ToastAction>
+        ),
+      })
+      // navigate(0);
     },
   });
 
@@ -149,6 +157,7 @@ const LoginCard: FC = () => {
           </form>
         </CardContent>
       </Card>
+      <Toaster/>
     </>
   );
 };
