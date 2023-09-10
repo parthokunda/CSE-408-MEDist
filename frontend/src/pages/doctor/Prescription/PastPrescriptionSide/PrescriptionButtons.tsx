@@ -14,6 +14,7 @@ const postCreatePrescription = async (input: {
   authToken: string;
   appID: number;
 }): Promise<boolean> => {
+  console.log("saving prescripiton", input.data);
   await axios.post(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
@@ -68,6 +69,7 @@ const PrescriptionButtons: FC = () => {
       advices: bottomStore.advices,
       past_history: [leftStore.pastHistory],
       meetAfter: bottomStore.meetAfter,
+      test : bottomStore.tests,
     };
     console.log(data);
     mutate({

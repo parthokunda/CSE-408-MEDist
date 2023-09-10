@@ -11,6 +11,7 @@ type PrescribeLeftStoreType = {
     removeSymptom: (symptom: string) => void,
     changeHistory: (history: string) => void,
     reset: () => void,
+    setAllInfo: (_diagnosisList: string[], _symptomsList:string[], _pastHistory:string) => void,
 }
 
 const usePrescribedLeftStore = create<PrescribeLeftStoreType>(set => (
@@ -24,6 +25,7 @@ const usePrescribedLeftStore = create<PrescribeLeftStoreType>(set => (
         addSymptom : (symptom: string) => set(state => ({...state, symptoms: [...state.symptoms, symptom]})),
         removeSymptom : (symptom: string) => set(state => ({...state, symptoms: state.symptoms.filter(item => item !== symptom)})),
         reset : () => set({diagnosis: [], symptoms: [], pastHistory: ''}),
+        setAllInfo: (_diag, _symp, _past) => set(state => ({...state, diagnosis: _diag, symptoms: _symp, pastHistory: _past})),
     }
 ));
 

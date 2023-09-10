@@ -1,5 +1,9 @@
 import { FC } from "react";
 import PrescriptionPatientInfo from "../PrescriptionPatientInfo";
+import OldPrescriptionLeftSide from "./OldPrescriptionLeftSide";
+import OldPrescriptionRightSide from "./OldPrescriptionRightSide";
+import PastPrescriptions from "../PastPrescriptionSide/PastPrescription";
+import PreviousPrescriptions from "../PreviousPrescriptions";
 
 
 
@@ -13,15 +17,15 @@ const OldPrescriptionView: FC = () => {
         </div>
         <div className="row-span-5 grid grid-cols-6 h-screen">
           <div className="col-span-2 bg-[#EFDAEA] h-full">
-            <PrescriptionLeftSide />
+            <OldPrescriptionLeftSide />
           </div>
           <div className="col-span-4 bg-[#FFFFFF] h-full p-4">
-            <PrescriptionRightSide />
+            <OldPrescriptionRightSide />
           </div>
         </div>
       </div>
       <div className="col-span-1 bg-[#F4F1E7] h-full border border-black">
-        <PrescriptionButtons />
+        <PreviousPrescriptions/>
       </div>
     </div>
   );

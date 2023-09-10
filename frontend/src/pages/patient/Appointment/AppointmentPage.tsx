@@ -8,6 +8,7 @@ import { useCookies } from "react-cookie";
 import DoctorSearchCards from "./DoctorSearchCards";
 import SearchDoctor from "./SearchDoctor";
 import PatientPendingAppointments from "./PatientPendingAppointments";
+import PreviousAppointments from "./PreviousAppointment/PreviousAppointments";
 
 const AppointmentPage: FC = () => {
   const [cookies] = useCookies(["user"]);
@@ -64,6 +65,7 @@ const AppointmentPage: FC = () => {
         <TabsTrigger value="pendingAppointments">
           Pending Appointments
         </TabsTrigger>
+        <TabsTrigger value="previousAppointments">Prescriptions</TabsTrigger>
       </TabsList>
       <TabsContent value="searchDoctor">
         <>
@@ -88,6 +90,9 @@ const AppointmentPage: FC = () => {
       </TabsContent>
       <TabsContent value="pendingAppointments">
         <PatientPendingAppointments />
+      </TabsContent>
+      <TabsContent value="previousAppointments">
+        <PreviousAppointments />
       </TabsContent>
     </Tabs>
   );

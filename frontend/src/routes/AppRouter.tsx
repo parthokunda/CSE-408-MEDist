@@ -5,16 +5,12 @@ import GenericDescriptionPage from "@/pages/Medicines/Generic/GenericDescription
 import ManufacturerDescriptionPage from "@/pages/Medicines/Manufacturer/ManufacturerPage";
 import MedicineDescriptionPage from "@/pages/Medicines/Medicine/MedicineDescriptionPage";
 import MedicineSearchPage from "@/pages/Medicines/SearchMedicines/MedicineSearchPage";
-import AddSchedule from "@/pages/doctor/AddSchedule";
-import DoctorInfo from "@/pages/doctor/DoctorInfo";
-import PatientSearchPage from "@/pages/doctor/DoctorPendingAppointments";
-import BookAppointment from "@/pages/patient/BookAppointment/PatientBookAppointment";
 import { FC } from "react";
 import { useCookies } from "react-cookie";
 import { Navigate, Route, Routes } from "react-router-dom";
 import AuthRoute from "./AuthRouter";
-import PatientRouter from "./PatientRouter";
 import DoctorRouter from "./DoctorRouter";
+import PatientRouter from "./PatientRouter";
 
 const AppRouter: FC = () => {
   const [cookies] = useCookies(["user"]);
@@ -26,7 +22,7 @@ const AppRouter: FC = () => {
       : "patient";
       const navList: navIcon[] = [
         { name: "Medicines", link: "/searchMedicines" },
-        { name: "Prescriptions", link: "/prescriptions" },
+        // { name: "Prescriptions", link: "/prescriptions" },
         { name: "Appointments", link: "/appointments", role: role },
         { name: "Account", link: "/account", role: role },
         { name: "Logout", link: "/logout/" }, //! careful with the first /. cookies path problem otherwise

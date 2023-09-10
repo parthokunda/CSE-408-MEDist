@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { useParams } from "react-router-dom";
@@ -27,14 +27,14 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 
-import { DoctorProfileInfo, SingleDaySchedule } from "@/models/DoctorSchema";
-import { useMutation } from "@tanstack/react-query";
+import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 import {
   ConfirmAppointmentResponse,
   RejectAppointmentRespone,
   RequestAppointmentInfo,
 } from "@/models/Appointment";
-import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
+import { DoctorProfileInfo } from "@/models/DoctorSchema";
+import { useMutation } from "@tanstack/react-query";
 
 type inputObject = {
   authToken: string;

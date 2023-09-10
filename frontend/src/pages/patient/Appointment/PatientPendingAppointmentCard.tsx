@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { PendingAppointmentOverviewInfo } from "@/models/Appointment";
 import { DialogClose } from "@radix-ui/react-dialog";
 
-const DoctorPendingCard: FC<{ app: PendingAppointmentOverviewInfo }> = (props) => {
+const PatientPendingAppointmentCard: FC<{ app: PendingAppointmentOverviewInfo }> = (props) => {
   // convert Date to date and time
   console.log(props.app);
   const date = new Date(props.app.startTime);
@@ -86,4 +86,4 @@ const DoctorPendingCard: FC<{ app: PendingAppointmentOverviewInfo }> = (props) =
     </div>
   );
 };
-export default DoctorPendingCard;
+export default PatientPendingAppointmentCard;

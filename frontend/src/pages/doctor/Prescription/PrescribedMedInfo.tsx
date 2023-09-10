@@ -2,7 +2,7 @@ import { BrandInfo } from "@/models/Brand";
 import { FC } from "react";
 
 const PrescribedMedInfo : FC<{med: BrandInfo}> = (props) => {
-  return <p className="col-span-5 px-2 pl-1 flex text-c1 font-bold">
+  return <div className="col-span-5 px-2 pl-1 flex text-c1 font-bold">
   <img
     src={props.med.DosageForm.img_url}
     className="ml-1 h-4 w-4 mt-1"
@@ -14,7 +14,7 @@ const PrescribedMedInfo : FC<{med: BrandInfo}> = (props) => {
   <p className="pl-6">
     {props.med.Brand.strength}
   </p>
-</p>
+</div>
 };
 
 export default PrescribedMedInfo;

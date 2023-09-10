@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { FC, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import DoctorPendingCards from "./PatientPendingAppointmentsCards";
+import PatientPendingAppointmentCards from "./PatientPendingAppointmentsCards";
 
 const fetchPendingAppointments = async (
   authToken: string,
@@ -46,7 +46,7 @@ const PatientPendingAppointments: FC = () => {
     );
   if (data)
     return (
-      <DoctorPendingCards
+      <PatientPendingAppointmentCards
         doctorFetchedData={data}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}

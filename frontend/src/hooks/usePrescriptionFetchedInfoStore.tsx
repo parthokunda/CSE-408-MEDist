@@ -1,7 +1,7 @@
 import {
   AppointmentPortion,
   DoctorPortion,
-  GETPrescriptionHeaderResponse,
+  GETPrescriptionResponse,
   OlderAppointmentOverviewInfo,
   PatientPortion,
 } from "@/models/Prescriptions";
@@ -16,7 +16,7 @@ export type PrescriptionFetchedInfoType = {
   setDoctorInfo: (doctorInfo: DoctorPortion) => void;
   setAppointmentInfo: (appInfo: AppointmentPortion) => void;
   setOldAppointments: (oldApps: OlderAppointmentOverviewInfo[]) => void;
-  setAllInfo: (allInfo: GETPrescriptionHeaderResponse) => void;
+  setAllInfo: (allInfo: GETPrescriptionResponse) => void;
 };
 
 const usePrescriptionFetchedInfoStore = create<PrescriptionFetchedInfoType>(
@@ -35,10 +35,10 @@ const usePrescriptionFetchedInfoStore = create<PrescriptionFetchedInfoType>(
       set((state) => ({ ...state, oldAppointments: oldApps })),
     setAllInfo: (allInfo) =>
       set(() => ({
-        patientInfo: allInfo.PatientPortionInfo,
-        doctorInfo: allInfo.DoctorPortionInfo,
-        appointmentInfo: allInfo.AppointmentPortionInfo,
-        oldAppointments: allInfo.OldAppointments,
+        patientInfo: allInfo.Header.PatientPortionInfo,
+        doctorInfo: allInfo.Header.DoctorPortionInfo,
+        appointmentInfo: allInfo.Header.AppointmentPortionInfo,
+        oldAppointments: allInfo.Header.OldAppointments,
       })),
   })
 );

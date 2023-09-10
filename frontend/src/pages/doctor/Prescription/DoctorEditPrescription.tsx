@@ -1,22 +1,26 @@
-import { FC, useState } from "react";
+import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
+import useOldPrescriptionStore from "@/hooks/useOldPrescriptionStore";
+import usePrescriptionFetchedInfoStore from "@/hooks/usePrescriptionFetchedInfoStore";
+import { AppointmentStatus } from "@/models/Appointment";
+import {
+  GETPrescriptionResponse
+} from "@/models/Prescriptions";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { FC, useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
 import { useParams } from "react-router-dom";
 import PrescriptionButtons from "./PastPrescriptionSide/PrescriptionButtons";
 import PrescriptionLeftSide from "./PrescriptionLeftSide";
 import PrescriptionPatientInfo from "./PrescriptionPatientInfo";
 import PrescriptionRightSide from "./PrescriptionRightSide";
-import { useQuery } from "@tanstack/react-query";
-import { useCookies } from "react-cookie";
-import axios from "axios";
-import { GETPrescriptionHeaderResponse } from "@/models/Prescriptions";
-import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
-import usePrescriptionFetchedInfoStore from "@/hooks/usePrescriptionFetchedInfoStore";
-import { AppointmentStatus } from "@/models/Appointment";
 import OldPrescriptionView from "./OldPrescriptionView/OldPrescriptionView";
+import PreviousPrescriptions from "./PreviousPrescriptions";
 
 const fetchPrescriptionInfo = async (
   prescriptionId: number,
   authToken: string
-): Promise<GETPrescriptionHeaderResponse> => {
+): Promise<GETPrescriptionResponse> => {
   const response = await axios.get(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
@@ -28,7 +32,10 @@ const fetchPrescriptionInfo = async (
       },
     }
   );
-  console.log("🚀 ~ file: DoctorEditPrescription.tsx:31 ~ response.data:", response.data)
+  console.log(
+    "🚀 ~ file: DoctorEditPrescription.tsx:31 ~ response.data:",
+    response.data
+  );
   return response.data;
 };
 
@@ -36,11 +43,19 @@ const DoctorEditPrescription: FC = () => {
   const [appStatus, setAppStatus] = useState<AppointmentStatus>();
   const { prescriptionId } = useParams();
   const [cookies] = useCookies(["user"]);
-  const setAllInfo = usePrescriptionFetchedInfoStore(state => state.setAllInfo);
+  const setAllInfo = usePrescriptionFetchedInfoStore(
+    (state) => state.setAllInfo
+  );
+  const setPrescriptionInfo = useOldPrescriptionStore(
+    (state) => state.setAllInfo
+  );
 
   if (!prescriptionId) {
     return <>No such ID found</>;
   }
+
+  console.log(prescriptionId, "prescriptionId");
+  
 
   const fetchAndSetPrescriptionData = async () => {
     const prescriptionAllInfo = await fetchPrescriptionInfo(
@@ -48,32 +63,47 @@ const DoctorEditPrescription: FC = () => {
       cookies.user.token
     );
     setAllInfo(prescriptionAllInfo);
-    setAppStatus(prescriptionAllInfo.AppointmentPortionInfo.status);
+    setAppStatus(prescriptionAllInfo.Header.AppointmentPortionInfo.status);
+    if (
+      prescriptionAllInfo.Header.AppointmentPortionInfo.status ===
+        AppointmentStatus.COMPLETED ||
+      prescriptionAllInfo.Header.AppointmentPortionInfo.status ===
+        AppointmentStatus.PRESCRIBED
+    ) {
+      setPrescriptionInfo(prescriptionAllInfo);
+    }
     return prescriptionAllInfo;
   };
 
-  const {
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["getPrescriptionInfo"],
-    queryFn: fetchAndSetPrescriptionData,
-    retry: 2,
-    staleTime: Infinity,
-    refetchOnWindowFocus: false,
+  const { mutate, isLoading, isError } = useMutation({
+    mutationKey: ["getPrescriptionInfo"],
+    mutationFn: fetchAndSetPrescriptionData,
+    // retry: 2,
+    // staleTime: Infinity,
+    // refetchOnWindowFocus: false,
   });
+
+  useEffect(() => {
+    mutate();
+  },[prescriptionId])
 
   if (isError) {
     <p>Errror</p>;
   }
 
   if (isLoading || !appStatus) {
-    return <div className="flex justify-center"><LoadingSpinner /></div>;
+    return (
+      <div className="flex justify-center">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
-
-  if(appStatus === AppointmentStatus.COMPLETED || appStatus === AppointmentStatus.PRESCRIBED){
-    return <></>
+  if (
+    appStatus === AppointmentStatus.COMPLETED ||
+    appStatus === AppointmentStatus.PRESCRIBED
+  ) {
+    return <OldPrescriptionView/>;
   }
 
   return (
@@ -93,6 +123,7 @@ const DoctorEditPrescription: FC = () => {
       </div>
       <div className="col-span-1 bg-[#F4F1E7] h-full border border-black">
         <PrescriptionButtons />
+        <PreviousPrescriptions />
       </div>
     </div>
   );

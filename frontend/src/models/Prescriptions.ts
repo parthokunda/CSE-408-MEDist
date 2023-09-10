@@ -1,5 +1,5 @@
 import { AppointmentStatus } from "./Appointment";
-import { BrandInfo } from "./Brand";
+import { BrandInfo, DosageFormAttributes, GenericAttributes, ManufacturerAttributes } from "./Brand";
 
 export type PrescribedMedType = {
   name: string;
@@ -127,7 +127,32 @@ export interface PrescriptionAttributes {
   past_history: string[];
 }
 
-export interface GETOldPrescriptionInfo extends PrescriptionAttributes {
+export interface GETPrescriptionResponse
+{
   Header: GETPrescriptionHeaderResponse;
-  Medicines: BrandInfo[];
-};
+  Medicines?: PrescriptionBrandInfo[];
+  id?: number;
+  symptoms?: string[];
+  diagnosis?: string[];
+  advices?: string[];
+  followUpDate?: Date;
+  meetAfter?: number;
+  otherNotes?: string[];
+  past_history?: string[];
+  test?: string[],
+}
+
+export interface PrescriptionBrandInfo {
+  Brand: {
+    id: number;
+    name: string;
+    strength: string;
+  };
+  DosageForm: DosageFormAttributes;
+  Generic: GenericAttributes;
+  Manufacturer: ManufacturerAttributes;
+
+  dosage: string;
+  when: string;
+  duration: number;
+}
