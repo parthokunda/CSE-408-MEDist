@@ -368,7 +368,7 @@ class Appointment_Controller implements Appointment_Controller_Interface {
       );
 
       res.status(200).json({
-        appointments,
+        ...appointments,
       });
     } catch (error) {
       next(error);
