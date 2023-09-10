@@ -6,11 +6,11 @@ import { TabsContent, TabsTrigger } from "@radix-ui/react-tabs";
 import DoctorPendingAppList from "./DoctorPendingAppList";
 import DoctorPreviousAppList from "./DoctorPreviousAppList";
 
-const PatientSearchPage: FC = (props) => {
+const DoctorAppointments: FC = (props) => {
   return (
-    <div className=" flex items-center justify-center">
-      <Tabs defaultValue="pending">
-        <TabsList className="flex justify-center bg-white border-gray-200 gap-6 my-6">
+    <div className="flex items-center justify-center">
+      <Tabs defaultValue="pending"  id="hi" className="flex flex-col items-center">
+        <TabsList className="flex justify-center w-fit bg-white border-gray-200 gap-6 my-6">
           <TabsTrigger
             value="previous"
             className="inline-block p-4 border-b-2 border-transparent rounded-t-lg data-[state=active]:text-c1 data-[state=active]:text-c1 data-[state=active]:font-bold"
@@ -35,4 +35,4 @@ const PatientSearchPage: FC = (props) => {
   );
 };
 
-export default PatientSearchPage;
+export default DoctorAppointments;

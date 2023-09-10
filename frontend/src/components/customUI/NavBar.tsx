@@ -25,7 +25,7 @@ const NavBar: FC<{ navList: navIcon[] }> = (props) => {
                 className="text-c4 hover:text-white"
               >
                 {icon.link === "/appointments" && icon.role === "doctor" ? (
-                  <Link to="/doctor/pendingAppointments">{icon.name}</Link>
+                  <Link to="/doctor/appointments">{icon.name}</Link>
                 ) : icon.link === "/appointments" && icon.role === "patient" ? (
                   <Link to="/patient/searchDoctor/">{icon.name}</Link>
                 ) : (

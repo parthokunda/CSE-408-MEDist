@@ -1,3 +1,4 @@
+import { AppointmentStatus } from "./Appointment";
 import { BrandInfo } from "./Brand";
 
 export type PrescribedMedType = {
@@ -69,6 +70,7 @@ export type AppointmentPortion = {
   id: number;
   type: string;
   time: Date;
+  status: AppointmentStatus;
 };
 
 export enum AppointmentType {
@@ -113,3 +115,19 @@ export type POSTCreatePrescriptionBody = {
   otherNotes?: string[] | undefined;
   past_history?: string[] | undefined;
 }
+
+export interface PrescriptionAttributes {
+  id: number;
+  symptoms: string[];
+  diagnosis: string[];
+  advices: string[];
+  followUpDate: Date;
+  meetAfter: number;
+  otherNotes: string[];
+  past_history: string[];
+}
+
+export interface GETOldPrescriptionInfo extends PrescriptionAttributes {
+  Header: GETPrescriptionHeaderResponse;
+  Medicines: BrandInfo[];
+};

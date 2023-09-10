@@ -3,7 +3,8 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { FC, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import DoctorPendingCards from "./DoctorPendingCards";
+import DoctorPendingCards from "./DoctorAppoinmentsCards";
+import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 
 const fetchPendingAppointments = async (
   authToken: string,
@@ -33,16 +34,21 @@ const DoctorPreviousAppList: FC = () => {
     mutationKey: ["getPreviousAppointments"],
     mutationFn: () => fetchPendingAppointments(cookies.user.token, currentPage),
   });
+
   useEffect(() => {
     mutate();
   }, [currentPage, mutate]);
+
   if (isLoading) {
-    return <>Loading...</>;
+    return (
+      <div className="flex justify-center">
+        <LoadingSpinner />
+      </div>
+    );
   }
-  if (isError) {
+  if (isError) 
     return <>Error</>;
-  }
-  console.log("here", data);
+  
   if (data)
     return (
       <div>

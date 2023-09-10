@@ -4,8 +4,6 @@ import PrescriptionSymptoms from "./PrescriptionSymptoms";
 import PrescriptionPastHistory from "./PrescriptionPastHistory";
 
 const PrescriptionLeftSide: FC = () => {
-  
-
   return (
     <>
     <PrescriptionDiagnosis/>

@@ -1,9 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { FC, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import DoctorPendingCards from "./DoctorPendingCards";
+import DoctorPendingCards from "./DoctorAppoinmentsCards";
 import { GetPendingAppointments } from "@/models/Appointment";
 import axios from "axios";
+import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 
 const fetchPendingAppointments = async (
   authToken: string,
@@ -36,7 +37,11 @@ const DoctorPendingAppList: FC = () => {
     mutate();
   }, [currentPage, mutate]);
   if (isLoading) {
-    return <>Loading...</>;
+    return (
+      <div className="flex justify-center">
+        <LoadingSpinner />
+      </div>
+    );
   }
   if (isError) {
     return <>Error</>;

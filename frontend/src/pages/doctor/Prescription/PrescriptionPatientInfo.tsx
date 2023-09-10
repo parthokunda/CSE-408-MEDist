@@ -1,4 +1,4 @@
-import usePrescriptionFetchedInfoStore from "@/hooks/usePrescriptionFetchedInfo";
+import usePrescriptionFetchedInfoStore from "@/hooks/usePrescriptionFetchedInfoStore";
 import { FC } from "react";
 
 

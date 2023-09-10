@@ -2,9 +2,9 @@ import { FC } from "react";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 
 import { GetPendingAppointments } from "@/models/Appointment";
-import DoctorPendingCard from "./DoctorPendingCard";
+import DoctorAppointmentCard from "./DoctorAppoinmentCard";
 
-const DoctorPendingCards: FC<{
+const DoctorAppoinmentCards: FC<{
   patientFetchedData: GetPendingAppointments;
   currentPage: number;
   setCurrentPage: (page: number) => void;
@@ -59,7 +59,7 @@ const DoctorPendingCards: FC<{
       <div className="grid lg:grid-cols-1 md:grid-cols-3 sm:grid-cols-3 mt-3 gap-5">
         {props.patientFetchedData &&
           records.map((patient, index) => (
-            <DoctorPendingCard app={patient} key={index} />
+            <DoctorAppointmentCard app={patient} key={index} />
           ))}
       </div>
       <nav className="absolute bottom-[-200px] w-full pb-3">
@@ -114,4 +114,4 @@ const DoctorPendingCards: FC<{
     </div>
   );
 };
-export default DoctorPendingCards;
+export default DoctorAppoinmentCards;

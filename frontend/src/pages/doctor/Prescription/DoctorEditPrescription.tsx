@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { useParams } from "react-router-dom";
 import PrescriptionButtons from "./PastPrescriptionSide/PrescriptionButtons";
 import PrescriptionLeftSide from "./PrescriptionLeftSide";
@@ -9,17 +9,18 @@ import { useCookies } from "react-cookie";
 import axios from "axios";
 import { GETPrescriptionHeaderResponse } from "@/models/Prescriptions";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
-import usePrescriptionFetchedInfoStore from "@/hooks/usePrescriptionFetchedInfo";
+import usePrescriptionFetchedInfoStore from "@/hooks/usePrescriptionFetchedInfoStore";
+import { AppointmentStatus } from "@/models/Appointment";
+import OldPrescriptionView from "./OldPrescriptionView/OldPrescriptionView";
 
 const fetchPrescriptionInfo = async (
   prescriptionId: number,
   authToken: string
 ): Promise<GETPrescriptionHeaderResponse> => {
-  console.log("requesting", authToken);
   const response = await axios.get(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
-    }/api/appointment/prescription/generate-prescription-header/${prescriptionId}`,
+    }/api/appointment/prescription/get-prescription/${prescriptionId}`,
     {
       headers: {
         Authorization: `Bearer ${authToken}`, // Replace with your actual token
@@ -27,14 +28,15 @@ const fetchPrescriptionInfo = async (
       },
     }
   );
+  console.log("🚀 ~ file: DoctorEditPrescription.tsx:31 ~ response.data:", response.data)
   return response.data;
 };
 
 const DoctorEditPrescription: FC = () => {
+  const [appStatus, setAppStatus] = useState<AppointmentStatus>();
   const { prescriptionId } = useParams();
   const [cookies] = useCookies(["user"]);
   const setAllInfo = usePrescriptionFetchedInfoStore(state => state.setAllInfo);
-
 
   if (!prescriptionId) {
     return <>No such ID found</>;
@@ -45,8 +47,8 @@ const DoctorEditPrescription: FC = () => {
       parseInt(prescriptionId),
       cookies.user.token
     );
-
     setAllInfo(prescriptionAllInfo);
+    setAppStatus(prescriptionAllInfo.AppointmentPortionInfo.status);
     return prescriptionAllInfo;
   };
 
@@ -62,11 +64,16 @@ const DoctorEditPrescription: FC = () => {
   });
 
   if (isError) {
-    <p>Loading errror</p>;
+    <p>Errror</p>;
   }
 
-  if (isLoading) {
-    <LoadingSpinner />;
+  if (isLoading || !appStatus) {
+    return <div className="flex justify-center"><LoadingSpinner /></div>;
+  }
+
+
+  if(appStatus === AppointmentStatus.COMPLETED || appStatus === AppointmentStatus.PRESCRIBED){
+    return <></>
   }
 
   return (

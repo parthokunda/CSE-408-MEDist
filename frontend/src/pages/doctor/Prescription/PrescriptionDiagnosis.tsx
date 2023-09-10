@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import usePrescribedLeftStore from "@/hooks/usePrescribedLeftStore";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { MdCancel } from "react-icons/md";
 
@@ -8,6 +8,7 @@ const PrescriptionDiagnosis: FC = () => {
   // const [diagnosisList, setDiagnosisList] = useState<string[]>(["abcd", "hi"]);
   const diagnosisList = usePrescribedLeftStore((state) => state.diagnosis);
   const addDiagnosis = usePrescribedLeftStore((state) => state.addDiagnosis);
+  
   const removeDiagnosis = usePrescribedLeftStore(
     (state) => state.removeDiagnosis
   );
@@ -36,10 +37,6 @@ const PrescriptionDiagnosis: FC = () => {
     removeDiagnosis(str);
   };
 
-  // use this to pass all elements to the parent
-  useEffect(() => {
-    console.log(diagnosisList);
-  }, [diagnosisList]);
   return (
     <>
       <div className="flex flex-col">
