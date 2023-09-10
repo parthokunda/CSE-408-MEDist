@@ -1,5 +1,5 @@
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
-import { GetPendingAppointmentsResponse } from "@/models/Appointment";
+import { GetPendingAppointments} from "@/models/Appointment";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { FC, useEffect, useState } from "react";
@@ -9,11 +9,11 @@ import DoctorPendingCards from "./PatientPendingAppointmentsCards";
 const fetchPendingAppointments = async (
   authToken: string,
   currentPage: number
-): Promise<GetPendingAppointmentsResponse> => {
+): Promise<GetPendingAppointments> => {
   const response = await axios.get(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
-    }/api/appointment/view-pending-appointments/${currentPage}`,
+    }/api/appointment/view-appointments/${currentPage}`,
     {
       headers: {
         Authorization: `Bearer ${authToken}`, // Replace with your actual token

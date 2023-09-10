@@ -1,20 +1,20 @@
 import { FC } from "react";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 
-import { GetPendingAppointmentsResponse } from "@/models/Appointment";
+import { GetPendingAppointments } from "@/models/Appointment";
 import DoctorPendingCard from "./PatientPendingAppointmentCard";
 
 const DoctorPendingCards: FC<{
-  doctorFetchedData: GetPendingAppointmentsResponse;
+  doctorFetchedData: GetPendingAppointments;
   currentPage: number;
   setCurrentPage: (page: number) => void;
 }> = (props) => {
   const { currentPage, setCurrentPage } = props;
   const recordsPerPage = 3;
-  const records = props.doctorFetchedData.pendingAppointments.appointments;
+  const records = props.doctorFetchedData.appointments;
   console.log("here records", records);
   const nPages = Math.ceil(
-    props.doctorFetchedData.pendingAppointments.totalCount / recordsPerPage
+    props.doctorFetchedData.totalCount / recordsPerPage
   );
   const array = [
     currentPage - 2,
@@ -26,7 +26,7 @@ const DoctorPendingCards: FC<{
   const pages = array.filter((page) => page > 0 && page <= nPages);
   if (
     props.doctorFetchedData &&
-    props.doctorFetchedData.pendingAppointments.totalCount === 0
+    props.doctorFetchedData.totalCount === 0
   ) {
     return (
       <div className="flex justify-center align-middle">No Doctor Found</div>
