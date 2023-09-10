@@ -8,7 +8,7 @@ import { useCookies } from "react-cookie";
 import DoctorSearchCards from "./DoctorSearchCards";
 import SearchDoctor from "./SearchDoctor";
 import PatientPendingAppointments from "./PatientPendingAppointments";
-import PreviousAppointments from "./PreviousAppointment/PreviousAppointments";
+import PreviousAppointments from "./PreviousAppointments";
 
 const AppointmentPage: FC = () => {
   const [cookies] = useCookies(["user"]);

@@ -140,6 +140,7 @@ export interface GETPrescriptionResponse
   otherNotes?: string[];
   past_history?: string[];
   test?: string[],
+  downloadLink?: string,
 }
 
 export interface PrescriptionBrandInfo {

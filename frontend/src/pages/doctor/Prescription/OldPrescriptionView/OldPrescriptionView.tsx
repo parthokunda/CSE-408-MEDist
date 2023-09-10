@@ -1,14 +1,13 @@
+import { Button } from "@/components/ui/button";
 import { FC } from "react";
 import PrescriptionPatientInfo from "../PrescriptionPatientInfo";
+import PreviousPrescriptions from "../PreviousPrescriptions";
 import OldPrescriptionLeftSide from "./OldPrescriptionLeftSide";
 import OldPrescriptionRightSide from "./OldPrescriptionRightSide";
-import PastPrescriptions from "../PastPrescriptionSide/PastPrescription";
-import PreviousPrescriptions from "../PreviousPrescriptions";
-
-
+import useOldPrescriptionStore from "@/hooks/useOldPrescriptionStore";
 
 const OldPrescriptionView: FC = () => {
-
+  const downloadLink = useOldPrescriptionStore(state => state.downloadLink);
   return (
     <div className="grid grid-cols-4 h-screen">
       <div className="col-span-3 h-full">
@@ -25,7 +24,12 @@ const OldPrescriptionView: FC = () => {
         </div>
       </div>
       <div className="col-span-1 bg-[#F4F1E7] h-full border border-black">
-        <PreviousPrescriptions/>
+        <div className="flex w-full mt-4 justify-around">
+          <a href={downloadLink} target="_blank">
+            <Button className="bg-c1 h-12 w-28">Download</Button>
+          </a>
+        </div>
+        <PreviousPrescriptions />
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ type OldPrescriptionStoreType = {
   advices: string[];
   tests: string[];
   meetAfter: number;
+  downloadLink: string,
   setAllInfo: (presInfo: GETPrescriptionResponse) => void;
 };
 
@@ -23,6 +24,7 @@ const useOldPrescriptionStore = create<OldPrescriptionStoreType>((set) => ({
   advices: [],
   tests: [],
   meetAfter: 0,
+  downloadLink: '',
   setAllInfo: (presInfo) =>
     set((state) => ({
       ...state,
@@ -33,6 +35,7 @@ const useOldPrescriptionStore = create<OldPrescriptionStoreType>((set) => ({
       meetAfter: presInfo.meetAfter ? presInfo.meetAfter : 0,
       past_history: presInfo.past_history ? presInfo.past_history[0] : '',
       tests: presInfo.test ? presInfo.test : [],
+      downloadLink: presInfo.downloadLink ? presInfo.downloadLink : '#',
     })),
 }));
 

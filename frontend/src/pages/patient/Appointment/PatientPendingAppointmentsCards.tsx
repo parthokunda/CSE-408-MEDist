@@ -10,7 +10,7 @@ const PatientPendingAppointmentCards: FC<{
   setCurrentPage: (page: number) => void;
 }> = (props) => {
   const { currentPage, setCurrentPage } = props;
-  const recordsPerPage = 3;
+  const recordsPerPage = 5;
   const records = props.doctorFetchedData.appointments;
   console.log("here records", records);
   const nPages = Math.ceil(

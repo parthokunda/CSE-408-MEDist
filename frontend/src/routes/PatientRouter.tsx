@@ -1,12 +1,11 @@
 import { ProfileStatus } from "@/models/LoginSignUpSchema";
 import AppointmentPage from "@/pages/patient/Appointment/AppointmentPage";
+import PrescriptionPage from "@/pages/patient/Appointment/PrescriptionPage";
 import BookAppointment from "@/pages/patient/BookAppointment/PatientBookAppointment";
 import PatientInfo from "@/pages/patient/PatientInfo";
 import { FC } from "react";
 import { useCookies } from "react-cookie";
 import { Navigate, Route, Routes } from "react-router-dom";
-
-
 
 const PatientRouter: FC = () => {
   const [cookies] = useCookies(["user"]);
@@ -20,7 +19,13 @@ const PatientRouter: FC = () => {
           <Route path="/" element={<PatientInfo />} />
           <Route path="/account" element={<PatientInfo />} />
           <Route path="/searchDoctor" element={<AppointmentPage />} />
-          <Route path="/bookAppointment/:doctorID" element={<BookAppointment />}
+          <Route
+            path="/bookAppointment/:doctorID"
+            element={<BookAppointment />}
+          />
+          <Route
+            path="/prescription/:prescriptionId"
+            element={<PrescriptionPage />}
           />
         </Route>
       </Routes>

@@ -22,7 +22,7 @@ const PreviousPrescriptions: FC = () => {
         {oldAppointments.map((item) => (
           <Card className="flex flex-grow mx-0" key={item.id}>
             <CardContent className="flex pt-6 flex-grow">
-              <div className="flex items-center flex-grow justify-center gap-4">
+              <div className="flex items-center flex-grow justify-center gap-12">
                 <p className="text-c1 font-bold">{item.id}</p>
                 <p>{new Date(item.startTime).toLocaleDateString()}</p>
                 <Button
@@ -30,14 +30,6 @@ const PreviousPrescriptions: FC = () => {
                   className="bg-c1"
                 >
                   View
-                </Button>
-                <Button
-                  className="bg-c1"
-                  // onClick={() =>
-                  //   navigate(`/doctor/prescription/${item.id}/download`)
-                  // }
-                >
-                  Download
                 </Button>
               </div>
             </CardContent>
