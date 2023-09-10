@@ -133,6 +133,8 @@ export interface Appointment_Repository_Interface {
 
   // get appointment by id
   Get_AppointmentInfo(appointmentID: number): Promise<Appointment>;
+
+  getOldAppointmentIDs(appointment: Appointment): Promise<number[]>;
 }
 
 class AppointmentRepository implements Appointment_Repository_Interface {
@@ -580,6 +582,31 @@ class AppointmentRepository implements Appointment_Repository_Interface {
     } catch (error) {
       log.error(error);
       throw createHttpError(500, "Error Modifying Pending Appointments");
+    }
+  }
+
+  async getOldAppointmentIDs(appointment: Appointment): Promise<number[]> {
+    try {
+      const olderAppointments = await Appointment.findAll({
+        where: {
+          doctorID: appointment.doctorID,
+          patientID: appointment.patientID,
+          status: AppointmentStatus.PRESCRIBED,
+          endTime: {
+            [Op.lte]: appointment.startTime,
+          },
+        },
+        order: [["startTime", "DESC"]],
+      });
+
+      const olderAppointmentIDs = olderAppointments.map(
+        (appointment) => appointment.id
+      );
+
+      return olderAppointmentIDs;
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Error getting old appointment IDs");
     }
   }
 }

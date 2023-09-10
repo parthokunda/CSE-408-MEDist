@@ -262,6 +262,9 @@ class PrescriptionService implements PrescriptionServiceInterface {
         patientID
       );
 
+      const olderAppointmentIDs =
+        await appointmentRepository.getOldAppointmentIDs(appointment);
+
       return {
         DoctorPortionInfo: DoctorInfo,
         PatientPortionInfo: PatientInfo,
@@ -272,7 +275,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
           status: appointment.status,
         },
         OldAppointments: await appointmentService.Get_Other_Appointments(
-          appointment.olderAppointmentIDs
+          olderAppointmentIDs
         ),
         SharedAppointments: await appointmentService.Get_Other_Appointments(
           appointment.otherAppointmentIDs
