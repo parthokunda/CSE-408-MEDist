@@ -1,4 +1,7 @@
 import { Button } from "@/components/ui/button";
+import { ToastAction } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/components/ui/use-toast";
 import usePrescribeBottomStore from "@/hooks/usePrescribedBottomStore";
 import usePrescribedLeftStore from "@/hooks/usePrescribedLeftStore";
 import usePrescribedStore from "@/hooks/usePrescribedStore";
@@ -7,28 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { FC } from "react";
 import { useCookies } from "react-cookie";
-import { useNavigate, useParams } from "react-router-dom";
-
-const postCreatePrescription = async (input: {
-  data: POSTCreatePrescriptionBody;
-  authToken: string;
-  appID: number;
-}): Promise<boolean> => {
-  console.log("saving prescripiton", input.data);
-  await axios.post(
-    `${import.meta.env.VITE_DB_URL}:${
-      import.meta.env.VITE_DB_PORT
-    }/api/appointment/prescription/create-prescription/${input.appID}`,
-    input.data,
-    {
-      headers: {
-        Authorization: `Bearer ${input.authToken}`, // Replace with your actual token
-        "Content-Type": "application/json",
-      },
-    }
-  );
-  return true;
-};
+import { useNavigate, useParams, } from "react-router-dom";
 
 const PrescriptionButtons: FC = () => {
   const { prescriptionId } = useParams();
@@ -37,6 +19,37 @@ const PrescriptionButtons: FC = () => {
   const medStore = usePrescribedStore();
   const bottomStore = usePrescribeBottomStore();
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  
+
+  const postCreatePrescription = async (input: {
+    data: POSTCreatePrescriptionBody;
+    authToken: string;
+    appID: number;
+  }): Promise<boolean> => {
+    console.log("saving prescripiton", input.data);
+    await axios.post(
+      `${import.meta.env.VITE_DB_URL}:${
+        import.meta.env.VITE_DB_PORT
+      }/api/appointment/prescription/create-prescription/${input.appID}`,
+      input.data,
+      {
+        headers: {
+          Authorization: `Bearer ${input.authToken}`, // Replace with your actual token
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    toast({
+      title: "Submitted",
+      description: "Prescription Submitted",
+      action: (
+        <ToastAction altText="abcd" onClick={() => navigate(0)}>OK</ToastAction>
+      ),
+    })
+    return true;
+  };
 
   const { mutate } = useMutation({
     mutationKey: ["createPrescription"],
@@ -69,7 +82,7 @@ const PrescriptionButtons: FC = () => {
       advices: bottomStore.advices,
       past_history: [leftStore.pastHistory],
       meetAfter: bottomStore.meetAfter,
-      test : bottomStore.tests,
+      test: bottomStore.tests,
     };
     console.log(data);
     mutate({
@@ -97,6 +110,7 @@ const PrescriptionButtons: FC = () => {
       >
         Discard
       </Button>
+      <Toaster/>
     </div>
   );
 };
