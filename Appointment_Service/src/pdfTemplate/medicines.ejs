@@ -1,17 +1,14 @@
 <div class="medicines">
   <div class="med-list">
-    <% if(Medicines.length > 0) { %> <% Medicines.forEach((brandInfo) => { %>
+    <% if(Medicines.length > 0) { Medicines.forEach((brandInfo) => { %>
     <div class="med-entry">
-      <div class="medBefAft">Before</div>
-      <div class="medDuration">7 days</div>
+      <div class="medBefAft"><%= brandInfo.when %></div>
+      <div class="medDuration"><%= brandInfo.duration %></div>
       <div class="medName">
-        <img
-          class="medImage"
-          src="https://medex.com.bd/img/dosage-forms/capsule.png"
-        />
-        <%= brandInfo.Brand.name %> <%= brandInfo.Brand.strength %>
+        <img class="medImage" src="<%" ="brandInfo.DosageForm.imag_url" % />
+        /> <%= brandInfo.Brand.name %> <%= brandInfo.Brand.strength %>
       </div>
-      <div class="medWhen">1+0+1</div>
+      <div class="medWhen"><%= brandInfo.dosage %></div>
     </div>
 
     <% }) } %>
@@ -20,17 +17,26 @@
   <div class="prescription-header">
     <div class="overlap-group">
       <div class="doctor-info">
-        <div class="doctorName">Dr. Strange</div>
+        <div class="doctorName">
+          Dr. <%= Header.DoctorPortionInfo.DoctorInfo.name %>
+        </div>
         <div class="doctor-additional">
-          <div class="contact">Contact: 017XXXXXXXX</div>
-          <div class="bmdc">BMDC : 12345</div>
-          <div class="degree">MBBS, MD - Neurology</div>
-          <div class="department">Neurologist</div>
+          <div class="contact">
+            Contact: <%= Header.DoctorPortionInfo.DoctorInfo.phone %>
+          </div>
+          <div class="degree">
+            <%= Header.DoctorPortionInfo.DoctorInfo.degrees.join(", ") %>
+          </div>
+          <div class="department">
+            <%= Header.DoctorPortionInfo.Specialization.name %>
+          </div>
         </div>
       </div>
       <div class="prescription-info">
-        <div class="prescriptionDate">Date: 07/01/2023</div>
-        <div class="appID">Appointment ID : 4321212</div>
+        <div class="prescriptionDate">
+          Date: <%= new
+          Date(Header.AppointmentPortionInfo.time).toLocaleDateString() %>
+        </div>
       </div>
     </div>
   </div>

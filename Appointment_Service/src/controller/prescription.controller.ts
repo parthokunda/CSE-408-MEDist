@@ -1,6 +1,9 @@
 // external imports
 import { NextFunction, Request, Response } from "express";
 import {} from "../utils/custom";
+import htmlPdf from "puppeteer-html-pdf";
+import fs from "fs";
+import ejs from "ejs";
 
 // service instances
 import {
@@ -21,6 +24,7 @@ import {
   Prescription_Medicine_Input,
 } from "../database/models";
 import { CreatePrescriptionInput } from "../database/repository";
+import path from "path";
 
 export interface PrescriptionControllerInterface {
   //create prescription - access by doctor
@@ -39,6 +43,12 @@ export interface PrescriptionControllerInterface {
 
   // temporary method to test prescription header - access by all
   generatePrescriptionHeader(
+    req: Request<Create_Prescription_Params_Input>,
+    res: Response,
+    next: NextFunction
+  );
+
+  printPrescription(
     req: Request<Create_Prescription_Params_Input>,
     res: Response,
     next: NextFunction
@@ -123,8 +133,50 @@ class PrescriptionController implements PrescriptionControllerInterface {
     try {
       const prescription: PrescriptionOutput =
         await prescriptionService.getPrescription(appointmentID);
+
       res.status(200).json(prescription);
     } catch (error) {
+      next(createHttpError(500, "Error getting prescription"));
+    }
+  }
+
+  // --------------- print prescription ----------------- //
+  async printPrescription(
+    req: Request<Create_Prescription_Params_Input>,
+    res: Response,
+    next: NextFunction
+  ) {
+    const appointmentID = Number(req.params.appointmentID);
+    try {
+      const prescription: PrescriptionOutput =
+        await prescriptionService.getPrescription(appointmentID);
+
+      log.info(prescription, "prescription");
+
+      const filePath = path.resolve(__dirname, "../pdfTemplate/template.ejs");
+
+      const htmlString = fs.readFileSync(filePath).toString();
+
+      const ejsData = await ejs.render(htmlString, { ...prescription });
+
+      const options = {
+        format: "Letter",
+        ImageType: "png",
+        printBackground: true,
+        path: path.resolve(__dirname, `../pdfs/${appointmentID}.pdf`),
+        preferCSSPageSize: false,
+      };
+
+      await htmlPdf.create(ejsData, options);
+
+      var data = fs.readFileSync(
+        path.resolve(__dirname, `../pdfs/${appointmentID}.pdf`)
+      );
+      res.contentType("application/pdf");
+
+      res.send(data);
+    } catch (error) {
+      log.error(error);
       next(createHttpError(500, "Error getting prescription"));
     }
   }

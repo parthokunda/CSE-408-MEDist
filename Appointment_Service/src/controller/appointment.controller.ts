@@ -366,9 +366,10 @@ class Appointment_Controller implements Appointment_Controller_Interface {
         req.params.currentPage ? Number(req.params.currentPage) : 1,
         role === "patient"
       );
+      log.info(appointments, "appointments in View_Pending_Appointments");
 
       res.status(200).json({
-        appointments,
+        ...appointments,
       });
     } catch (error) {
       next(error);

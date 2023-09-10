@@ -2,6 +2,7 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
+import path from "path";
 
 //internal imports
 import log from "./utils/logger";
@@ -24,6 +25,9 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "pdfTemplate"));
 
 // routes
 app.use(router);
