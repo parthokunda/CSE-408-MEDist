@@ -52,6 +52,7 @@ class Prescription_Schema implements Prescription_Schema_Interface {
         .optional(),
       otherNotes: string().array().optional(),
       past_history: string().array().optional(),
+      test: string().array().optional(),
 
       medicines: object({
         medicineID: number()

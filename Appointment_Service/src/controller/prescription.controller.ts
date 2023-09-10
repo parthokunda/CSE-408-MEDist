@@ -107,6 +107,7 @@ class PrescriptionController implements PrescriptionControllerInterface {
       meetAfter: req.body.meetAfter ? Number(req.body.meetAfter) : null,
       past_history: req.body.past_history || null,
       otherNotes: req.body.otherNotes || null,
+      test : req.body.test || null,
     };
 
     log.info(createPrescriptionInput, "prescription creation input");

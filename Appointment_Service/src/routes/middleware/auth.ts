@@ -14,7 +14,7 @@ const authorize =
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const token = req.headers.authorization?.split(" ")[1];
-      //log.debug(token, "token");
+      log.debug(token, "token");
 
       if (!token) {
         return next(createError.Unauthorized());

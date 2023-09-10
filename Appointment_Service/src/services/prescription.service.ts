@@ -242,6 +242,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
           id: appointment.id,
           type: appointment.type,
           time: appointment.startTime,
+          status : appointment.status
         },
         OldAppointments: await appointmentService.Get_Other_Appointments(
           appointment.olderAppointmentIDs

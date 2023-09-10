@@ -21,6 +21,8 @@ import {
   AppointmentStatus,
   AppointmentTimeSlot,
   AppointmentType,
+  FinalAppointmentOverviewInfo,
+  PrescriptionOutput,
   WeekName,
 } from "../database/models";
 
@@ -381,7 +383,33 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     req: Request<Confirm_Online_Appointment_Params_Input>,
     res: Response,
     next: NextFunction
-  ) {}
+  ) {
+    const appointmentID = Number(req.params.appointmentID);
+    let patientID: number | null = null,
+      doctorID: number | null = null;
+
+    if (req.user_identity?.role === "patient")
+      patientID = Number(req.user_identity.id);
+    else if (req.user_identity?.role === "doctor")
+      doctorID = Number(req.user_identity.id);
+
+    try {
+      const result: FinalAppointmentOverviewInfo | PrescriptionOutput =
+        await appointmentService.View_Appointment(
+          appointmentID,
+          patientID,
+          doctorID
+        );
+
+      log.info(result, "view appointment result");
+
+      res.status(200).json({
+        result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new Appointment_Controller();
