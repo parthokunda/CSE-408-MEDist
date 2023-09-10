@@ -11,27 +11,32 @@ proxy/pnpm-lock.yaml
 Medicine_Service/node_modules
 Medicine_Service/dist
 Medicine_Service/pnpm-lock.yaml
+Medicine_Service/.env
 
 # Auth_Service
 Auth_Service/node_modules
 Auth_Service/dist
 Auth_Service/token.json
 Auth_Service/pnpm-lock.yaml
+Auth_Service/.env
 
 # Patient_Service
 Patient_Service/node_modules
 Patient_Service/dist
 Patient_Service/pnpm-lock.yaml
+Patient_Service/.env
 
 # Doctor_Service
 Doctor_Service/node_modules
 Doctor_Service/dist
 Doctor_Service/pnpm-lock.yaml
+Doctor_Service/.env
 
 # Appointment_Service
 Appointment_Service/node_modules
 Appointment_Service/dist
 Appointment_Service/pnpm-lock.yaml
+Appointment_Service/.env
 
 # frontend
 frontend/logs

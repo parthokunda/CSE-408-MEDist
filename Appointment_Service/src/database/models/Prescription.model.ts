@@ -14,7 +14,10 @@ import {
 
 // sequelize connection
 import sequelizeConnection from "../config";
-import Appointment, { AppointmentStatus, OlderAppointmentOverviewInfo } from "./Appointment.model";
+import Appointment, {
+  AppointmentStatus,
+  OlderAppointmentOverviewInfo,
+} from "./Appointment.model";
 import Prescription_Medicines, {
   BrandInfo,
 } from "./Prescription_Medicines.model";
@@ -56,7 +59,7 @@ export interface AppointmentPortion {
   id: number;
   type: string;
   time: Date;
-  status : AppointmentStatus;
+  status: AppointmentStatus;
 }
 
 export interface PrescriptionHeader {
@@ -77,10 +80,22 @@ export interface PrescriptionAttributes {
   meetAfter: number;
   otherNotes: string[];
   past_history: string[];
-  test : string[];
+  test: string[];
 }
 
-export interface PrescriptionOutput extends PrescriptionAttributes {
+export interface PrescriptionOutput
+  extends Optional<
+    PrescriptionAttributes,
+    | "id"
+    | "symptoms"
+    | "diagnosis"
+    | "advices"
+    | "followUpDate"
+    | "meetAfter"
+    | "otherNotes"
+    | "past_history"
+    | "test"
+  > {
   Header: PrescriptionHeader;
   Medicines: BrandInfo[];
 }
@@ -165,7 +180,7 @@ Prescription.init(
     test: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
-    }
+    },
   },
   {
     sequelize: sequelizeConnection,

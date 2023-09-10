@@ -41,7 +41,7 @@ export interface Prescription_Repository_Interface {
   ): Promise<Prescription>;
   getPrescription_fromAppointmentID(
     appointmentID: number
-  ): Promise<Prescription>;
+  ): Promise<Prescription | null>;
 
   //create prescription
   createPrescription(input: CreatePrescriptionInput): Promise<Prescription>;
@@ -112,7 +112,7 @@ class PrescriptionRepository implements Prescription_Repository_Interface {
 
   async getPrescription_fromAppointmentID(
     appointmentID: number
-  ): Promise<Prescription> {
+  ): Promise<Prescription | null> {
     try {
       const appointment = await Appointment.findByPk(appointmentID);
 
@@ -120,8 +120,7 @@ class PrescriptionRepository implements Prescription_Repository_Interface {
 
       const prescription = await appointment.getPrescription();
 
-      if (!prescription)
-        throw createHttpError(404, "Prescription not created yet");
+      if (!prescription) return null;
 
       return prescription;
     } catch (error) {

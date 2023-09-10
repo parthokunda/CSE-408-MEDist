@@ -145,7 +145,9 @@ class PrescriptionService implements PrescriptionServiceInterface {
           "Error getting patient information from RPC"
         );
 
-        return { ...patient_response_payload.data["resultData"] } as PatientPortion;
+      return {
+        ...patient_response_payload.data["resultData"],
+      } as PatientPortion;
     } catch (error) {
       log.error(error);
       throw createHttpError(500, "Error getting patient information from RPC");
@@ -242,7 +244,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
           id: appointment.id,
           type: appointment.type,
           time: appointment.startTime,
-          status : appointment.status
+          status: appointment.status,
         },
         OldAppointments: await appointmentService.Get_Other_Appointments(
           appointment.olderAppointmentIDs
@@ -290,7 +292,18 @@ class PrescriptionService implements PrescriptionServiceInterface {
           appointmentID
         );
 
-      if (!prescription) throw createHttpError(404, "Prescription not found");
+      if (!prescription) {
+        const prescriptionHeader = await this.generatePrescriptionHeader(
+          appointmentID,
+          null
+        );
+        if (!prescriptionHeader)
+          throw createHttpError(500, "Error generating prescription header");
+        return {
+          Header: prescriptionHeader,
+          Medicines: [],
+        };
+      }
 
       const prescriptionOutput = await this.generatePrescriptionOutput(
         prescription.id
