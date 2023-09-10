@@ -471,6 +471,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
 
 
       if(!prescription.downloadLink){
+        await this.createPrescriptionPdf(prescription.appointmentID, {Header : prescriptionHeader, Medicines : brandInfos, ...prescription.dataValues});
         const downloadURL = await this.uploadPrescriptionPdf_and_getDownLoadlink(
           prescription.appointmentID
         );
