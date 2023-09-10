@@ -79,7 +79,7 @@ class Prescription_Schema implements Prescription_Schema_Interface {
         ])
           .transform((val) => Number(val).toString())
           .refine((val) => {
-            return Number.isInteger(val) && Number(val) > 0;
+            return Number.isInteger(Number(val)) && Number(val) > 0;
           }, "duration must be an positive integer"),
       })
         .array()
