@@ -596,8 +596,14 @@ class AppointmentRepository implements Appointment_Repository_Interface {
         order: [["startTime", "DESC"]],
       });
 
-      const olderAppointmentIDs = olderAppointments.map(
-        (appointment) => appointment.id
+      const filtertedAppointment = olderAppointments.filter(
+        (newAppointment) => {
+          if (newAppointment.id !== appointment.id) return newAppointment;
+        }
+      );
+
+      const olderAppointmentIDs = filtertedAppointment.map(
+        (newAppointment) => newAppointment.id
       );
 
       return olderAppointmentIDs;
