@@ -3,6 +3,7 @@ import User from "../models/User.model";
 
 //internal imports
 import jwtService from "../../utils/jwt";
+import log from "../../utils/logger";
 
 export interface UserRepositoryInterface {
   createUser(_newUser: Partial<User>): Promise<User>;
@@ -33,19 +34,18 @@ class UserRepository implements UserRepositoryInterface {
     _email: string,
     _password: string
   ): Promise<User> {
-    const existingUser = await this.findUserByEmail(_email);
-    if (existingUser) {
-      const ok = jwtService.validatePassword(
-        _email,
-        _password,
-        existingUser.password,
-        existingUser.salt
-      );
+    try {
+      const tempUser = await User.findOne({ where: { email: _email } });
+      const tempPassword = await jwtService.generatePasswordHash(_email,_password, tempUser.salt);
 
-      if (ok) return existingUser;
+      log.debug(tempPassword, "generated password");
+      log.debug(tempUser.password, "saved password");
+
+      return tempUser.password === tempPassword ? tempUser : null;  
+    } catch (error) {
+      log.error(error);
+      return null;
     }
-
-    return null;
   }
 
   async findUserByEmail(_email: string): Promise<User> {

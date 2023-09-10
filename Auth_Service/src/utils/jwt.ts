@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 
 // internal imports
 import { config } from "../config";
+import log from "./logger";
 
 export interface JWT_Payload {
   id: number;
@@ -55,10 +56,16 @@ class JWT_Service implements JWT_Service_Interface {
     savedPassword: string,
     salt: string
   ): Promise<boolean> {
-    return (
-      (await this.generatePasswordHash(email, enteredPassword, salt)) ===
-      savedPassword
-    );
+    try{
+      //const tempWord = `${email}${enteredPassword}`;
+      const tempPassword = await this.generatePasswordHash(email,enteredPassword, salt);
+      return await bcrypt.compare(tempPassword, savedPassword);      
+    }
+    catch(error){
+      log.error(error);
+      return false;
+
+    }
   }
 
   async generateToken(payload: JWT_Payload): Promise<string> {
