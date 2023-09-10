@@ -56,7 +56,7 @@ export interface Prescription_MedicinesAttributes {
   //instructions
   dosage: string;
   when: string;
-  duration: number;
+  duration: string;
 }
 
 class Prescription_Medicines
@@ -70,7 +70,7 @@ class Prescription_Medicines
   //instructions
   public dosage!: string;
   public when!: string;
-  public duration!: number;
+  public duration!: string;
 
   // define associations
   public prescriptionID!: number;
@@ -111,7 +111,7 @@ Prescription_Medicines.init(
     },
 
     duration: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },

@@ -77,7 +77,7 @@ class Prescription_Schema implements Prescription_Schema_Interface {
             required_error: "duration is required",
           }),
         ])
-          .transform((val) => Number(val))
+          .transform((val) => Number(val).toString())
           .refine((val) => {
             return Number.isInteger(val) && Number(val) > 0;
           }, "duration must be an positive integer"),

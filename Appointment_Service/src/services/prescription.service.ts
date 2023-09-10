@@ -454,7 +454,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
       for (let i = 0; i < brandInfos.length; i++) {
         brandInfos[i].dosage = prescription_medicines[i].dosage;
         brandInfos[i].when = prescription_medicines[i].when;
-        brandInfos[i].duration = prescription_medicines[i].duration;
+        brandInfos[i].duration = Number(prescription_medicines[i].duration);
       }
 
       return {
