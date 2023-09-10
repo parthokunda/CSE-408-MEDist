@@ -592,9 +592,6 @@ class AppointmentRepository implements Appointment_Repository_Interface {
           doctorID: appointment.doctorID,
           patientID: appointment.patientID,
           status: AppointmentStatus.PRESCRIBED,
-          endTime: {
-            [Op.lte]: appointment.startTime,
-          },
         },
         order: [["startTime", "DESC"]],
       });
