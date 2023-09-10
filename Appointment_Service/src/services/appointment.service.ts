@@ -359,6 +359,9 @@ class AppointmentService implements AppointmentServiceInterface {
           slotRequest.timeInterval_forEachSlot
         );
 
+        log.debug(`freeBookingAppointmentTime => Date : ${freeBookingAppointmentTime.toLocaleDateString()}  Time : ${freeBookingAppointmentTime.toLocaleTimeString()}`);
+        log.debug(`slotRequest end time =>  Date : ${slotRequest.day_endTime.toLocaleDateString()}  Time : ${slotRequest.day_endTime.toLocaleTimeString()}`);
+
       // if no free time slot found
       if (
         freeBookingAppointmentTime.getTime() >=
