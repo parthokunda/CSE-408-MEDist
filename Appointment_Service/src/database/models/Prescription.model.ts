@@ -81,6 +81,7 @@ export interface PrescriptionAttributes {
   otherNotes: string[];
   past_history: string[];
   test: string[];
+  downloadLink: string;
 }
 
 export interface PrescriptionOutput
@@ -95,6 +96,7 @@ export interface PrescriptionOutput
     | "otherNotes"
     | "past_history"
     | "test"
+    | "downloadLink"
   > {
   Header: PrescriptionHeader;
   Medicines: BrandInfo[];
@@ -112,6 +114,7 @@ class Prescription extends Model implements PrescriptionAttributes {
   public otherNotes!: string[];
   public past_history!: string[];
   public test!: string[];
+  public downloadLink!: string;
 
   // define associations
   public getAppointment!: HasOneGetAssociationMixin<Appointment>;
@@ -179,6 +182,11 @@ Prescription.init(
 
     test: {
       type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+
+    downloadLink: {
+      type: DataTypes.STRING,
       allowNull: true,
     },
   },

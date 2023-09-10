@@ -1,5 +1,15 @@
 // external imports
 import createHttpError from "http-errors";
+import htmlPdf from "puppeteer-html-pdf";
+import fs from "fs";
+import ejs from "ejs";
+import { initializeApp } from "firebase/app";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 
 // internal imports
 import log from "../utils/logger";
@@ -28,6 +38,7 @@ import {
   prescriptionRepository,
 } from "../database/repository";
 import { appointmentService } from ".";
+import path from "path";
 
 export interface PrescriptionServiceInterface {
   //private methods
@@ -61,6 +72,20 @@ export interface PrescriptionServiceInterface {
   generatePrescriptionOutput(
     prescriptionID: number
   ): Promise<PrescriptionOutput>;
+
+  //create prescription pdf
+  createPrescriptionPdf(
+    appointmentID: number,
+    prescription: PrescriptionOutput
+  ): Promise<void>;
+
+  //upload prescription pdf and get download url
+  uploadPrescriptionPdf_and_getDownLoadlink(
+    appointmentID: number
+  ): Promise<string>;
+
+  //get prescriptionPDF download link
+  getPrescriptionPDFDownloadLink(appointmentID: number): Promise<string>;
 }
 
 class PrescriptionService implements PrescriptionServiceInterface {
@@ -270,14 +295,87 @@ class PrescriptionService implements PrescriptionServiceInterface {
       if (!newPrescription)
         throw createHttpError(500, "Error creating prescription in database");
 
-      const prescriptionOutput = await this.generatePrescriptionOutput(
+      let prescriptionOutput = await this.generatePrescriptionOutput(
         newPrescription.id
       );
 
       if (!prescriptionOutput)
         throw createHttpError(500, "Error generating prescription output");
 
+      await this.createPrescriptionPdf(input.appointmentID, prescriptionOutput);
+
+      const downloadURL = await this.uploadPrescriptionPdf_and_getDownLoadlink(
+        input.appointmentID
+      );
+
+      if (!downloadURL)
+        throw createHttpError(500, "Error uploading prescription pdf");
+
+      await prescriptionRepository.updatePrescription_downloadURL(
+        newPrescription.id,
+        downloadURL
+      );
+
+      prescriptionOutput.downloadLink = downloadURL;
+
       return prescriptionOutput;
+    } catch (error) {
+      log.error(error);
+      throw error;
+    }
+  }
+
+  async createPrescriptionPdf(
+    appointmentID: number,
+    prescription: PrescriptionOutput
+  ): Promise<void> {
+    try {
+      const filePath = path.resolve(__dirname, "../pdfTemplate/template.ejs");
+
+      const htmlString = fs.readFileSync(filePath).toString();
+
+      const ejsData = await ejs.render(htmlString, { ...prescription });
+
+      const options = {
+        format: "Letter",
+        ImageType: "png",
+        printBackground: true,
+        path: path.resolve(__dirname, `../pdfs/${appointmentID}.pdf`),
+        preferCSSPageSize: false,
+      };
+
+      await htmlPdf.create(ejsData, options);
+    } catch (error) {
+      log.error(error);
+      throw error;
+    }
+  }
+
+  async uploadPrescriptionPdf_and_getDownLoadlink(
+    appointmentID: number
+  ): Promise<string> {
+    try {
+      const pdfPath = path.resolve(__dirname, `../pdfs/${appointmentID}.pdf`);
+
+      const firebaseApp = initializeApp(config.FIREBASE_CONFIG);
+
+      const storage = getStorage(firebaseApp);
+
+      const storageRef = ref(storage, `prescriptions/${appointmentID}.pdf`);
+
+      const uploadTask = uploadBytesResumable(
+        storageRef,
+        fs.readFileSync(pdfPath)
+      );
+
+      await uploadTask;
+
+      const downloadURL = await getDownloadURL(storageRef);
+
+      //now delete the pdf file
+      fs.unlinkSync(pdfPath);
+
+      return downloadURL;
     } catch (error) {
       log.error(error);
       throw error;
@@ -364,6 +462,46 @@ class PrescriptionService implements PrescriptionServiceInterface {
         Medicines: brandInfos,
         ...prescription.dataValues,
       };
+    } catch (error) {
+      log.error(error);
+      throw error;
+    }
+  }
+
+  // ---------------------- Get Prescription PDF Download Link ---------------------- //
+  async getPrescriptionPDFDownloadLink(appointmentID: number): Promise<string> {
+    try {
+      const prescription =
+        await prescriptionRepository.getPrescription_fromAppointmentID(
+          appointmentID
+        );
+
+      if (!prescription) throw createHttpError(404, "Prescription not found");
+
+      if (prescription.downloadLink) return prescription.downloadLink;
+
+      const prescriptionOutput = await this.generatePrescriptionOutput(
+        prescription.id
+      );
+
+      if (!prescriptionOutput)
+        throw createHttpError(500, "Error generating prescription output");
+
+      await this.createPrescriptionPdf(appointmentID, prescriptionOutput);
+
+      const downloadURL = await this.uploadPrescriptionPdf_and_getDownLoadlink(
+        appointmentID
+      );
+
+      if (!downloadURL)
+        throw createHttpError(500, "Error uploading prescription pdf");
+
+      await prescriptionRepository.updatePrescription_downloadURL(
+        prescription.id,
+        downloadURL
+      );
+
+      return downloadURL;
     } catch (error) {
       log.error(error);
       throw error;

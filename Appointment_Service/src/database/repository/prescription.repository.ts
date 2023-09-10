@@ -46,7 +46,11 @@ export interface Prescription_Repository_Interface {
   //create prescription
   createPrescription(input: CreatePrescriptionInput): Promise<Prescription>;
 
-  //get
+  //updatePrescription - downloadURL
+  updatePrescription_downloadURL(
+    prescriptionID: number,
+    downloadURL: string
+  ): Promise<void>;
 }
 
 class PrescriptionRepository implements Prescription_Repository_Interface {
@@ -202,6 +206,25 @@ class PrescriptionRepository implements Prescription_Repository_Interface {
     } catch (error) {
       log.error(error);
       throw createHttpError(500, "Error creating prescription");
+    }
+  }
+
+  // ---------------------- Update Prescription ---------------------- //
+  async updatePrescription_downloadURL(
+    prescriptionID: number,
+    downloadURL: string
+  ): Promise<void> {
+    try {
+      const prescription = await Prescription.findByPk(prescriptionID);
+
+      if (!prescription)
+        throw createHttpError.NotFound("Prescription not found");
+
+      prescription.downloadLink = downloadURL;
+      await prescription.save();
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Error updating prescription downloadURL");
     }
   }
 }
