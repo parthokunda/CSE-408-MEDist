@@ -261,19 +261,6 @@ class Appointment_Controller implements Appointment_Controller_Interface {
         "appointment_day_end_time"
       );
 
-      // check patient has already booked appointment with the doctor on that day
-      const isAlreadyBooked =
-        await appointmentService.Patient_Booked_Appointment_In_That_Day(
-          patientID,
-          appointment_day_start_time,
-          appointment_day_end_time
-        );
-      if (isAlreadyBooked)
-        throw createHttpError(
-          400,
-          "You have already booked appointment in that time slot"
-        );
-
       // construct time interval for each slot according to totalSlots and startTime & endTime
       const timeInterval_forEachSlot = Math.floor(
         (appointment_day_end_time.getTime() -

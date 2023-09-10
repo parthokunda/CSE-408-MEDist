@@ -361,7 +361,11 @@ class AppointmentRepository implements Appointment_Repository_Interface {
       // if current time is greater than day_startTime then search for appointments after currentTime
       if (currentTime > day_startTime) {
         const timeDiff = currentTime.getTime() - day_startTime.getTime();
-        const extraTime = (day_startTime = new Date(currentTime));
+        const extraTime = Math.ceil(timeDiff / timeInterval_of_eachSlot);
+
+        day_startTime = new Date(
+          day_startTime.getTime() + extraTime * timeInterval_of_eachSlot
+        );
       }
 
       // find all appointments in that day
@@ -377,18 +381,18 @@ class AppointmentRepository implements Appointment_Repository_Interface {
 
       if (appointments.length === 0) return day_startTime;
 
-      for (let i = 0; i < appointments.length - 1; i++) {
+      // now find the first time gap between appointments
+      for (let i = 0; i < appointments.length; i++) {
         if (
-          appointments[i + 1].startTime.getTime() -
-            appointments[i].endTime.getTime() >=
+          appointments[i].startTime.getTime() - day_startTime.getTime() >=
           timeInterval_of_eachSlot
-        ) {
-          return appointments[i].endTime;
-        }
+        )
+          return day_startTime;
+
+        day_startTime = appointments[i].endTime;
       }
 
-      // if no time gap found
-      // then return the last appointment end time
+      // if no time gap found then return the last appointment endTime
       return appointments[appointments.length - 1].endTime;
     } catch (error) {
       log.error(error);

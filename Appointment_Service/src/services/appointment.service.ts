@@ -359,8 +359,12 @@ class AppointmentService implements AppointmentServiceInterface {
           slotRequest.timeInterval_forEachSlot
         );
 
-        log.debug(`freeBookingAppointmentTime => Date : ${freeBookingAppointmentTime.toLocaleDateString()}  Time : ${freeBookingAppointmentTime.toLocaleTimeString()}`);
-        log.debug(`slotRequest end time =>  Date : ${slotRequest.day_endTime.toLocaleDateString()}  Time : ${slotRequest.day_endTime.toLocaleTimeString()}`);
+      log.debug(
+        `freeBookingAppointmentTime => Date : ${freeBookingAppointmentTime.toLocaleDateString()}  Time : ${freeBookingAppointmentTime.toLocaleTimeString()}`
+      );
+      log.debug(
+        `slotRequest end time =>  Date : ${slotRequest.day_endTime.toLocaleDateString()}  Time : ${slotRequest.day_endTime.toLocaleTimeString()}`
+      );
 
       // if no free time slot found
       if (
@@ -386,6 +390,18 @@ class AppointmentService implements AppointmentServiceInterface {
 
       const endTime = new Date(startTime);
       endTime.setTime(endTime.getTime() + slotRequest.timeInterval_forEachSlot);
+
+      const isBooked = await this.Patient_Booked_Appointment_In_That_Day(
+        patientID,
+        startTime,
+        endTime
+      );
+
+      if (isBooked)
+        throw createHttpError(
+          400,
+          "You have already booked an appointment in that day"
+        );
 
       // get patient credentials and doctor email
       const { doctorInfo, patientName } = await this.PatientName_and_DoctorInfo(
