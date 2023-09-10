@@ -257,7 +257,7 @@ class AppointmentRepository implements Appointment_Repository_Interface {
         where: {
           doctorID: appointment.doctorID,
           patientID: appointment.patientID,
-          status: AppointmentStatus.COMPLETED,
+          status: AppointmentStatus.PRESCRIBED,
           endTime: {
             [Op.lte]: appointment.startTime,
           },
@@ -359,7 +359,10 @@ class AppointmentRepository implements Appointment_Repository_Interface {
       const currentTime = new Date();
 
       // if current time is greater than day_startTime then search for appointments after currentTime
-      if (currentTime > day_startTime) day_startTime = new Date(currentTime);
+      if (currentTime > day_startTime) {
+        const timeDiff = currentTime.getTime() - day_startTime.getTime();
+        const extraTime = (day_startTime = new Date(currentTime));
+      }
 
       // find all appointments in that day
       const appointments: AppointmentAttributes[] = await Appointment.findAll({
