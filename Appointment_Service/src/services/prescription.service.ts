@@ -118,7 +118,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
       const payload: RPC_Request_Payload = {
         type: "GET_DOCTOR_INFO_FOR_PRESCRIPTION",
         data: {
-          doctorID: 2,
+          doctorID: doctorID,
         },
       };
 
@@ -150,7 +150,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
       const payload: RPC_Request_Payload = {
         type: "GET_PATIENT_INFO_FOR_PRESCRIPTION",
         data: {
-          patientID: 4,
+          patientID: patientID,
         },
       };
 
@@ -240,7 +240,7 @@ class PrescriptionService implements PrescriptionServiceInterface {
       if (appointmentID === null) {
         appointment =
           await prescriptionRepository.getAppointment_fromPrescriptionID(
-            prescriptionID!
+            prescriptionID as number
           );
       } else {
         appointment = await appointmentRepository.Get_AppointmentInfo(
@@ -250,8 +250,14 @@ class PrescriptionService implements PrescriptionServiceInterface {
 
       if (!appointment) throw createHttpError(404, "Appointment not found");
 
+      log.info(appointment, "appointment");
+
       const doctorID = appointment.doctorID;
       const patientID = appointment.patientID;
+
+      log.info(doctorID, "doctorID");
+      log.info(patientID, "patientID");
+
 
       const tempPatientInfo = await this.getPatientInformation(patientID);
 
@@ -429,6 +435,9 @@ class PrescriptionService implements PrescriptionServiceInterface {
           prescriptionID
         );
 
+      log.info(prescriptionID, "prescriptionID");
+      log.info(prescription, "prescription");
+
       if (!prescription) throw createHttpError(404, "Prescription not found");
 
       const prescriptionHeader = await this.generatePrescriptionHeader(
@@ -460,6 +469,20 @@ class PrescriptionService implements PrescriptionServiceInterface {
         brandInfos[i].duration = Number(prescription_medicines[i].duration);
       }
 
+      if(!prescription.downloadLink){
+        const downloadURL = await this.uploadPrescriptionPdf_and_getDownLoadlink(
+          prescription.appointmentID
+        );
+
+        if (!downloadURL)
+          throw createHttpError(500, "Error uploading prescription pdf");
+
+        await prescriptionRepository.updatePrescription_downloadURL(
+          prescription.id,
+          downloadURL
+        );
+      }
+
       return {
         Header: prescriptionHeader,
         Medicines: brandInfos,
@@ -489,6 +512,8 @@ class PrescriptionService implements PrescriptionServiceInterface {
 
       if (!prescriptionOutput)
         throw createHttpError(500, "Error generating prescription output");
+
+      log.info(prescriptionOutput, "prescriptionOutput");
 
       await this.createPrescriptionPdf(appointmentID, prescriptionOutput);
 
