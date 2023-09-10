@@ -26,6 +26,7 @@ export interface CreatePrescriptionInput {
   meetAfter: number | null;
   otherNotes: string[] | null;
   past_history: string[] | null;
+  test: string[] | null;
 }
 
 export interface Prescription_Repository_Interface {

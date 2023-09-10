@@ -77,6 +77,7 @@ export interface PrescriptionAttributes {
   meetAfter: number;
   otherNotes: string[];
   past_history: string[];
+  test : string[];
 }
 
 export interface PrescriptionOutput extends PrescriptionAttributes {
@@ -95,6 +96,7 @@ class Prescription extends Model implements PrescriptionAttributes {
   public meetAfter!: number;
   public otherNotes!: string[];
   public past_history!: string[];
+  public test!: string[];
 
   // define associations
   public getAppointment!: HasOneGetAssociationMixin<Appointment>;
@@ -159,6 +161,11 @@ Prescription.init(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+
+    test: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    }
   },
   {
     sequelize: sequelizeConnection,
