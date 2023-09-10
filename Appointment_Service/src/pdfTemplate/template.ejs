@@ -635,6 +635,15 @@
           <hr style="margin-top: 25px" />
         </div>
 
+        <div class="tests">
+          <div class="advice-header">Tests</div>
+          <% if(test && test.length> 0) { test.forEach((entry) => {>
+            <div class="advice-entry">
+              <%= entry %>
+            </div>
+            <% })} %>
+        </div>
+
         <div class="advices">
           <div class="advice-header">Advice</div>
           <% advices.forEach((advice)=> { %>
@@ -701,19 +710,28 @@
         <div class="leftBar">
           <div class="history">
             <div class="leftBarHeadings">Past History</div>
-            <div class="PastHistoryEntry">XYZdddddddddddddddddddddddddddddddddddddddd</div>
+            <% if(past_history && past_history.length> 0) { past_history.forEach((history) => {>
+              <div class="PastHistoryEntry">
+                <%= history %>
+              </div>
+              <% })} %>
           </div>
           <div class="Diagnosis">
             <div class="leftBarHeadings">Diagnosis:</div>
-            <div class="leftBarEntries">XYZ</div>
-            <div class="leftBarEntries">XYZ</div>
-            <div class="leftBarEntries">XYZ</div>
+            <% if(diagnosis && diagnosis.length> 0) { diagnosis.forEach((entry) => {>
+              <div class="leftBarEntries">
+                <%= entry %>
+              </div>
+              <% })} %>
+
           </div>
           <div class="symptom">
             <div class="leftBarHeadings">Symptoms:</div>
-            <div class="symptomEntry">sdasdhaskdhkaskdhka</div>
-            <div class="symptomEntry">A</div>
-            <div class="symptomEntry">B</div>
+            <% if(symptoms && symptoms.length> 0) { symptoms.forEach((entry) => {>
+              <div class="symptomEntry">
+                <%= entry %>
+              </div>
+              <% })} %>
           </div>
         </div>
 
