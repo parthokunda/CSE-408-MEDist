@@ -432,6 +432,7 @@
     .box .medImage {
       max-width: 30px;
       max-height: 30px;
+      margin-right: 5px;
     }
 
     .box .leftBar {
@@ -461,8 +462,8 @@
       height: 34px;
       font-family: "Inter-Medium", Helvetica;
       font-weight: 500;
-      color: #3c6255;
-      font-size: 28px;
+      color: #1b1f1d;
+      font-size: 24px;
       letter-spacing: 0;
       line-height: normal;
     }
@@ -475,8 +476,8 @@
       width: 300px;
       font-family: "Inter-Medium", Helvetica;
       font-weight: 500;
-      color: #3c6255;
-      font-size: 28px;
+      color: #1b1f1d;
+      font-size: 24px;
       letter-spacing: 0;
       line-height: normal;
       word-break: break-all;
@@ -519,7 +520,7 @@
       left: 0;
       font-family: "Inter-Medium", Helvetica;
       font-weight: 500;
-      color: #3c6255;
+      color: #1b1f1d;
       font-size: 24px;
       letter-spacing: 0;
       line-height: normal;
@@ -709,7 +710,7 @@
 
         <div class="leftBar">
           <div class="history">
-            <div class="leftBarHeadings">Past History</div>
+            <div class="leftBarHeadings">Past History: </div>
             <% if(past_history && past_history.length> 0) { past_history.forEach((history) => { %>
               <div class="PastHistoryEntry">
                 <%= history %>
@@ -743,7 +744,7 @@
               Height: <%= Header.PatientPortionInfo.height.feet %>’ <%= Header.PatientPortionInfo.height.inches %>’’
             </div>
             <div class="weight">
-              Weight: <%= Header.PatientPortionInfo.weight %> kgs
+              Weight: <%= Header.PatientPortionInfo.weight %> kg
             </div>
             <div class="name">
               Name: <%= Header.PatientPortionInfo.name %>
