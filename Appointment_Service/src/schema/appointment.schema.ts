@@ -1,7 +1,7 @@
 // external imports
 import { object, string, union, TypeOf, number, date, any } from "zod";
 import log from "../utils/logger";
-import { WeekName } from "../database/models";
+import { AppointmentStatus, WeekName } from "../database/models";
 
 export interface Appointment_Schema_Interface {
   // booking online appointment
@@ -12,6 +12,9 @@ export interface Appointment_Schema_Interface {
 
   // confirm online appointment
   Confirm_Online_Appointment: object;
+
+  // add other appoinment
+  Add_Other_Appointments: object;
 }
 
 class Appointment_Schema implements Appointment_Schema_Interface {
@@ -55,6 +58,11 @@ class Appointment_Schema implements Appointment_Schema_Interface {
 
     query: object({
       type: string().optional(),
+      status: string()
+        .refine((val) => {
+          return Object.values(AppointmentStatus).includes(val as any);
+        })
+        .optional(),
 
       pagination: union([number(), string()])
         .refine(
@@ -109,9 +117,42 @@ class Appointment_Schema implements Appointment_Schema_Interface {
         }),
     }),
   });
+
+  // ------------------ Add Other Appointments ------------------ //
+  Add_Other_Appointments = object({
+    params: object({
+      appointmentID: union([string(), number()])
+        .refine((val) => {
+          // must be a positive integer
+          const num = Number(val);
+          return !isNaN(num) && num > 0 && Number.isInteger(num);
+        }, "appointmentID must be a positive integer")
+        .transform((val) => {
+          return Number(val).toString();
+        }),
+    }),
+    body: object({
+      appoinmentIDs: number()
+        .array()
+        .min(1, "Atleast one appointment ID is required")
+        .refine((val) => {
+          for (const id of val) {
+            if (isNaN(id) || !Number.isInteger(id) || id < 0) return false;
+          }
+        }, "All appointment IDs must be positive integers"),
+    }),
+  });
 }
 
 export default Appointment_Schema;
+
+export type Add_Other_Appointments_Params_Input = TypeOf<
+  Appointment_Schema["Add_Other_Appointments"]
+>["params"];
+
+export type Add_Other_Appointments_Body_Input = TypeOf<
+  Appointment_Schema["Add_Other_Appointments"]
+>["body"];
 
 export type Booking_Online_Appointment_Params_Input = TypeOf<
   Appointment_Schema["Booking_Online_Appointment"]

@@ -15,6 +15,7 @@ import Patient, {
   PatientAdditionalInfo_Excluded_Properties,
   PatientOverviewInfo,
   PatientOverviewInfo_Excluded_Properties,
+  Patient_Info_For_Prescription,
   UpdatedPatientAdditionalInfo,
 } from "../database/models/Patient.model";
 import log from "../utils/logger";
@@ -121,13 +122,63 @@ class PatientService implements PatientServiceInterface {
     }
   }
 
+  // ----------------------------------------- Get Patient Info for Prescription ------------------------------------------ //
+  async getPatientInfo_forPrescription(
+    patientID: number
+  ): Promise<RPC_Response_Payload> {
+    try {
+      const patientInfo = (await this.getPatientAdditionalInfo(patientID))
+        .PatientInfo;
+
+      if (!patientInfo) throw createHttpError(404, "Patient not found");
+
+      // remove status from patientInfo
+      const { status, address, dob, ...rest } = patientInfo;
+
+      log.info(rest, "patient info for prescription");
+
+      // if (rest["updatedAt"]) delete rest["updatedAt"];
+      // if (rest["createdAt"]) delete rest["createdAt"];
+
+      // calculate age from dob
+      const oneYear = 365.25 * 24 * 60 * 60 * 1000;
+      const age = Math.floor((Date.now() - dob.getTime()) / oneYear);
+
+      const resultData: Patient_Info_For_Prescription = {
+        ...rest,
+        age,
+      };
+
+      return {
+        status: "success",
+        data: {
+          resultData,
+        },
+      };
+    } catch (error) {
+      log.error(error);
+      return {
+        status: "error",
+        data: {
+          message: error.message,
+        },
+      };
+    }
+  }
+
   // ----------------- server side RPC request handler ----------------
   async serveRPCRequest(payload: RPC_Request_Payload) {
     log.debug(payload, "Rpc request payload");
-
+    console.log(payload, "Rpc request payload");
     let response: RPC_Response_Payload = {
       status: "error",
-      data: {},
+      data: {
+        message: `request you sent - ${
+          payload.type
+        } - is not handled by the server & your data is - ${JSON.stringify(
+          payload.data
+        )}`,
+      },
     };
     switch (payload.type) {
       case "CREATE_NEW_ENTITY":
@@ -138,6 +189,11 @@ class PatientService implements PatientServiceInterface {
 
       case "GET_NAME_FROM_ID":
         return await this.getName_givenID(payload.data["patientID"]);
+
+      case "GET_PATIENT_INFO_FOR_PRESCRIPTION":
+        return await this.getPatientInfo_forPrescription(
+          payload.data["patientID"]
+        );
 
       default:
         break;
@@ -194,7 +250,7 @@ class PatientService implements PatientServiceInterface {
       // inches is the decimal part of height
       let inches = height - feet;
       // convert inches to integer
-      inches = Math.floor(inches * 100);
+      inches = Math.round(inches * 100);
 
       const updatedPatientAdditionalInfo = {
         ...patientAdditionalInfo,

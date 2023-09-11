@@ -9,6 +9,8 @@ import {
   prescription_medicineService,
 } from "../services";
 import {
+  Add_Other_Appointments_Body_Input,
+  Add_Other_Appointments_Params_Input,
   Booking_Online_Appointment_Params_Input,
   Confirm_Online_Appointment_Params_Input,
 } from "../schema/appointment.schema";
@@ -19,6 +21,8 @@ import {
   AppointmentStatus,
   AppointmentTimeSlot,
   AppointmentType,
+  FinalAppointmentOverviewInfo,
+  PrescriptionOutput,
   WeekName,
 } from "../database/models";
 
@@ -47,6 +51,17 @@ export interface Appointment_Controller_Interface {
     next: NextFunction
   );
 
+  //add other appointment - access by patient
+  Add_Other_Appointments(
+    req: Request<
+      Add_Other_Appointments_Params_Input,
+      {},
+      Add_Other_Appointments_Body_Input
+    >,
+    res: Response,
+    next: NextFunction
+  );
+
   //cancel online appointment - access by patient
   Cancel_Online_Appointment(
     req: Request<Confirm_Online_Appointment_Params_Input>,
@@ -55,7 +70,14 @@ export interface Appointment_Controller_Interface {
   );
 
   // view pending appointments - access by both patient and doctor
-  View_Pending_Appointments(req: Request, res: Response, next: NextFunction);
+  Search_Appointments(req: Request, res: Response, next: NextFunction);
+
+  // view appointment - access by both patient and doctor
+  View_Appointment(
+    req: Request<Confirm_Online_Appointment_Params_Input>,
+    res: Response,
+    next: NextFunction
+  );
 }
 
 class Appointment_Controller implements Appointment_Controller_Interface {
@@ -64,25 +86,25 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     this.Confirm_Online_Appointment =
       this.Confirm_Online_Appointment.bind(this);
     this.Cancel_Online_Appointment = this.Cancel_Online_Appointment.bind(this);
-    this.View_Pending_Appointments = this.View_Pending_Appointments.bind(this);
+    this.Search_Appointments = this.Search_Appointments.bind(this);
   }
 
-  private setAppointmentDay(weekday: number, thisweek: boolean): Date {
-    let today: number, appointmentDay: Date;
+  private setAppointmentDay(weekday: number): Date {
+    const today = (new Date().getDay() + 2) % 7;
+    const dayDiff = weekday - today;
 
-    today = new Date().getDay();
+    log.debug("weekday : " + weekday + " today : " + today);
 
-    if (thisweek) {
-      appointmentDay = new Date();
-    } else {
-      // appointmentDay is next week
-      appointmentDay = new Date();
-      appointmentDay.setDate(appointmentDay.getDate() + 7);
+    let appointmentDay = new Date();
+
+    if (dayDiff < 0) {
+      //same day next week
+      appointmentDay.setDate(appointmentDay.getDate() + 7 + dayDiff);
+    } else if (dayDiff > 0) {
+      //same day this week
+      appointmentDay.setDate(appointmentDay.getDate() + dayDiff);
     }
 
-    appointmentDay.setDate(
-      appointmentDay.getDate() + (weekday - 2 - today) // -2 because weekday starts from 2
-    );
     appointmentDay.setHours(0, 0, 0, 0);
 
     log.info(
@@ -154,6 +176,37 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     }
   }
 
+  // ----------------- Add Other Appointment ----------------- //
+  async Add_Other_Appointments(
+    req: Request<
+      Add_Other_Appointments_Params_Input,
+      {},
+      Add_Other_Appointments_Body_Input
+    >,
+    res: Response,
+    next: NextFunction
+  ) {
+    const patientID = req.user_identity?.id as number;
+    const appoinmentID = Number(req.params.appointmentID);
+    const appointmentIDs = req.body.appoinmentIDs as number[];
+
+    try {
+      const appointment =
+        await appointmentService.Add_Other_Prescriptions_To_Confirmed_Appointment(
+          appoinmentID,
+          patientID,
+          appointmentIDs
+        );
+
+      res.status(200).json({
+        message: "Appointment added successfully",
+        appointment,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   // ----------------- Book Online Appointment ----------------- //
   async Book_Online_Appointment(
     req: Request<Booking_Online_Appointment_Params_Input>,
@@ -185,14 +238,9 @@ class Appointment_Controller implements Appointment_Controller_Interface {
       const endTime = timeSlotInfo.endTime;
       const totalSlots = timeSlotInfo.totalSlots;
 
-      const today = new Date().getDay();
+      const today = (new Date().getDay() + 2) % 7;
 
-      let appointmentDay: Date;
-
-      // construct appointmentDay from weekday
-      if (weekday < today)
-        appointmentDay = this.setAppointmentDay(weekday, false);
-      else appointmentDay = this.setAppointmentDay(weekday, true);
+      const appointmentDay: Date = this.setAppointmentDay(weekday);
 
       // construct appointment_day_start_time and appointment_day_end_time
       const appointment_day_start_time = new Date(
@@ -212,19 +260,6 @@ class Appointment_Controller implements Appointment_Controller_Interface {
         appointment_day_end_time.toTimeString(),
         "appointment_day_end_time"
       );
-
-      // check patient has already booked appointment with the doctor on that day
-      const isAlreadyBooked =
-        await appointmentService.Patient_Booked_Appointment_In_That_Day(
-          patientID,
-          appointment_day_start_time,
-          appointment_day_end_time
-        );
-      if (isAlreadyBooked)
-        throw createHttpError(
-          400,
-          "You have already booked appointment in that time slot"
-        );
 
       // construct time interval for each slot according to totalSlots and startTime & endTime
       const timeInterval_forEachSlot = Math.floor(
@@ -252,6 +287,8 @@ class Appointment_Controller implements Appointment_Controller_Interface {
           slotRequest
         );
 
+      log.debug(appointment.startTime.toDateString(), "appointment startTime");
+
       // send response
       res.status(200).json({
         message: "Confirm the appointment within 5 minutes",
@@ -262,12 +299,8 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     }
   }
 
-  // view pending appointments
-  async View_Pending_Appointments(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  // search appointments
+  async Search_Appointments(req: Request, res: Response, next: NextFunction) {
     log.info(req.user_identity, "user_identity in View_Pending_Appointments");
     log.info(req.query, "query in View_Pending_Appointments");
     log.info(req.params, "params in View_Pending_Appointments");
@@ -280,7 +313,9 @@ class Appointment_Controller implements Appointment_Controller_Interface {
         ? (req.query.type as string)
         : AppointmentType.ONLINE,
 
-      status: AppointmentStatus.PENDING,
+      status: req.query.status
+        ? (req.query.status as string)
+        : AppointmentStatus.PENDING,
 
       filterByStartTime: req.query.fromDate
         ? new Date(req.query.fromDate as string)
@@ -314,17 +349,49 @@ class Appointment_Controller implements Appointment_Controller_Interface {
     );
 
     try {
-      const pendingAppointments =
-        await appointmentService.Search_Pending_Appointment(
-          search_appointment_input,
-          req.query.pagination ? Number(req.query.pagination) : 5,
-          req.params.currentPage ? Number(req.params.currentPage) : 1,
-          role === "patient"
-        );
+      const appointments = await appointmentService.Search_Appointments(
+        search_appointment_input,
+        req.query.pagination ? Number(req.query.pagination) : 5,
+        req.params.currentPage ? Number(req.params.currentPage) : 1,
+        role === "patient"
+      );
+      log.info(appointments, "appointments in View_Pending_Appointments");
 
       res.status(200).json({
-        // message: "Pending appointments fetched successfully",
-        pendingAppointments,
+        ...appointments,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // view appointment
+  async View_Appointment(
+    req: Request<Confirm_Online_Appointment_Params_Input>,
+    res: Response,
+    next: NextFunction
+  ) {
+    const appointmentID = Number(req.params.appointmentID);
+    let patientID: number | null = null,
+      doctorID: number | null = null;
+
+    if (req.user_identity?.role === "patient")
+      patientID = Number(req.user_identity.id);
+    else if (req.user_identity?.role === "doctor")
+      doctorID = Number(req.user_identity.id);
+
+    try {
+      const result: FinalAppointmentOverviewInfo | PrescriptionOutput =
+        await appointmentService.View_Appointment(
+          appointmentID,
+          patientID,
+          doctorID
+        );
+
+      log.info(result, "view appointment result");
+
+      res.status(200).json({
+        result,
       });
     } catch (error) {
       next(error);

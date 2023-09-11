@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 // internal imports
 import { config } from "../config";
 import log from "./logger";
-import { PatientServiceInterface } from "../services/patient.service";
+import { MedicineRPCServiceInterface } from "../rpc_service/medicine.rpc.service";
 
 export interface RPC_Request_Payload {
   type: string;
@@ -23,12 +23,7 @@ export interface RPC_Response_Payload {
 }
 
 export interface BrokerServiceInterface {
-  RPC_Request(
-    RPC_QUEUE_NAME: string,
-    requestPayload: RPC_Request_Payload
-  ): Promise<RPC_Response_Payload>;
-
-  RPC_Observer(userService: PatientServiceInterface): Promise<void>;
+  RPC_Observer(userService: MedicineRPCServiceInterface): Promise<void>;
 }
 
 class BrokerService implements BrokerServiceInterface {
@@ -61,63 +56,7 @@ class BrokerService implements BrokerServiceInterface {
     }
   }
 
-  async RPC_Request(
-    RPC_QUEUE_NAME: string,
-    requestPayload: RPC_Request_Payload
-  ): Promise<RPC_Response_Payload> {
-    const uuid = uuidv4(); // correlation id
-
-    const channel = await this.getChannel();
-    const queue = await channel.assertQueue("", {
-      exclusive: false,
-      durable: false,
-      autoDelete: true,
-    });
-
-    // send the request
-    await channel.sendToQueue(
-      RPC_QUEUE_NAME,
-      Buffer.from(JSON.stringify(requestPayload)),
-      {
-        replyTo: queue.queue,
-        correlationId: uuid,
-      }
-    );
-
-    return new Promise((resolve, reject) => {
-      // timeout for 8 seconds
-      const timeout = setTimeout(() => {
-        channel.close();
-        reject(new Error("API could not fulfill the request"));
-      }, 8000);
-
-      // consume the response
-      channel.consume(
-        queue.queue,
-
-        (msg: Message | null) => {
-          if (msg && msg.properties.correlationId === uuid) {
-            // if correlation id matches, that means the response is for the request we sent
-
-            //delete the queue
-            channel.deleteQueue(queue.queue);
-
-            resolve(JSON.parse(msg.content.toString()) as RPC_Response_Payload);
-            clearTimeout(timeout);
-          } else {
-            // means the response is not for the request we sent
-            reject(new Error("Correlation ID mismatch. Data not found!"));
-          }
-        },
-        {
-          // noAck: true means that the message will be deleted from the queue as soon as it is consumed
-          noAck: true,
-        }
-      );
-    });
-  }
-
-  async RPC_Observer(userService: PatientServiceInterface) {
+  async RPC_Observer(userService: MedicineRPCServiceInterface) {
     const channel = await this.getChannel();
 
     const RPC_QUEUE_NAME = config.SELF_RPC_QUEUE;

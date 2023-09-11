@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 // internal imports
 import { config } from "../config";
 import log from "./logger";
-import { UserServiceInterface } from "services/user.service";
+import { UserServiceInterface } from "../services/user.service";
 
 export interface RPC_Request_Payload {
   type: string;
@@ -13,7 +13,12 @@ export interface RPC_Request_Payload {
 }
 
 export interface RPC_Response_Payload {
-  status: "success" | "error" | "not_found" | "unauthorized";
+  status:
+    | "success"
+    | "error"
+    | "not_found"
+    | "unauthorized"
+    | "duplicate_error";
   data: object;
 }
 
@@ -37,24 +42,47 @@ export interface BrokerServiceInterface {
 }
 
 class BrokerService implements BrokerServiceInterface {
-  private amqlibConnection: Connection;
+  private amqlibConnection: Connection | null;
+  private channel: Channel | null;
 
   constructor() {
     this.amqlibConnection = null;
+    this.channel = null;
   }
 
   async getChannel(): Promise<Channel> {
     if (this.amqlibConnection === null) {
       this.amqlibConnection = await amqplib.connect(config.MSG_QUEUE_URL);
     }
-    return await this.amqlibConnection.createChannel();
+    if (this.channel === null) {
+      this.channel = await this.amqlibConnection.createChannel();
+    }
+    return this.channel;
   }
+
+  async closeConnectionAndChannel() {
+    if (this.channel) {
+      await this.channel.close();
+      this.channel = null;
+    }
+    if (this.amqlibConnection) {
+      await this.amqlibConnection.close();
+      this.amqlibConnection = null;
+    }
+  }
+
+  //create exchange one time even if the class is instantiated multiple times
 
   async SUBSCRIBE_TO_EXCHANGE(
     RPC_EXCHANGE_NAME: string,
     callback: (requestPayload: RPC_Request_Payload) => void
   ): Promise<void> {
     const channel = await this.getChannel();
+
+    // Ensure the exchange is declared before binding the queue
+    await channel.assertExchange(RPC_EXCHANGE_NAME, "fanout", {
+      durable: false,
+    });
 
     const queue = await channel.assertQueue("", { exclusive: true });
 
@@ -109,7 +137,20 @@ class BrokerService implements BrokerServiceInterface {
     const uuid = uuidv4(); // correlation id
 
     const channel = await this.getChannel();
-    const queue = await channel.assertQueue("", { exclusive: true });
+
+    // create a temporary queue which will be deleted once the message is consumed
+    const queue = await channel.assertQueue("", {
+      exclusive: false,
+      durable: false,
+      autoDelete: true,
+    });
+    //exclusive: true means that the queue will be deleted once the connection is closed
+
+    log.info(
+      `Sending RPC request: ${JSON.stringify(
+        requestPayload
+      )} to ${RPC_QUEUE_NAME}`
+    );
 
     // send the request
     await channel.sendToQueue(
@@ -126,14 +167,18 @@ class BrokerService implements BrokerServiceInterface {
       const timeout = setTimeout(() => {
         channel.close();
         reject(new Error("API could not fulfill the request"));
-      }, 8000);
+      }, 16000);
 
       // consume the response
       channel.consume(
         queue.queue,
 
         (msg: Message | null) => {
-          if (msg.properties.correlationId === uuid) {
+          log.info(msg?.content.toString(), "Response in RPC");
+
+          if (msg && msg.properties.correlationId === uuid) {
+            //delete the queue
+            channel.deleteQueue(queue.queue);
             // if correlation id matches, that means the response is for the request we sent
             resolve(JSON.parse(msg.content.toString()) as RPC_Response_Payload);
             clearTimeout(timeout);
@@ -164,7 +209,7 @@ class BrokerService implements BrokerServiceInterface {
     channel.consume(
       RPC_QUEUE_NAME,
       async (msg: Message | null) => {
-        if (msg.content) {
+        if (msg && msg.content) {
           log.info(`Received RPC request: ${msg.content.toString()}`);
 
           const payload: RPC_Request_Payload = JSON.parse(
@@ -175,7 +220,9 @@ class BrokerService implements BrokerServiceInterface {
             const response: RPC_Response_Payload =
               await userService.serveRPCRequest(payload);
 
-            log.info(`Response to ${payload.type} : ${response}`);
+            log.info(
+              `Response to ${payload.type} : ${JSON.stringify(response)}`
+            );
 
             // send the response
             channel.sendToQueue(
@@ -212,6 +259,8 @@ class BrokerService implements BrokerServiceInterface {
 
             // Acknowledge the message even if there's an error, so it is removed from the queue.
             channel.ack(msg);
+          } finally {
+            //
           }
         }
       },

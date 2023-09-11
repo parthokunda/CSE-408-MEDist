@@ -41,7 +41,16 @@ export const DoctorAdditionalInfo_Excluded_Properties: (
   | "scheduleID"
   | "specializationID"
   | "online_visit_fee"
-)[] = ["userID", "scheduleID", "specializationID", "online_visit_fee"];
+  | "createdAt"
+  | "updatedAt"
+)[] = [
+  "userID",
+  "scheduleID",
+  "specializationID",
+  "online_visit_fee",
+  "createdAt",
+  "updatedAt",
+];
 
 export const DoctorOverviewInfo_Excluded_Properties: (
   | "userID"
@@ -50,7 +59,18 @@ export const DoctorOverviewInfo_Excluded_Properties: (
   | "status"
   | "dob"
   | "phone"
-)[] = ["userID", "scheduleID", "specializationID", "status", "dob", "phone"];
+  | "createdAt"
+  | "updatedAt"
+)[] = [
+  "userID",
+  "scheduleID",
+  "specializationID",
+  "status",
+  "dob",
+  "phone",
+  "createdAt",
+  "updatedAt",
+];
 
 export interface SearchDoctorInfo {
   Doctors: DoctorOverviewInfo[];
@@ -60,7 +80,12 @@ export interface SearchDoctorInfo {
 export interface DoctorAdditionalInfo {
   DoctorInfo: Omit<
     DoctorAttributes,
-    "userID" | "scheduleID" | "specializationID" | "online_visit_fee"
+    | "userID"
+    | "scheduleID"
+    | "specializationID"
+    | "online_visit_fee"
+    | "createdAt"
+    | "updatedAt"
   >;
   Specialization: SpecializationAttributes | {};
 }
@@ -76,19 +101,81 @@ export interface DoctorOnlineScheduleInfo {
 }
 
 export interface DoctorProfileInfo {
-  DoctorInfo: DoctorAttributes;
+  DoctorInfo: Omit<
+    DoctorAttributes,
+    "userID" | "scheduleID" | "createdAt" | "updatedAt" | "online_visit_fee"
+  >;
   Specialization: SpecializationAttributes | {};
   OnlineSchedule: OnlineScheduleOverview;
 }
 
+export const DoctorProfileInfo_Excluded_Properties: (
+  | "userID"
+  | "scheduleID"
+  | "createdAt"
+  | "updatedAt"
+  | "online_visit_fee"
+)[] = ["userID", "scheduleID", "createdAt", "updatedAt", "online_visit_fee"];
+
 export interface DoctorOverviewInfo {
   DoctorInfo: Omit<
     DoctorAttributes,
-    "userID" | "scheduleID" | "specializationID" | "status" | "dob" | "phone"
+    | "userID"
+    | "scheduleID"
+    | "specializationID"
+    | "status"
+    | "dob"
+    | "phone"
+    | "createdAt"
+    | "updatedAt"
   >; // exclude userID, scheduleID, specializationID
 
   Specialization: SpecializationAttributes | {};
 }
+
+export interface PrescriptionDoctorInfo {
+  DoctorInfo: Omit<
+    DoctorAttributes,
+    | "userId"
+    | "scheduleId"
+    | "specializationId"
+    | "status"
+    | "dob"
+    | "online_visit_fee"
+    | "gender"
+    | "bmdc"
+    | "issueDate"
+    | "createdAt"
+    | "updatedAt"
+  >;
+  Specialization: SpecializationAttributes;
+}
+
+export const PrescriptionDoctorInfo_Excluded_Properties: (
+  | "userID"
+  | "scheduleID"
+  | "specializationID"
+  | "status"
+  | "dob"
+  | "online_visit_fee"
+  | "gender"
+  | "bmdc"
+  | "issueDate"
+  | "createdAt"
+  | "updatedAt"
+)[] = [
+  "userID",
+  "scheduleID",
+  "specializationID",
+  "status",
+  "dob",
+  "gender",
+  "bmdc",
+  "issueDate",
+  "online_visit_fee",
+  "createdAt",
+  "updatedAt",
+];
 
 export interface DoctorAttributes {
   id: number;

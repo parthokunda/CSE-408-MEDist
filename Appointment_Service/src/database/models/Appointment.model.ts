@@ -29,6 +29,7 @@ export enum AppointmentStatus {
   RATED = "rated",
   COMPLETED = "completed",
   TEMPORARY = "temporary",
+  EXPIRED = "expired",
 }
 
 export enum AppointmentType {
@@ -55,7 +56,7 @@ export interface Patient_or_Doctor_Info {
   email: string;
 }
 
-export interface PendingAppointmentOverviewInfo {
+export interface AppointmentOverviewInfo {
   id: number;
   type: AppointmentType;
 
@@ -71,8 +72,21 @@ export interface PendingAppointmentOverviewInfo {
   meetingLink: string | null;
 }
 
+export interface OlderAppointmentOverviewInfo
+  extends Omit<AppointmentOverviewInfo, "meetingLink" | "status"> {}
+
+export const OlderAppointmentOverviewInfo_Excluded_Properties: (
+  | "meetingLink"
+  | "status"
+)[] = ["meetingLink", "status"];
+
+export interface FinalAppointmentOverviewInfo extends AppointmentOverviewInfo {
+  olderAppointments: OlderAppointmentOverviewInfo[];
+  otherAppointments: OlderAppointmentOverviewInfo[];
+}
+
 export interface PendingAppointments {
-  appointments: PendingAppointmentOverviewInfo[];
+  appointments: AppointmentOverviewInfo[];
   totalCount: number;
 }
 
@@ -102,6 +116,9 @@ export interface AppointmentAttributes {
 
   expires_at: Date;
 
+  olderAppointmentIDs: number[];
+  otherAppointmentIDs: number[];
+
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -128,6 +145,9 @@ class Appointment extends Model implements AppointmentAttributes {
 
   public timeSlotID!: number;
   public expires_at!: Date;
+
+  public olderAppointmentIDs!: number[];
+  public otherAppointmentIDs!: number[];
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -222,6 +242,16 @@ Appointment.init(
     expires_at: {
       type: DataTypes.DATE,
       allowNull: false,
+    },
+
+    olderAppointmentIDs: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      allowNull: true,
+    },
+
+    otherAppointmentIDs: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      allowNull: true,
     },
   },
   {

@@ -2,7 +2,7 @@
 import createHttpError from "http-errors";
 
 //import model
-import { Doctor, OnlineSchedule } from "../models";
+import { Doctor, DoctorStatus, OnlineSchedule } from "../models";
 import log from "../../utils/logger";
 
 export interface Online_Schedule_Repository_Interface {
@@ -68,6 +68,9 @@ class Online_Schedule_Repository
         await doctor.addOnlineSchedule(schedule);
         await schedule.setDoctor(doctor);
       }
+
+      doctor.status = DoctorStatus.FULLY_REGISTERED;
+      await doctor.save();
 
       return createdSchedules;
     } catch (error) {

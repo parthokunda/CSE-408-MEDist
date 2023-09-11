@@ -12,9 +12,46 @@ import {
 import sequelizeConnection from "../config";
 import Prescription from "./Prescription.model";
 
+export interface BrandInfo {
+  Brand: {
+    id: number;
+    name: string;
+    strength: string;
+  };
+  DosageForm: DosageFormAttributes;
+  Generic: GenericAttributes;
+  Manufacturer: ManufacturerAttributes;
+
+  dosage: string;
+  when: string;
+  duration: number;
+}
+
+export interface DosageFormAttributes {
+  id: number;
+  name: string;
+  img_url: string;
+}
+
+export interface GenericAttributes {
+  id: number;
+  name: string;
+  type: string;
+}
+
+export interface ManufacturerAttributes {
+  id: number;
+  name: string;
+}
+
+export interface Prescription_Medicine_Input
+  extends Omit<Prescription_MedicinesAttributes, "id" | "prescriptionID"> {}
+
 export interface Prescription_MedicinesAttributes {
   id: number;
   medicineID: number;
+
+  prescriptionID: number;
 
   //instructions
   dosage: string;

@@ -70,11 +70,21 @@ export interface Appointment_Repository_Interface {
   Book_Temporary_Appointment(
     req: AppointmentBookingInput
   ): Promise<Appointment>;
+
+  //add other appointments
+  Add_Other_Appointments(
+    appointmentID: number,
+    otherAppointmentIDs: number[]
+  ): Promise<Appointment>;
+
   // book online appointment
   Confirm_Online_Appointment(
     appointmentID: number,
     req: AppointmentConfirmingInput
   ): Promise<Appointment>;
+
+  //Find Older Appointments
+  Find_Older_AppointmentIDs(appointment: Appointment): Promise<number[]>;
 
   // delete appointment
   Delete_Appointment(appointmentID: number, patientID: number): Promise<void>;
@@ -108,6 +118,12 @@ export interface Appointment_Repository_Interface {
     day_endTime: Date
   ): Promise<boolean>;
 
+  //modify pending appointments
+  Check_Pending_Appointments(
+    appointments: Appointment[],
+    totalCount: number
+  ): Promise<{ appointments: Appointment[]; totalCount: number }>;
+
   // search appointments
   Search_Appointments(
     req: Search_Appointment_Input,
@@ -117,6 +133,8 @@ export interface Appointment_Repository_Interface {
 
   // get appointment by id
   Get_AppointmentInfo(appointmentID: number): Promise<Appointment>;
+
+  getOldAppointmentIDs(appointment: Appointment): Promise<number[]>;
 }
 
 class AppointmentRepository implements Appointment_Repository_Interface {
@@ -234,6 +252,32 @@ class AppointmentRepository implements Appointment_Repository_Interface {
     }
   }
 
+  // ----------------- Find Older Appointments ----------------- //
+  async Find_Older_AppointmentIDs(appointment: Appointment): Promise<number[]> {
+    try {
+      const olderAppointments = await Appointment.findAll({
+        where: {
+          doctorID: appointment.doctorID,
+          patientID: appointment.patientID,
+          status: AppointmentStatus.PRESCRIBED,
+          endTime: {
+            [Op.lte]: appointment.startTime,
+          },
+        },
+        order: [["startTime", "DESC"]],
+      });
+
+      const olderAppointmentIDs = olderAppointments.map(
+        (appointment) => appointment.id
+      );
+
+      return olderAppointmentIDs;
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Internal Server Error");
+    }
+  }
+
   // ----------------- Book Online Appointment ----------------- //
   async Confirm_Online_Appointment(
     appointmentID: number,
@@ -270,12 +314,39 @@ class AppointmentRepository implements Appointment_Repository_Interface {
       // update meet link
       appointment.meetingLink = meetLink;
       appointment.status = AppointmentStatus.PENDING;
+
+      //older appointments
+      const olderAppointmentIDs = await this.Find_Older_AppointmentIDs(
+        appointment
+      );
+
+      appointment.olderAppointmentIDs = olderAppointmentIDs;
       await appointment.save();
 
       return appointment;
     } catch (error) {
       log.error(error);
       throw createHttpError(500, "Internal Server Error");
+    }
+  }
+
+  // ----------------- Add Other Appointments ----------------- //
+  async Add_Other_Appointments(
+    appointmentID: number,
+    otherAppointmentIDs: number[]
+  ): Promise<Appointment> {
+    try {
+      const appointment = await Appointment.findByPk(appointmentID);
+
+      if (!appointment) throw createHttpError(404, "Appointment not found");
+
+      appointment.otherAppointmentIDs = otherAppointmentIDs;
+      await appointment.save();
+
+      return appointment;
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Error Adding Other Prescriptions");
     }
   }
 
@@ -287,8 +358,17 @@ class AppointmentRepository implements Appointment_Repository_Interface {
     timeInterval_of_eachSlot: number
   ): Promise<Date> {
     try {
-      // find a time gap between day_startTime and day_endTime where no appointment is booked that is there is no entry in database
-      // for that time gap
+      const currentTime = new Date();
+
+      // if current time is greater than day_startTime then search for appointments after currentTime
+      if (currentTime > day_startTime) {
+        const timeDiff = currentTime.getTime() - day_startTime.getTime();
+        const extraTime = Math.ceil(timeDiff / timeInterval_of_eachSlot);
+
+        day_startTime = new Date(
+          day_startTime.getTime() + extraTime * timeInterval_of_eachSlot
+        );
+      }
 
       // find all appointments in that day
       const appointments: AppointmentAttributes[] = await Appointment.findAll({
@@ -303,18 +383,18 @@ class AppointmentRepository implements Appointment_Repository_Interface {
 
       if (appointments.length === 0) return day_startTime;
 
-      for (let i = 0; i < appointments.length - 1; i++) {
+      // now find the first time gap between appointments
+      for (let i = 0; i < appointments.length; i++) {
         if (
-          appointments[i + 1].startTime.getTime() -
-            appointments[i].endTime.getTime() >=
+          appointments[i].startTime.getTime() - day_startTime.getTime() >=
           timeInterval_of_eachSlot
-        ) {
-          return appointments[i].endTime;
-        }
+        )
+          return day_startTime;
+
+        day_startTime = appointments[i].endTime;
       }
 
-      // if no time gap found
-      // then return the last appointment end time
+      // if no time gap found then return the last appointment endTime
       return appointments[appointments.length - 1].endTime;
     } catch (error) {
       log.error(error);
@@ -364,7 +444,7 @@ class AppointmentRepository implements Appointment_Repository_Interface {
         endTime: req.appointmentEndTime,
 
         //expiry time after 10 minutes
-        expires_at: new Date(Date.now() + 10 * 60 * 1000),
+        expires_at: new Date(Date.now() + 60 * 1000),
 
         timeSlotID: req.timeSlotID,
 
@@ -441,16 +521,27 @@ class AppointmentRepository implements Appointment_Repository_Interface {
       const itemsPerPage = pagination;
       const offset = (currentPage - 1) * itemsPerPage;
 
-      const appointments = await Appointment.findAll({
+      let appointments = await Appointment.findAll({
         where: searchQuery,
         order: [["startTime", "DESC"]],
         offset,
         limit: itemsPerPage,
       });
 
-      const totalCount = await Appointment.count({
+      let totalCount = await Appointment.count({
         where: searchQuery,
       });
+
+      //for pending appointments
+      if (req.type === "online" && req.status === "pending") {
+        const modifiedAppointments = await this.Check_Pending_Appointments(
+          appointments,
+          totalCount
+        );
+
+        appointments = modifiedAppointments.appointments;
+        totalCount = modifiedAppointments.totalCount;
+      }
 
       return {
         appointments,
@@ -459,6 +550,68 @@ class AppointmentRepository implements Appointment_Repository_Interface {
     } catch (error) {
       log.error(error);
       throw createHttpError(500, "Internal Server Error");
+    }
+  }
+
+  async Check_Pending_Appointments(
+    appointments: Appointment[],
+    totalCount: number
+  ): Promise<{ appointments: Appointment[]; totalCount: number }> {
+    try {
+      const currentTime = new Date();
+
+      const modifiedAppointments: Appointment[] = [];
+
+      for (let i = 0; i < appointments.length; i++) {
+        const approxEndTime =
+          appointments[i].endTime.getTime() + 30 * 60 * 1000; // adding 30 minutes to endTime
+
+        if (
+          appointments[i].status === AppointmentStatus.PENDING &&
+          approxEndTime < currentTime.getTime()
+        ) {
+          appointments[i].status = AppointmentStatus.EXPIRED;
+          appointments[i].meetingLink = "";
+          await appointments[i].save();
+
+          totalCount--;
+        } else modifiedAppointments.push(appointments[i]);
+      }
+
+      return { appointments: modifiedAppointments, totalCount };
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Error Modifying Pending Appointments");
+    }
+  }
+
+  async getOldAppointmentIDs(appointment: Appointment): Promise<number[]> {
+    try {
+      const olderAppointments = await Appointment.findAll({
+        where: {
+          doctorID: appointment.doctorID,
+          patientID: appointment.patientID,
+          status: AppointmentStatus.PRESCRIBED,
+        },
+        order: [["startTime", "DESC"]],
+      });
+
+      const filtertedAppointment = olderAppointments.filter(
+        (newAppointment) => {
+          if (newAppointment.id !== appointment.id) return newAppointment;
+        }
+      );
+
+      const olderAppointmentIDs = filtertedAppointment.map(
+        (newAppointment) => newAppointment.id
+      );
+
+      log.info(olderAppointmentIDs, "older appoinmentIDs");
+
+      return olderAppointmentIDs;
+    } catch (error) {
+      log.error(error);
+      throw createHttpError(500, "Error getting old appointment IDs");
     }
   }
 }

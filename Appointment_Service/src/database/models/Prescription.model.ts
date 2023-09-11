@@ -14,8 +14,61 @@ import {
 
 // sequelize connection
 import sequelizeConnection from "../config";
-import Appointment from "./Appointment.model";
-import Prescription_Medicines from "./Prescription_Medicines.model";
+import Appointment, {
+  AppointmentStatus,
+  OlderAppointmentOverviewInfo,
+} from "./Appointment.model";
+import Prescription_Medicines, {
+  BrandInfo,
+} from "./Prescription_Medicines.model";
+
+export interface DoctorPortion {
+  DoctorInfo: {
+    id: number;
+    name: string;
+    email: string;
+    image: string;
+
+    phone: string;
+    degrees: string[];
+  };
+  Specialization: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface PatientPortion {
+  id: number;
+  name: string;
+  email: string;
+  image: string;
+
+  phone: string;
+  gendar: string;
+  age: number;
+  bloodGroup: string;
+  height: {
+    feet: number;
+    inches: number;
+  };
+  weight: number;
+}
+
+export interface AppointmentPortion {
+  id: number;
+  type: string;
+  time: Date;
+  status: AppointmentStatus;
+}
+
+export interface PrescriptionHeader {
+  DoctorPortionInfo: DoctorPortion;
+  PatientPortionInfo: PatientPortion;
+  AppointmentPortionInfo: AppointmentPortion;
+  OldAppointments: OlderAppointmentOverviewInfo[];
+  SharedAppointments: OlderAppointmentOverviewInfo[];
+}
 
 export interface PrescriptionAttributes {
   id: number;
@@ -24,7 +77,29 @@ export interface PrescriptionAttributes {
   diagnosis: string[];
   advices: string[];
   followUpDate: Date;
+  meetAfter: number;
   otherNotes: string[];
+  past_history: string[];
+  test: string[];
+  downloadLink: string;
+}
+
+export interface PrescriptionOutput
+  extends Optional<
+    PrescriptionAttributes,
+    | "id"
+    | "symptoms"
+    | "diagnosis"
+    | "advices"
+    | "followUpDate"
+    | "meetAfter"
+    | "otherNotes"
+    | "past_history"
+    | "test"
+    | "downloadLink"
+  > {
+  Header: PrescriptionHeader;
+  Medicines: BrandInfo[];
 }
 
 class Prescription extends Model implements PrescriptionAttributes {
@@ -35,7 +110,11 @@ class Prescription extends Model implements PrescriptionAttributes {
   public diagnosis!: string[];
   public advices!: string[];
   public followUpDate!: Date;
+  public meetAfter!: number;
   public otherNotes!: string[];
+  public past_history!: string[];
+  public test!: string[];
+  public downloadLink!: string;
 
   // define associations
   public getAppointment!: HasOneGetAssociationMixin<Appointment>;
@@ -88,6 +167,26 @@ Prescription.init(
 
     otherNotes: {
       type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+
+    past_history: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+
+    meetAfter: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+
+    test: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+
+    downloadLink: {
+      type: DataTypes.STRING,
       allowNull: true,
     },
   },

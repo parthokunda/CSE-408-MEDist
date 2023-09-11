@@ -30,21 +30,9 @@ if [ $# -eq 1 ]; then
             if [ -d "$folder" ]; then
                 pushd $folder >> /dev/null
                 pnpm i >> /dev/null
-                gnome-terminal --title="$folder" -- bash -c "pnpm start; exec bash"
+                gnome-terminal --title="$folder" -- bash -c "pnpm run dev; exec bash"
                 popd >> /dev/null
             fi
         done
-        # gnome-terminal -- bash -c "cd Auth_Service/ && pnpm start; exec bash"
-        # gnome-terminal -- bash -c "cd Patient_Service/ && pnpm start; exec bash"
-        # gnome-terminal -- bash -c "cd Medicine_Service/ && pnpm start; exec bash"
-        # if ss -tuln | grep -q ":3000"; then
-        #     echo "Port $PORT is occupied."
-        #     PID=$(sudo lsof -t -i :3000)
-        #     echo "Terminating process with PID $PID..."
-        #     sudo kill $PID
-        #     gnome-terminal -- bash -c "cd proxy/ && pnpm start; exec bash"
-        # else
-        #     gnome-terminal -- bash -c "cd proxy/ && pnpm start; exec bash"
-        # fi
     fi
 fi

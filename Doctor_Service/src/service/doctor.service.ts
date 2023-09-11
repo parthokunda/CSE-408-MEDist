@@ -10,9 +10,12 @@ import broker, {
 import {
   DoctorAdditionalInfo,
   DoctorAdditionalInfo_Excluded_Properties,
+  DoctorAttributes,
   DoctorOverviewInfo,
   DoctorOverviewInfo_Excluded_Properties,
   DoctorProfileInfo,
+  DoctorProfileInfo_Excluded_Properties,
+  PrescriptionDoctorInfo_Excluded_Properties,
   SearchDoctorInfo,
 } from "../database/models/Doctor.model";
 
@@ -123,6 +126,39 @@ class DoctorService implements DoctorServiceInterface {
     }
   }
 
+  // ----------------- get prescription doctor info -----------------
+  async getPrescriptionDoctorInfo(
+    doctorID: number
+  ): Promise<RPC_Response_Payload> {
+    try {
+      const doctor = await doctorRepository.getDoctorInfo(doctorID);
+
+      if (!doctor) throw new Error("Doctor not found");
+
+      const doctorInfo = excludeProperties(
+        doctor.dataValues,
+        PrescriptionDoctorInfo_Excluded_Properties
+      );
+
+      const specialization = await doctor.getSpecialization();
+
+      if (!specialization) throw new Error("Specialization not found");
+
+      return {
+        status: "success",
+        data: {
+          DoctorInfo: doctorInfo,
+          Specialization: specialization.dataValues,
+        },
+      };
+    } catch (error) {
+      return {
+        status: "error",
+        data: {},
+      };
+    }
+  }
+
   // ----------------- server side RPC request handler ----------------
   async serveRPCRequest(
     payload: RPC_Request_Payload
@@ -149,6 +185,11 @@ class DoctorService implements DoctorServiceInterface {
           Number(payload.data["scheduleID"])
         );
 
+      case "GET_DOCTOR_INFO_FOR_PRESCRIPTION":
+        return await this.getPrescriptionDoctorInfo(
+          Number(payload.data["doctorID"])
+        );
+
       default:
         return response;
     }
@@ -161,6 +202,7 @@ class DoctorService implements DoctorServiceInterface {
   ): Promise<DoctorAdditionalInfo> {
     try {
       const doctor = await doctorRepository.getDoctorInfo(doctorID);
+
       const doctorInfo = excludeProperties(
         doctor.dataValues,
         DoctorAdditionalInfo_Excluded_Properties
@@ -256,6 +298,11 @@ class DoctorService implements DoctorServiceInterface {
       const specialization = await doctor.getSpecialization();
       const onlineSchedules = await doctor.getOnlineSchedules();
 
+      const doctorInfo = excludeProperties(
+        doctor.dataValues,
+        DoctorProfileInfo_Excluded_Properties
+      );
+
       const onlineSchedulesInfo = onlineSchedules.map((schedule) => {
         return excludeProperties(
           schedule.dataValues,
@@ -269,7 +316,7 @@ class DoctorService implements DoctorServiceInterface {
       });
 
       return {
-        DoctorInfo: doctor.dataValues,
+        DoctorInfo: doctorInfo,
         Specialization: specialization?.dataValues || {},
         OnlineSchedule: {
           visit_fee: doctor.online_visit_fee,

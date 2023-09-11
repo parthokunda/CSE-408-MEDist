@@ -10,11 +10,11 @@ import { config } from "../../config";
 import log from "../../utils/logger";
 
 const authorize =
-  (onlyPatient: boolean) =>
+  (onlyPatient: boolean, onlyDoctor: boolean) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const token = req.headers.authorization?.split(" ")[1];
-      //log.debug(token, "token");
+      log.debug(token, "token");
 
       if (!token) {
         return next(createError.Unauthorized());
@@ -39,6 +39,9 @@ const authorize =
           const role = auth_response_payload.data["role"];
 
           if (onlyPatient && role !== "patient")
+            return next(createError.Unauthorized());
+
+          if (onlyDoctor && role !== "doctor")
             return next(createError.Unauthorized());
 
           req.user_identity = {

@@ -135,7 +135,11 @@ class BrokerService implements BrokerServiceInterface {
     const uuid = uuidv4(); // correlation id
 
     const channel = await this.getChannel();
-    const queue = await channel.assertQueue("", { exclusive: true });
+    const queue = await channel.assertQueue("", {
+      exclusive: false,
+      durable: false,
+      autoDelete: true,
+    });
 
     // send the request
     await channel.sendToQueue(
@@ -161,6 +165,10 @@ class BrokerService implements BrokerServiceInterface {
         (msg: Message | null) => {
           if (msg && msg.properties.correlationId === uuid) {
             // if correlation id matches, that means the response is for the request we sent
+
+            //delete the queue
+            channel.deleteQueue(queue.queue);
+
             resolve(JSON.parse(msg.content.toString()) as RPC_Response_Payload);
             clearTimeout(timeout);
           } else {
