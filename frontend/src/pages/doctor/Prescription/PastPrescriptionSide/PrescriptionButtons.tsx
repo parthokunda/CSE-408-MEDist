@@ -29,7 +29,7 @@ const PrescriptionButtons: FC = () => {
     appID: number;
   }): Promise<boolean> => {
     console.log("saving prescripiton", input.data);
-    await axios.post(
+    const res=await axios.post(
       `${import.meta.env.VITE_DB_URL}:${
         import.meta.env.VITE_DB_PORT
       }/api/appointment/prescription/create-prescription/${input.appID}`,
@@ -41,6 +41,7 @@ const PrescriptionButtons: FC = () => {
         },
       }
     );
+    console.log(res.data);
     toast({
       title: "Submitted",
       description: "Prescription Submitted",
