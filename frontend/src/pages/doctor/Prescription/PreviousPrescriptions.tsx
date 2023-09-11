@@ -2,11 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import usePrescriptionFetchedInfoStore from "@/hooks/usePrescriptionFetchedInfoStore";
 import { FC } from "react";
+import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 
 const PreviousPrescriptions: FC = () => {
   const navigate = useNavigate();
-
+  const [cookies] = useCookies(["user"]);
   const oldAppointments = usePrescriptionFetchedInfoStore(
     (state) => state.oldAppointments
   );
@@ -26,7 +27,7 @@ const PreviousPrescriptions: FC = () => {
                 <p className="text-c1 font-bold">{item.id}</p>
                 <p>{new Date(item.startTime).toLocaleDateString()}</p>
                 <Button
-                  onClick={() => navigate(`/doctor/prescription/${item.id}`)}
+                  onClick={() => navigate(`/${cookies.user.role}/prescription/${item.id}`)}
                   className="bg-c1"
                 >
                   View
