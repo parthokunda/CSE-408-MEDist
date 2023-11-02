@@ -21,6 +21,7 @@ export type DoctorAttributes = {
   degrees: string[];
 
   specializationID: number;
+  [key: string]:any;
 }
 export interface DoctorProfileInfo {
   DoctorInfo: DoctorAttributes;

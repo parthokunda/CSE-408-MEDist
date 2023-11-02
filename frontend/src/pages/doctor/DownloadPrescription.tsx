@@ -2,13 +2,14 @@ import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 import { useQuery } from "@tanstack/react-query";
 import { FC } from "react";
 import { useCookies } from "react-cookie";
-import { Link, useParams } from "react-router-dom";
-import { axios } from "axios"
+import { Link, useNavigate, useParams } from "react-router-dom";
+import axios  from "axios"
 
 const fetchDownloadLink = async (input: {
   prescriptionId: number;
   authToken: string;
 }) => {
+  const navigate = useNavigate();
   const response = await axios.get(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT

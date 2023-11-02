@@ -5,12 +5,14 @@ import { useToast } from "@/components/ui/use-toast";
 import usePrescribeBottomStore from "@/hooks/usePrescribedBottomStore";
 import usePrescribedLeftStore from "@/hooks/usePrescribedLeftStore";
 import usePrescribedStore from "@/hooks/usePrescribedStore";
-import { POSTCreatePrescriptionBody } from "@/models/Prescriptions";
+import {
+  POSTCreatePrescriptionBody,
+} from "@/models/Prescriptions";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { FC } from "react";
 import { useCookies } from "react-cookie";
-import { useNavigate, useParams, } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const PrescriptionButtons: FC = () => {
   const { prescriptionId } = useParams();
@@ -21,15 +23,13 @@ const PrescriptionButtons: FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  
-
   const postCreatePrescription = async (input: {
     data: POSTCreatePrescriptionBody;
     authToken: string;
     appID: number;
   }): Promise<boolean> => {
     console.log("saving prescripiton", input.data);
-    const res=await axios.post(
+    const res = await axios.post(
       `${import.meta.env.VITE_DB_URL}:${
         import.meta.env.VITE_DB_PORT
       }/api/appointment/prescription/create-prescription/${input.appID}`,
@@ -46,9 +46,11 @@ const PrescriptionButtons: FC = () => {
       title: "Submitted",
       description: "Prescription Submitted",
       action: (
-        <ToastAction altText="abcd" onClick={() => navigate(0)}>OK</ToastAction>
+        <ToastAction altText="abcd" onClick={() => navigate(0)}>
+          OK
+        </ToastAction>
       ),
-    })
+    });
     return true;
   };
 
@@ -61,23 +63,22 @@ const PrescriptionButtons: FC = () => {
 
   const onSavePrescription = () => {
     const medicineDataForPost = medStore.medList
+      .filter((item) => item.brandInfo !== undefined)
       .map((item) => {
-        if (item.brandInfo)
-          return {
-            medicineID: item.brandInfo.Brand.id,
-            dosage: (+item.dosage.morning +
-              "+" +
-              +item.dosage.day +
-              "+" +
-              +item.dosage.night) as string,
-            duration: item.duration as number,
-            when: item.when as string,
-          };
-      })
-      .filter((item) => item !== undefined);
+        return {
+          medicineID: item.brandInfo? item.brandInfo.Brand.id : -1,
+          dosage: (+item.dosage.morning +
+            "+" +
+            +item.dosage.day +
+            "+" +
+            +item.dosage.night) as string,
+          when: item.when as string,
+          duration: item.duration as number,
+        };
+      });
 
     const data = {
-      medicines: medicineDataForPost,
+      medicines: medicineDataForPost ? medicineDataForPost : [],
       symptoms: leftStore.symptoms,
       diagnosis: leftStore.diagnosis,
       advices: bottomStore.advices,
@@ -111,7 +112,7 @@ const PrescriptionButtons: FC = () => {
       >
         Discard
       </Button>
-      <Toaster/>
+      <Toaster />
     </div>
   );
 };
