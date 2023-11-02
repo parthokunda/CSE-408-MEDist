@@ -64,5 +64,7 @@ const DoctorPreviousAppList: FC = () => {
         )}
       </div>
     );
+  
+    return <></>
 };
 export default DoctorPreviousAppList;

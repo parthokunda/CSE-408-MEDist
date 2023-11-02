@@ -1,5 +1,4 @@
-import { BrandInfo } from "./Brand";
-import { BrandDescription } from "./BrandDescription";
+import { BrandDescription } from "@/models/Brand";
 
 
 export interface Generic {

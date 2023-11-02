@@ -12,8 +12,6 @@ const DoctorAppoinmentCards: FC<{
   console.log(props.patientFetchedData, "here");
   const { currentPage, setCurrentPage } = props;
   const recordsPerPage = 5;
-  const lastIndex = props.currentPage * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
   const records = props.patientFetchedData.appointments
   const nPages = Math.ceil(
     props.patientFetchedData.totalCount / recordsPerPage

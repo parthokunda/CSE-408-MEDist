@@ -21,12 +21,7 @@ export const LoginCardForm = z.object({
 
 export type LoginCardFormType = z.infer<typeof LoginCardForm>;
 
-const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-];
+
 export const DoctorAdditionalInfoForm = z.object({
   name:z.string().nonempty({message: "Image Error"}),
   gender: z.union([z.literal("male"), z.literal("female"), z.literal("other")]),

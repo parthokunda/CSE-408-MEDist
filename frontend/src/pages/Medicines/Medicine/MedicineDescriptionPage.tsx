@@ -4,12 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 
-const fetchMedicineDescription = async ({
-  queryKey,
-}): Promise<BrandDescription> => {
+const fetchMedicineDescription = async ({}): Promise<BrandDescription> => {
   const [_, medicineId] = queryKey;
   const response = await fetch(
-    `${import.meta.env.VITE_DB_URL}:${import.meta.env.VITE_DB_PORT}/api/medicine/get_medicine_info/${medicineId}`
+    `${import.meta.env.VITE_DB_URL}:${
+      import.meta.env.VITE_DB_PORT
+    }/api/medicine/get_medicine_info/${medicineId}`
   );
   const data = await response.json();
   console.log(
@@ -66,9 +66,15 @@ const MedicineDescriptionPage: FC = () => {
           />
         </div>
         <p className="opacity-50">{medicine.DosageForm.name}</p>
-        <Link to={`/generic/${medicine.Generic.id}`}><p className="hover:text-cyan-700">{medicine.Generic.name}</p></Link>
+        <Link to={`/generic/${medicine.Generic.id}`}>
+          <p className="hover:text-cyan-700">{medicine.Generic.name}</p>
+        </Link>
         <p>{medicine.Brand.strength}</p>
-        <Link to={`/manufacturer/${medicine.Manufacturer.id}`}><p className=" opacity-50 hover:text-c2">{medicine.Manufacturer.name}</p></Link>
+        <Link to={`/manufacturer/${medicine.Manufacturer.id}`}>
+          <p className=" opacity-50 hover:text-c2">
+            {medicine.Manufacturer.name}
+          </p>
+        </Link>
         {/* <p className=" opacity-50 hover:text-c2">{medicine.Manufacturer.name}</p> */}
         <p>
           Unit price :

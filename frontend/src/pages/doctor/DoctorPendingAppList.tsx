@@ -61,5 +61,6 @@ const DoctorPendingAppList: FC = () => {
         )}
       </div>
     );
+  return <></>
 };
 export default DoctorPendingAppList;

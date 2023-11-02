@@ -1,6 +1,6 @@
 import { Textarea } from "@/components/ui/textarea";
 import usePrescribedLeftStore from "@/hooks/usePrescribedLeftStore";
-import { ChangeEvent, ChangeEventHandler, FC, useEffect, useState } from "react";
+import { ChangeEvent, FC, useEffect } from "react";
 
 const PrescriptionPastHistory: FC = () => {
   // const [pastHistory, setPastHistory] = useState<string>("");

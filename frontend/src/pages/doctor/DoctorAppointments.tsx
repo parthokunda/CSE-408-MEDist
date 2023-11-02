@@ -6,7 +6,7 @@ import { TabsContent, TabsTrigger } from "@radix-ui/react-tabs";
 import DoctorPendingAppList from "./DoctorPendingAppList";
 import DoctorPreviousAppList from "./DoctorPreviousAppList";
 
-const DoctorAppointments: FC = (props) => {
+const DoctorAppointments: FC = () => {
   return (
     <div className="flex items-center justify-center">
       <Tabs defaultValue="pending"  id="hi" className="flex flex-col items-center">

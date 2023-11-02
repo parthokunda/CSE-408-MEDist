@@ -1,7 +1,6 @@
 import { SearchBrandOutput } from "@/models/Brand";
 import { FC } from "react";
 import MedCard from "./MedCard";
-import { useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { AiOutlineArrowRight } from "react-icons/ai";
 const MedCards: FC<{
@@ -24,7 +23,10 @@ const MedCards: FC<{
     currentPage + 2,
   ];
   const pages = array.filter((page) => page > 0 && page <= nPages);
-  if (props.brandFetchedData.brandInfos && props.brandFetchedData.brandInfos.length === 0) {
+  if (
+    props.brandFetchedData.brandInfos &&
+    props.brandFetchedData.brandInfos.length === 0
+  ) {
     return (
       <div className="flex justify-center align-middle">No Item Found</div>
     );

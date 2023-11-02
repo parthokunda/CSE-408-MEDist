@@ -10,9 +10,6 @@ const DoctorSearchCards: FC<{
   setCurrentPage: (page: number) => void;
 }> = (props) => {
   const { currentPage, setCurrentPage } = props;
-  // const recordsPerPage = 3;
-  const lastIndex = props.currentPage * props.recordsPerPage;
-  const firstIndex = lastIndex - props.recordsPerPage;
   console.log(props.doctorFetchedData);
   const records = props.doctorFetchedData.Doctors;
   const nPages = Math.ceil(props.doctorFetchedData.totalCount / props.recordsPerPage);
@@ -30,9 +27,6 @@ const DoctorSearchCards: FC<{
     );
   }
   console.log(props.doctorFetchedData);
-  function setPage(page: number) {
-    setCurrentPage(page);
-  }
   function prevPage() {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);

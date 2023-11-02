@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { FC } from "react";
-import { Control, Controller } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 const ImageComponent: FC<{selectedFile: File | null, imageURL: string | null, formControl: any, handleFileInput: Function}> = (props) => {
   return (

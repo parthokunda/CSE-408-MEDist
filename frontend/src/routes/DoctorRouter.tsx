@@ -1,7 +1,6 @@
 import { ProfileStatus } from "@/models/LoginSignUpSchema";
 import DoctorAppointments from "@/pages/doctor/DoctorAppointments";
 import DoctorInfo from "@/pages/doctor/DoctorInfo";
-import DownlaodPrescription from "@/pages/doctor/DownloadPrescription";
 import DoctorEditPrescription from "@/pages/doctor/Prescription/DoctorEditPrescription";
 import { FC } from "react";
 import { useCookies } from "react-cookie";

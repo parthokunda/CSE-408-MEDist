@@ -1,8 +1,9 @@
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { FC } from "react";
 import { useCookies } from "react-cookie";
 import { Link, useParams } from "react-router-dom";
+import { axios } from "axios"
 
 const fetchDownloadLink = async (input: {
   prescriptionId: number;

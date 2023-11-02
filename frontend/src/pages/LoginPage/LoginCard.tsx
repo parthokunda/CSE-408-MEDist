@@ -53,7 +53,7 @@ const LoginCard: FC = () => {
     mutate(formData);
   };
 
-  const { isLoading, mutate, error, isError } = useMutation({
+  const { isLoading, mutate, } = useMutation({
     mutationKey: ["postLogin"],
     mutationFn: postLogin,
     onSuccess: (data) => {

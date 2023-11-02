@@ -12,7 +12,6 @@ import { FC, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {

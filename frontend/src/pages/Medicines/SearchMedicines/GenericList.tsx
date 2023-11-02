@@ -1,5 +1,5 @@
 import { SearchGenericOutput } from "@/models/Brand";
-import { FC ,useState} from "react";
+import { FC } from "react";
 import { Link } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { AiOutlineArrowRight } from "react-icons/ai";
@@ -13,8 +13,6 @@ const GenericList: FC<{
   const { currentPage, setCurrentPage } = props;
   const recordsPerPage = 15;
   const lastIndex = props.currentPage * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
-  const records = props.genericList.genericInfos;
   const nPages = Math.ceil(props.genericList.totalCount / recordsPerPage);
   const array = [
   currentPage - 2,

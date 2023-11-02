@@ -5,7 +5,7 @@ import { AppointmentStatus } from "@/models/Appointment";
 import {
   GETPrescriptionResponse
 } from "@/models/Prescriptions";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { FC, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
