@@ -12,7 +12,6 @@ const GenericList: FC<{
 }> = (props) => {
   const { currentPage, setCurrentPage } = props;
   const recordsPerPage = 15;
-  const lastIndex = props.currentPage * recordsPerPage;
   const nPages = Math.ceil(props.genericList.totalCount / recordsPerPage);
   const array = [
   currentPage - 2,

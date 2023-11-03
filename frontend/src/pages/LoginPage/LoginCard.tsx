@@ -37,7 +37,7 @@ const postLogin = async (
 
 const LoginCard: FC = () => {
   const navigate = useNavigate();
-  const {toast} = useToast();
+  const { toast } = useToast();
   const [cookies, setCookie] = useCookies(["user"]);
 
   const loginForms = useForm<LoginCardFormType>({
@@ -53,7 +53,7 @@ const LoginCard: FC = () => {
     mutate(formData);
   };
 
-  const { isLoading, mutate, } = useMutation({
+  const { isLoading, mutate } = useMutation({
     mutationKey: ["postLogin"],
     mutationFn: postLogin,
     onSuccess: (data) => {
@@ -73,14 +73,40 @@ const LoginCard: FC = () => {
       navigate("/patient/");
     },
     onError: (error) => {
+      let errorMessage = "Login Error. Try Again";
+      if (typeof error === "object" && error && "response" in error) {
+        if (
+          typeof error.response === "object" &&
+          error.response &&
+          "data" in error.response
+        ) {
+          if (
+            typeof error.response.data === "object" &&
+            error.response.data &&
+            "message" in error.response.data
+          ) {
+            if (
+              error.response.data.message &&
+              typeof error.response.data.message === "string"
+            )
+              errorMessage = error.response.data.message;
+          }
+        }
+      }
       toast({
         title: "Error",
-        description: error.response.data.message,
+        description: errorMessage,
         action: (
-          <ToastAction altText="Refresh" onClick={() => {navigate(0);}}>Reload</ToastAction>
+          <ToastAction
+            altText="Refresh"
+            onClick={() => {
+              navigate(0);
+            }}
+          >
+            Reload
+          </ToastAction>
         ),
-      })
-      // navigate(0);
+      });
     },
   });
 
@@ -156,7 +182,7 @@ const LoginCard: FC = () => {
           </form>
         </CardContent>
       </Card>
-      <Toaster/>
+      <Toaster />
     </>
   );
 };

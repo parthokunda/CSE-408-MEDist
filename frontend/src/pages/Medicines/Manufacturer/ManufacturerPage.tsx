@@ -8,8 +8,8 @@ import MedCards from "../SearchMedicines/MedCards";
 
 const fetchManufacturerDescription = async ({
   queryKey,
-}): Promise<SingleManufacturerInfo> => {
-  const [_, {manufacturerId,currentPage}] = queryKey;
+}: any): Promise<SingleManufacturerInfo> => {
+  const [_, { manufacturerId, currentPage }] = queryKey;
   const response = await fetch(
     `${import.meta.env.VITE_DB_URL}:${
       import.meta.env.VITE_DB_PORT
@@ -31,7 +31,7 @@ const ManufacturerDescriptionPage: FC = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["manufacturerDescription", {manufacturerId, currentPage}],
+    queryKey: ["manufacturerDescription", { manufacturerId, currentPage }],
     queryFn: fetchManufacturerDescription,
   });
   useEffect(() => {

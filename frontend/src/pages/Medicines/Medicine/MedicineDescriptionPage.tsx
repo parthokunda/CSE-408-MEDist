@@ -4,7 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 
-const fetchMedicineDescription = async ({}): Promise<BrandDescription> => {
+const fetchMedicineDescription = async ({
+  queryKey,
+}: any): Promise<BrandDescription> => {
   const [_, medicineId] = queryKey;
   const response = await fetch(
     `${import.meta.env.VITE_DB_URL}:${

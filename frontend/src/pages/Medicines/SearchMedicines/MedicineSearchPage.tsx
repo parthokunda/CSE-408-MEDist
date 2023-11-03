@@ -14,7 +14,7 @@ import { MedSearchForm } from "@/models/FormSchema";
 import GenericList from "./GenericList";
 import { LoadingSpinner } from "@/components/customUI/LoadingSpinner";
 
-const MedicineSearchPage: FC = (props) => {
+const MedicineSearchPage: FC = () => {
   const fetchMedList = async (
     formData: z.infer<typeof MedSearchForm>
   ): Promise<SearchBrandOutput | SearchGenericOutput> => {

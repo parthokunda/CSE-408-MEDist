@@ -11,8 +11,6 @@ const MedCards: FC<{
   // const [currentPage, setCurrentPage] = useState(1);
   const { currentPage, setCurrentPage } = props;
   const recordsPerPage = 15;
-  const lastIndex = props.currentPage * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
   const records = props.brandFetchedData.brandInfos;
   const nPages = Math.ceil(props.brandFetchedData.totalCount / recordsPerPage);
   const array = [

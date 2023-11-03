@@ -7,10 +7,12 @@ import AvailableBrandCards from "./AvailableBrandCards";
 
 const fetchGenericDescription = async ({
   queryKey,
-}): Promise<GenericDescription> => {
+} : any): Promise<GenericDescription> => {
   const [_, genericId] = queryKey;
   const response = await fetch(
-    `${import.meta.env.VITE_DB_URL}:${import.meta.env.VITE_DB_PORT}/api/medicine/get_generic_info/${genericId}`
+    `${import.meta.env.VITE_DB_URL}:${
+      import.meta.env.VITE_DB_PORT
+    }/api/medicine/get_generic_info/${genericId}`
   );
   const data = await response.json();
   console.log(data.result);
@@ -137,8 +139,10 @@ const GenericDescriptionPage: FC = () => {
         )}
       </div>
       <div className="flex-[50%] mt-6 ml-3">
-      <p className="text-xl justify-center align-middle font-bold">Available Brands</p>
-      <AvailableBrandCards brandFetchedData={generic.availableBrands} />
+        <p className="text-xl justify-center align-middle font-bold">
+          Available Brands
+        </p>
+        <AvailableBrandCards brandFetchedData={generic.availableBrands} />
       </div>
     </div>
   );
