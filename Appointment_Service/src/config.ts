@@ -10,7 +10,15 @@ export const config = {
   },
   MSG_QUEUE_URL: process.env.MSG_QUEUE_URL as string,
   ENVIRONMENT: process.env.NODE_ENV,
-  FIREBASE_CONFIG: JSON.parse(process.env.FIREBASE as string),
+  FIREBASE_CONFIG: {
+    apiKey: "AIzaSyCHZ4fFHB6mG2e1QfU8njqeZnbhmRnO9Go",
+    authDomain: "medist-photos-8c6bf.firebaseapp.com",
+    projectId: "medist-photos-8c6bf",
+    storageBucket: "medist-photos-8c6bf.appspot.com",
+    messagingSenderId: "488575338890",
+    appId: "1:488575338890:web:74cac2aba18611d2296073",
+    measurementId: "G-11DL9TJF5L",
+  },
 
   SELF_RPC_QUEUE: "APPOINTMENT_RPC",
 

@@ -29,7 +29,7 @@ if [ $# -eq 1 ]; then
         for folder in *; do
             if [ -d "$folder" ]; then
                 pushd $folder >> /dev/null
-                pnpm i >> /dev/null
+                pnpm i 
                 gnome-terminal --title="$folder" -- bash -c "pnpm run dev; exec bash"
                 popd >> /dev/null
             fi
