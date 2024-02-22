@@ -4,7 +4,12 @@ import cors from "cors";
 import proxy from "express-http-proxy";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
-dotenv.config();
+if (process.env.NODE_ENV !== "prod") {
+  const configFile = `./.env.local`;
+  dotenv.config({ path: configFile });
+} else {
+  dotenv.config();
+}
 
 // internal imports
 import log from "./utils/logger";

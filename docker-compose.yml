@@ -1,0 +1,116 @@
+version: "3"
+
+services:
+  sql-db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    container_name: sql-db
+    environment:
+      POSTGRES_USER: Udayon-Paul-Dhrubo
+      POSTGRES_PASSWORD: D8nerLGyER0B
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:alpine
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+
+  auth-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./Auth_Service
+    container_name: auth-service
+    ports:
+      - "3001:3001"
+    restart: always
+    depends_on:
+      - sql-db
+      - rabbitmq
+    volumes:
+      - .:/app
+      - /app/Auth_Service/node_modules
+
+  medicine-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./Medicine_Service
+    container_name: medicine-service
+    ports:
+      - "3002:3002"
+    restart: always
+    depends_on:
+      - sql-db
+      - rabbitmq
+    volumes:
+      - .:/app
+      - /app/Medicine_Service/node_modules
+
+  patient-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./Patient_Service
+    container_name: patient-service
+    ports:
+      - "3003:3003"
+    restart: always
+    depends_on:
+      - sql-db
+      - rabbitmq
+    volumes:
+      - .:/app
+      - /app/Patient_Service/node_modules
+    
+  doctor-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./Doctor_Service
+    container_name: doctor-service
+    ports:
+      - "3004:3004"
+    restart: always
+    depends_on:
+      - sql-db
+      - rabbitmq
+    volumes:
+      - .:/app
+      - /app/Doctor_Service/node_modules
+
+  appointment-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./Appointment_Service
+    container_name: appointment-service
+    ports:
+      - "3005:3005"
+    restart: always
+    depends_on:
+      - sql-db
+      - rabbitmq
+    volumes:
+      - .:/app
+      - /app/Appointment_Service/node_modules
+
+
+  proxy:
+    build:
+      dockerfile: Dockerfile
+      context: ./proxy
+    container_name: proxy
+    ports:
+      - "3000:3000"
+    restart: always
+    depends_on:
+      - auth-service
+      - medicine-service
+      - patient-service
+      - doctor-service
+      - appointment-service
+    volumes:
+      - .:/app
+      - /app/Proxy/node_modules
+
+volumes:
+  postgres-data:

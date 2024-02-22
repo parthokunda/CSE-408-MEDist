@@ -1,15 +1,14 @@
 import dayjs from "dayjs";
 import logger from "pino";
-import pinoPretty from "pino-pretty";
 
 const log = logger({
   transport: {
     target: "pino-pretty",
-    crlf: false,
-  },
-  prettifier: pinoPretty,
-  base: {
-    pid: false,
+    options: {
+      colorize: true,
+      translateTime: true,
+      ignore: "pid,hostname",
+    },
   },
   timestamp: () => `,"time":"${dayjs().format()}"`,
   level: "trace",
