@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <style>
+    .box {
+      width: 1204px;
+      height: 1200px;
+    }
+
+    .box .group {
+      position: fixed;
+      width: 1204px;
+      height: 1200px;
+      top: 0;
+      left: 0;
+    }
+
+    .box .overlap {
+      position: relative;
+      width: 1204px;
+      height: 960px;
+      top: -2px;
+      left: -2px;
+    }
+
+    .box .rectangle {
+      position: absolute;
+      width: 1204px;
+      height: 960px;
+      top: 0;
+      left: 0;
+      background-color: #FFFFFF;
+    }
+
+    .box .text-wrapper {
+      position: absolute;
+      height: 24px;
+      top: 904px;
+      left: 424px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #3c6255;
+      font-size: 20px;
+      text-align: center;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .med-header {
+      position: absolute;
+      width: 750px;
+      height: 28px;
+      top: 364px;
+      left: 422px;
+    }
+
+    .box .navbar {
+      position: absolute;
+      width: 750px;
+      height: 24px;
+      top: 0;
+      left: 0;
+      border-top: 2px;
+    }
+
+    .box .div {
+      left: 0;
+      position: absolute;
+      height: 24px;
+      top: -1px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #00000099;
+      font-size: 20px;
+      text-align: center;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .text-wrapper-2 {
+      left: 397px;
+      position: absolute;
+      height: 24px;
+      top: -1px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #00000099;
+      font-size: 20px;
+      text-align: center;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .horizontal-line {
+      left: 397px;
+      position: absolute;
+      height: 24px;
+      top: 1px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #00000099;
+      font-size: 20px;
+      text-align: center;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .text-wrapper-3 {
+      left: 524px;
+      position: absolute;
+      height: 24px;
+      top: -1px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #00000099;
+      font-size: 20px;
+      text-align: center;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .text-wrapper-4 {
+      left: 668px;
+      position: absolute;
+      height: 24px;
+      top: -1px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #00000099;
+      font-size: 20px;
+      text-align: center;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .line {
+      position: absolute;
+      width: 750px;
+      height: 1px;
+      top: 27px;
+      left: 0;
+      object-fit: cover;
+    }
+
+    .box .tests {
+      position: absolute;
+      width: 184px;
+      height: 90px;
+      top: 790px;
+      left: 424px;
+    }
+
+    .box .advice-entry {
+      position: relative;
+      height: 24px;
+      top: 10px;
+      left: 0;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #3c6255;
+      font-size: 20px;
+      text-align: left;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .advices {
+      position: relative;
+      width: 277px;
+      height: 90px;
+      top: 800px;
+      left: 860px;
+    }
+
+    .box .advice-header {
+      position: relative;
+      height: 24px;
+      top: 0;
+      left: 0;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #00000099;
+      font-size: 20px;
+      text-align: left;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .medicines {
+      position: absolute;
+      width: 1200px;
+      height: 483px;
+      top: 2px;
+      left: 2px;
+    }
+
+    .box .med-list {
+      position: absolute;
+      width: 758px;
+      height: 93px;
+      top: 390px;
+      left: 420px;
+    }
+
+    .box .med-entry {
+      margin-top: 30px;
+      position: relative;
+      width: 754px;
+      height: 29px;
+      top: 0px;
+      left: 0;
+    }
+
+    .box .medBefAft {
+      top: 10px;
+      left: 522px;
+      position: absolute;
+      height: 29px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #3c6255;
+      font-size: 24px;
+      text-align: center;
+      letter-spacing: 0;
+      line-height: normal;
+    }
+
+    .box .medDuration {
+      height: 29px;
+      top: 10px;
+      left: 671px;
+      font-size: 24px;
+      position: absolute;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #3c6255;
+      text-align: center;
+      letter-spacing: 0;
+      line-height: normal;
+    }
+
+    .box .medName {
+      position: absolute;
+      height: 29px;
+      top: 10px;
+      left: 0;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #3c6255;
+      font-size: 24px;
+      text-align: center;
+      letter-spacing: 0;
+      line-height: normal;
+      display: flex;
+      align-items: center;
+    }
+
+    .box .medWhen {
+      top: 10px;
+      left: 389px;
+      position: absolute;
+      height: 29px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #3c6255;
+      font-size: 24px;
+      text-align: center;
+      letter-spacing: 0;
+      line-height: normal;
+    }
+
+    .box .img {
+      position: absolute;
+      width: 749px;
+      height: 1px;
+      top: 46px;
+      left: 0;
+    }
+
+    .box .prescription-header {
+      position: absolute;
+      width: 1200px;
+      height: 180px;
+      top: 0;
+      left: 0;
+    }
+
+    .box .overlap-group {
+      position: relative;
+      width: 1202px;
+      height: 182px;
+      top: -1px;
+      left: -1px;
+      background-color: #d9d9d9;
+      border-bottom-width: 1px;
+      border-bottom-style: solid;
+      border-color: #000000;
+    }
+
+    .box .doctor-info {
+      position: absolute;
+      width: 500px;
+      height: 141px;
+      top: 18px;
+      left: 30px;
+    }
+
+    .box .doctorName {
+      position: absolute;
+      width: 500px;
+      height: 39px;
+      top: 0;
+      left: 0;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #3c6255;
+      font-size: 30px;
+      letter-spacing: 0;
+      line-height: normal;
+    }
+
+    .box .doctor-additional {
+      position: absolute;
+      width: 500px;
+      height: 102px;
+      top: 39px;
+      left: 0;
+    }
+
+    .box .contact {
+      position: absolute;
+      width: 500px;
+      height: 26px;
+      top: 50px;
+      left: 0;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #61876e;
+      font-size: 20px;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .degree {
+      position: absolute;
+      width: 500px;
+      height: 24px;
+      top: 0;
+      left: 0;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #61876e;
+      font-size: 20px;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .department {
+      position: absolute;
+      width: 500px;
+      height: 24px;
+      top: 27px;
+      left: 0;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #61876e;
+      font-size: 20px;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .prescription-info {
+      position: absolute;
+      width: 263px;
+      height: 61px;
+      top: 18px;
+      left: 936px;
+    }
+
+    .box .prescriptionDate {
+      position: absolute;
+      width: 168px;
+      height: 24px;
+      top: 37px;
+      left: 0;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #3c6255;
+      font-size: 20px;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .appID {
+      position: absolute;
+      width: 259px;
+      height: 24px;
+      top: 0;
+      left: 0;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #3c6255;
+      font-size: 20px;
+      letter-spacing: 0;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .box .rxImg {
+      position: absolute;
+      width: 45px;
+      height: 45px;
+      top: 300px;
+      left: 420px;
+      object-fit: cover;
+    }
+
+    .box .medImage {
+      max-width: 30px;
+      max-height: 30px;
+      margin-right: 5px;
+    }
+
+    .box .leftBar {
+      position: absolute;
+      width: 390px;
+      height: 690px;
+      top: 272px;
+      left: 2px;
+      background-color: #efdaea;
+      border-top-width: 1px;
+      border-top-style: solid;
+      border-color: #000000;
+    }
+
+    .box .history {
+      position: absolute;
+      width: 192px;
+      height: 84px;
+      top: 373px;
+      left: 28px;
+    }
+
+    .box .leftBarEntries {
+      top: 50px;
+      left: 0;
+      position: relative;
+      height: 34px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #1b1f1d;
+      font-size: 24px;
+      letter-spacing: 0;
+      line-height: normal;
+    }
+
+    .box .PastHistoryEntry {
+      top: 50px;
+      left: 0;
+      position: relative;
+      height: 34px;
+      width: 300px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #1b1f1d;
+      font-size: 24px;
+      letter-spacing: 0;
+      line-height: normal;
+      word-break: break-all;
+
+    }
+
+    .box .Diagnosis {
+      position: absolute;
+      width: 163px;
+      height: 92px;
+      top: 24px;
+      left: 29px;
+    }
+
+    .box .leftBarHeadings {
+      position: absolute;
+      height: 39px;
+      top: 0;
+      left: 0;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #3c6255;
+      font-size: 32px;
+      letter-spacing: 0;
+      line-height: normal;
+    }
+
+    .box .symptom {
+      position: absolute;
+      width: 181px;
+      height: 167px;
+      top: 180px;
+      left: 29px;
+    }
+
+    .box .symptomEntry {
+      position: relative;
+      height: 29px;
+      top: 50px;
+      left: 0;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #1b1f1d;
+      font-size: 24px;
+      letter-spacing: 0;
+      line-height: normal;
+    }
+
+    .box .presc-patient-info {
+      position: absolute;
+      width: 1210px;
+      height: 90px;
+      top: 182px;
+      left: 2px;
+    }
+
+    .box .patientDiv {
+      position: relative;
+      width: 1202px;
+      height: 92px;
+      top: -1px;
+      left: -1px;
+      background-color: #2a7e994c;
+      border-bottom-width: 1px;
+      border-bottom-style: solid;
+      border-color: #000000;
+    }
+
+    .box .age {
+      position: absolute;
+      width: 140px;
+      height: 34px;
+      top: 29px;
+      left: 600px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #61876e;
+      font-size: 24px;
+      letter-spacing: 0;
+      line-height: normal;
+    }
+
+    .box .height {
+      position: absolute;
+      width: 200px;
+      height: 34px;
+      top: 28px;
+      left: 740px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #61876e;
+      font-size: 24px;
+      letter-spacing: 0;
+      line-height: normal;
+    }
+
+    .box .weight {
+      position: absolute;
+      width: 220px;
+      height: 34px;
+      top: 28px;
+      left: 960px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #61876e;
+      font-size: 24px;
+      letter-spacing: 0;
+      line-height: normal;
+    }
+
+    .box .name {
+      position: absolute;
+      width: 400px;
+      height: 34px;
+      top: 28px;
+      left: 30px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #61876e;
+      font-size: 24px;
+      letter-spacing: 0;
+      line-height: normal;
+    }
+
+    .box .blood {
+      position: absolute;
+      height: 34px;
+      top: 29px;
+      left: 450px;
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: #61876e;
+      font-size: 24px;
+      letter-spacing: 0;
+      line-height: normal;
+    }
+  </style>
+
+</head>
+
+<body>
+  <!-- main div -->
+  <div class="box">
+    <div class="group">
+      <div class="overlap">
+        <div class="rectangle"></div>
+        <div class="text-wrapper">Meet After <%= meetAfter %> Days</div>
+        <div class="med-header">
+          <div class="navbar">
+            <div class="div">Name</div>
+            <div class="text-wrapper-2">Dosage</div>
+            <div class="text-wrapper-3">When</div>
+            <div class="text-wrapper-4">Duration</div>
+          </div>
+
+          <hr style="margin-top: 25px" />
+        </div>
+
+        <div class="tests">
+          <div class="advice-header">Tests</div>
+          <% if(test && test.length> 0) { test.forEach((entry) => { %>
+            <div class="advice-entry">
+              <%= entry %>
+            </div>
+            <% })} %>
+        </div>
+
+        <div class="advices">
+          <div class="advice-header">Advice</div>
+          <% advices.forEach((advice)=> { %>
+            <div class="advice-entry">
+              <%= advice %>
+            </div>
+            <% }) %>
+        </div>
+
+        <div class="medicines">
+          <div class="med-list">
+            <% if(Medicines.length> 0) { Medicines.forEach((brandInfo) => {
+              %>
+
+              <div class="med-entry">
+                <div class="medBefAft">
+                  <%= brandInfo.when %>
+                </div>
+                <div class="medDuration">
+                  <%= brandInfo.duration %>
+                </div>
+                <div class="medName">
+                  <img class="medImage" src=<%=brandInfo.DosageForm.img_url %>
+                  />
+                  <%= brandInfo.Brand.name %>
+                    <%= brandInfo.Brand.strength %>
+                </div>
+                <div class="medWhen">
+                  <%= brandInfo.dosage %>
+                </div>
+              </div>
+
+              <% }) } %>
+          </div>
+
+          <div class="prescription-header">
+            <div class="overlap-group">
+              <div class="doctor-info">
+                <div class="doctorName">
+                  Dr. <%= Header.DoctorPortionInfo.DoctorInfo.name %>
+                </div>
+                <div class="doctor-additional">
+                  <div class="contact">
+                    Contact: <%= Header.DoctorPortionInfo.DoctorInfo.phone %>
+                  </div>
+                  <div class="degree">
+                    <%= Header.DoctorPortionInfo.DoctorInfo.degrees.join(", ") %>
+                      </div>
+                      <div class=" department">
+                      <%= Header.DoctorPortionInfo.Specialization.name %>
+                  </div>
+                </div>
+              </div>
+              <div class="prescription-info">
+                <div class="prescriptionDate">
+                  Date: <%= new Date(Header.AppointmentPortionInfo.time).toLocaleDateString() %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <img class="rxImg" src="https://www.freeiconspng.com/thumbs/rx-icon/rx-icon-6.png" />
+        </div>
+
+        <div class="leftBar">
+          <div class="history">
+            <div class="leftBarHeadings">Past History: </div>
+            <% if(past_history && past_history.length> 0) { past_history.forEach((history) => { %>
+              <div class="PastHistoryEntry">
+                <%= history %>
+              </div>
+              <% })} %>
+          </div>
+          <div class="Diagnosis">
+            <div class="leftBarHeadings">Diagnosis:</div>
+            <% if(diagnosis && diagnosis.length> 0) { diagnosis.forEach((entry) => { %>
+              <div class="leftBarEntries">
+                <%= entry %>
+              </div>
+              <% })} %>
+
+          </div>
+          <div class="symptom">
+            <div class="leftBarHeadings">Symptoms:</div>
+            <% if(symptoms && symptoms.length> 0) { symptoms.forEach((entry) => { %>
+              <div class="symptomEntry">
+                <%= entry %>
+              </div>
+              <% })} %>
+          </div>
+        </div>
+
+        <div class="presc-patient-info">
+          <div class="patientDiv">
+            <div class="age">Age: <%= Header.PatientPortionInfo.age %>
+            </div>
+            <div class="height">
+              Height: <%= Header.PatientPortionInfo.height.feet %>’ <%= Header.PatientPortionInfo.height.inches %>’’
+            </div>
+            <div class="weight">
+              Weight: <%= Header.PatientPortionInfo.weight %> kg
+            </div>
+            <div class="name">
+              Name: <%= Header.PatientPortionInfo.name %>
+            </div>
+            <div class="blood">
+              Blood: <%= Header.PatientPortionInfo.bloodGroup %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end of main div -->
+</body>
+
+
+</html>
